@@ -1,9 +1,13 @@
 from django.shortcuts import render
 
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from .models import NewUserForm
 from django.contrib.auth import login
 from django.contrib import messages
+
+
+def homepage(request):
+    return render(request=request, template_name='homepage.html')
 
 
 def register_request(request):
