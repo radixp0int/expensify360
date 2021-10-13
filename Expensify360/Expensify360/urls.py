@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from Pages import views as pgViews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', pgViews ),
+    path('register',  '/Pages/apps.py')
 ]
