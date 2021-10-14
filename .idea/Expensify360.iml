@@ -27,9 +27,7 @@
     <option name="TEMPLATE_CONFIGURATION" value="Django" />
     <option name="TEMPLATE_FOLDERS">
       <list>
-        <option value="$MODULE_DIR$/templates" />
-        <option value="$MODULE_DIR$/templates/includes" />
-        <option value="$MODULE_DIR$/templates/Pages" />
+        <option value="$MODULE_DIR$/Expensify360/Expensify360/templates" />
       </list>
     </option>
   </component>
