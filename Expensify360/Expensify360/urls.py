@@ -20,5 +20,5 @@ from Pages import views as pgViews
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', pgViews.homepage, name='home'),
-    path('register',  pgViews.register_request, name='register')
+    path('register/',  pgViews.register_request, name='register')
 ]
