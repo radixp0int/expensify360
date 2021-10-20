@@ -16,9 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from Pages import views as pgViews
+from Expenses import views as ExpenseViews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', pgViews.homepage, name='home'),
-    path('register/',  pgViews.register_request, name='register')
+    path('register/',  pgViews.register_request, name='register'),
+    path('mileage/', ExpenseViews.mileage, name='mileage'),
 ]

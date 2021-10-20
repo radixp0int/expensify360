@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',          # python package for bootstrap
+    'Expenses',              # Expense functions
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
