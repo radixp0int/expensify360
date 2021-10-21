@@ -15,10 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from Pages import views as pgViews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', pgViews.homepage, name='home'),
-    path('register/',  pgViews.register_request, name='register')
+    path('', include('Pages.urls'))  # do this for every app in project, see Pages.urls
 ]
