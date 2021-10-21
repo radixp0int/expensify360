@@ -61,7 +61,7 @@ ROOT_URLCONF = 'Expensify360.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['Expensify360/templates'],
+        'DIRS': ['Expensify360/templates', 'django.contrib.auth'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
