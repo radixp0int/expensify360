@@ -4,4 +4,16 @@
 
 {% block content %}
     <h1> Mileage Entry Form </h1>
+    <form>
+        <div class="form-group">
+            <label for="DistanceInputLabel">Distance Driven</label>
+            <input type="text" class="form-control" id="formDistanceDriven" placeholder="Distance Driven" required>
+        </div>
+        <div class="form-group">
+            <label for="RatePerMileInputLabel">Rate per mile driven</label>
+            <input type="text" class="form-control" id="RatePerMile" placeholder="$0.56" readonly>
+        </div>
+        <button class="btn btn-primary" type="MileageSubmit">Submit Mileage</button>
+    </form>
+
 {% endblock %}
