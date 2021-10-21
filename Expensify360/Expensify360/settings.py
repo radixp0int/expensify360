@@ -133,3 +133,5 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
+
+LOGIN_REDIRECT_URL = 'home'
