@@ -61,7 +61,7 @@ ROOT_URLCONF = 'Expensify360.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['Expensify360/templates'],
+        'DIRS': ['Expensify360/templates', 'django.contrib.auth'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -133,3 +133,5 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
+
+LOGIN_REDIRECT_URL = 'home'
