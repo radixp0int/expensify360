@@ -1,5 +1,5 @@
 from django.shortcuts import render
 
 
-def mileage(request):
-    return render(request, 'mileage.html')
+def expense(request):
+    return render(request, 'expense.html')
