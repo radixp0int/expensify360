@@ -277,8 +277,13 @@
                     <div class="card border-0 shadow">
                         <div class="card-header border-bottom d-flex align-items-center justify-content-between">
                             <h2 class="fs-5 fw-bold mb-0">Organizations</h2>
-                            <a href="#" class="btn btn-sm btn-primary">See all</a>
+                            <a href="#" class="btn btn-sm btn-primary">Create Organization</a>
                         </div>
+                        {% if context|length == 0 %}
+                            <div>
+                                <h3 class="offset-sm-3 fw-bold mb-0">You are not a member of any organizations yet.</h3>
+                            </div>
+                            {% endif %}
                         <div class="card-body">
                             <ul class="list-group list-group-flush list my--3">
                                 {% for grp, member_list in context %}
