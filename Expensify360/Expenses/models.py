@@ -7,21 +7,21 @@ class Request(models.Model):
     submissionDate = models.DateField(auto_now_add=True)
 
     # Mileage Specific
-    miles = models.DecimalFIeld(max_digits=8, decimal_places=1)
-    mileageRate = models.DecimalFIeld(max_digits=5, decimal_places=2)
-    milageTotal = models.DecimalFIeld(max_digits=8, decimal_places=2)
+    miles = models.DecimalField(max_digits=8, decimal_places=1)
+    mileageRate = models.DecimalField(max_digits=5, decimal_places=2)
+    mileageTotal = models.DecimalField(max_digits=8, decimal_places=2)
 
     # Expense Specific
     # TO-DO FIlE UPLOAD HERE
-    expenseCost = models.DecimalFIeld(max_digits=8, decimal_places=2)
-    tax = models.DecimalFIeld(max_digits=8, decimal_places=2)
-    shipping = models.DecimalFIeld(max_digits=8, decimal_places=2)
-    expenseTotal = models.DecimalFIeld(max_digits=8, decimal_places=2)
+    expenseCost = models.DecimalField(max_digits=8, decimal_places=2)
+    tax = models.DecimalField(max_digits=8, decimal_places=2)
+    shipping = models.DecimalField(max_digits=8, decimal_places=2)
+    expenseTotal = models.DecimalField(max_digits=8, decimal_places=2)
 
     # Hours Specific
-    hours = models.DecimalFIeld(max_digits=6, decimal_places=2)
-    hourlyRate = models.DecimalFIeld(max_digits=6, decimal_places=2)
-    hourTotal = models.DecimalFIeld(max_digits=6, decimal_places=2)
+    hours = models.DecimalField(max_digits=6, decimal_places=2)
+    hourlyRate = models.DecimalField(max_digits=6, decimal_places=2)
+    hourTotal = models.DecimalField(max_digits=6, decimal_places=2)
 
     def __str__(self):
         return str(self.userID)
