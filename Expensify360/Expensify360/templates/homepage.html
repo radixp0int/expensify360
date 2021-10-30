@@ -277,7 +277,7 @@
                     <div class="card border-0 shadow">
                         <div class="card-header border-bottom d-flex align-items-center justify-content-between">
                             <h2 class="fs-5 fw-bold mb-0">Organizations</h2>
-                            <a href="#" class="btn btn-sm btn-primary">Create Organization</a>
+                            <a href={% url 'create_org' %} class="btn btn-sm btn-primary">Create Organization</a>
                         </div>
                         {% if context|length == 0 %}
                             <div>
