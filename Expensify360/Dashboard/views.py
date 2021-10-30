@@ -10,7 +10,8 @@ def homepage(request):
     groups = request.user.groups.all()
     for g in groups:
         context[g] = list(Group.objects.get(id=g.id).user_set.all())
-    return render(request=request, template_name='homepage.html', context=context)
+        context[g].remove(request.user)
+    return render(request, 'homepage.html', {'groups': context})
 
 
 @login_required

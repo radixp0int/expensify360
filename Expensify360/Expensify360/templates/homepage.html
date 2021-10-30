@@ -277,16 +277,14 @@
                     <div class="card border-0 shadow">
                         <div class="card-header border-bottom d-flex align-items-center justify-content-between">
                             <h2 class="fs-5 fw-bold mb-0">Organizations</h2>
+                            <!-- ignore the error pycharm throws below -->
                             <a href={% url 'create_org' %} class="btn btn-sm btn-primary">Create Organization</a>
                         </div>
-                        {% if context|length == 0 %}
-                            <div>
-                                <h3 class="offset-sm-3 fw-bold mb-0">You are not a member of any organizations yet.</h3>
-                            </div>
-                            {% endif %}
+
                         <div class="card-body">
                             <ul class="list-group list-group-flush list my--3">
-                                {% for grp, member_list in context %}
+                                {% for grp, member_list in groups.items %}
+                                    <h2 class="fs-5 fw-bold mb-0">{{ grp }}</h2>
                                     <ul class="list-group list-group-flush list my--4">
                                     {% for member in member_list %}
                                         <li class="list-group-item px-0">
@@ -294,18 +292,18 @@
                                                 <div class="col-auto"></div>
                                                 <div class="col-auto ms--2">
                                                     <h4 class="h6 mb-0">
-                                                        <a href="#">{ member.firstname } { member.lastname }</a>
+                                                        <a href="#">{{ member.username }}</a>
                                                     </h4>
                                                     <div class="d-flex align-items-center">
                                                         <div class="bg-success dot rounded-circle me-1"></div>
-                                                            <small>Online</small>
+                                                            <small>Something</small>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col text-end">
                                                 <a href="#" class="btn btn-sm btn-secondary d-inline-flex align-items-center">
                                                 <svg class="icon icon-xxs me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
-                                                Invite
+                                                Manage
                                                 </a>
                                             </div>
                                         </li>
@@ -331,7 +329,7 @@
                                 <div class="col">
                                     <div class="progress-wrapper">
                                         <div class="progress-info">
-                                            <div class="h6 mb-0">Rocket - SaaS Template</div>
+                                            <div class="h6 mb-0">Ending My Sanity</div>
                                             <div class="small fw-bold text-gray-500"><span>75 %</span></div>
                                         </div>
                                         <div class="progress mb-0">
