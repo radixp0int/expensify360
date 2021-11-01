@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
+from Dashboard.models import *
 
 
 @login_required
@@ -19,7 +20,10 @@ def create_org(request):
     if request.method == 'POST':
         form = CreateOrgForm(request.POST)
         if form.is_valid():
-            org = Group(name=form.cleaned_data['Organization_Name'])
+            org = Organization(
+                name=form.cleaned_data['Organization_Name'],
+                manager=request.user.username,
+            )
             org.save()
             request.user.groups.add(org)
         return redirect('org_success')
