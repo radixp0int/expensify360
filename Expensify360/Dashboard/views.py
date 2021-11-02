@@ -1,8 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from Dashboard.models import *
+from django.contrib import messages
 
 
 @login_required
@@ -62,3 +64,26 @@ def org_success(request):
 def proj_success(request):
     return render(request, template_name='proj_success.html')
 
+
+def manage_users(request):
+    if request.method == 'POST':
+        if 'submit' in request.POST:
+            form = UserCreationForm(request.POST or None)
+            if form.is_valid():
+                user = form.save()
+                messages.success(request, f'{user.username} Added Successfully')
+                return render(request, 'user_management.html', {'add': ManageUsers(), 'rem': RemoveUser()})
+        elif 'add-user' in request.POST:
+            return render(request, 'add_user.html', {'add': UserCreationForm(), 'submit_or_cancel': MakeUser()})
+        elif 'remove-user' in request.POST:
+            name = request.POST.get('Username')
+            try:
+                user = User.objects.get(username=request.POST.get('Username'))
+                user.delete()
+                messages.success(request, f'{name} Deleted Successfully')
+            except User.DoesNotExist:
+                messages.error(request, f'{name} Does Not Exist')
+                rem = RemoveUser()
+                return render(request, 'user_management.html', {'add': ManageUsers(), 'rem': rem})
+    rem = RemoveUser()
+    return render(request, 'user_management.html', {'add': ManageUsers(), 'rem': rem})

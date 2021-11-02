@@ -35,6 +35,56 @@ class CreateProjForm(forms.Form):
             HTML("<a href={% url 'home' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
         )
     )
+    
+
+class ManageUsers(forms.Form):
+    
+    # TODO: add user to project
+
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+        FormActions(
+            Submit('add-user', 'Add User', css_class="btn btn-primary btn-me me-2")
+        )
+    )
+
+
+class RemoveUser(forms.Form):
+    Username = forms.CharField()
+
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+        Field('Username', css_class='input-xlarge'),
+
+        FormActions(
+            Submit('remove-user', 'Remove User', css_class="btn btn-primary btn-me me-2"),
+            HTML("<a href={% url 'home' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
+        )
+    )
+
+
+class MakeUser(forms.Form):
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+        Field('Username', css_class='input-xlarge'),
+
+        FormActions(
+            Submit('submit', 'Submit', css_class="btn btn-primary btn-me me-2"),
+            HTML("<a href={% url 'user_management' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
+        )
+    )
+
+
+    
+class ManageGroups(forms.Form):
+    pass
+    # TODO: edit group name
+    # TODO: delete group
+    # TODO: add user
+    # TODO: change manager
 
 
 '''

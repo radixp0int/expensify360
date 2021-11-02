@@ -1,0 +1,14 @@
+{% extends 'header.html' %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="container">
+        <h1 class="h1">Add User</h1>
+        {% crispy add %}
+    </div>
+
+    <div class="container">
+        <h1 class="h1">Remove User</h1>
+        {% crispy rem %}
+    </div>
+    {% endblock %}
