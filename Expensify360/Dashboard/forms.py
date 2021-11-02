@@ -69,7 +69,6 @@ class MakeUser(forms.Form):
     helper = FormHelper()
     helper.form_class = 'bootstrap4'
     helper.layout = Layout(
-        Field('Username', css_class='input-xlarge'),
 
         FormActions(
             Submit('submit', 'Submit', css_class="btn btn-primary btn-me me-2"),
