@@ -20,7 +20,7 @@ def create_org(request):
     if request.method == 'POST':
         form = CreateOrgForm(request.POST)
         if form.is_valid():
-            org = Organization(
+            org = Organization.create(
                 name=form.cleaned_data['Organization_Name'],
                 manager=request.user.username,
             )
@@ -30,5 +30,27 @@ def create_org(request):
     return render(request, 'create_org.html', {'form': CreateOrgForm()})
 
 
+@login_required
+def create_proj(request):
+    if request.method == 'POST':
+        form = CreateProjForm(request.POST)
+        if form.is_valid():
+            org_name = request.GET.get('org-name')
+            prj = Project.create(
+                name=form.cleaned_data['Project_Name'],
+                manager=request.user.username,
+                org_name=org_name
+            )
+            prj.save()
+            request.user.groups.add(prj)
+        return redirect('proj_success')
+    return render(request, 'create-proj.html', {'form': CreateProjForm()})
+
+
 def org_success(request):
     return render(request, template_name='org_success.html')
+
+
+def proj_success(request):
+    return render(request, template_name='proj_success.html')
+

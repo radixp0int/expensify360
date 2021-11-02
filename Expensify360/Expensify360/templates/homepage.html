@@ -277,7 +277,7 @@
                     <div class="card border-0 shadow">
                         <div class="card-header border-bottom d-flex align-items-center justify-content-between">
                             <h2 class="fs-5 fw-bold mb-0">Organizations</h2>
-                            <!-- ignore the error pycharm throws below -->
+                            <!-- ignore the errors pycharm throws below -->
                             <a href={% url 'create_org' %} class="btn btn-sm btn-primary">Create Organization</a>
                         </div>
 
@@ -285,6 +285,21 @@
                             <ul class="list-group list-group-flush list my--3">
                                 {% for grp, member_list in groups.items %}
                                     <h2 class="fs-5 fw-bold mb-0">{{ grp }}</h2>
+                                    <form action={% url 'create_proj' %} name="org" method="get">
+                                    {% csrf_token %}
+                                        <input type="hidden" name="org-name" value="{{ grp }}">
+                                        <input type="submit" value="create project" class="btn btn-primary">
+                                            Create Project
+                                    </form>
+
+                                    <ul class="list-group list-group-flush list my--4">
+                                    {% for k in grp.projects.keys %}
+                                        <li class="list-group-item">
+                                            <h3 class="offset-4">{{ k }}</h3>
+                                        </li>
+                                    {% endfor %}
+                                    </ul>
+
                                     <ul class="list-group list-group-flush list my--4">
                                     <div class="container-fluid">
                                     {% for member in member_list %}

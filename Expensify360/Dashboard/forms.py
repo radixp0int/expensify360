@@ -6,14 +6,29 @@ from crispy_forms.bootstrap import FormActions
 
 # crispy docs: https://django-crispy-forms.readthedocs.io/en/latest/
 
+
 class CreateOrgForm(forms.Form):
     Organization_Name = forms.CharField()
 
-    # Uni-form
     helper = FormHelper()
     helper.form_class = 'bootstrap4'
     helper.layout = Layout(
         Field('Organization_Name', css_class='input-xlarge'),
+
+        FormActions(
+            Submit('create', 'Create', css_class="btn btn-primary btn-me me-2"),
+            HTML("<a href={% url 'home' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
+        )
+    )
+
+
+class CreateProjForm(forms.Form):
+    Project_Name = forms.CharField()
+
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+        Field('Project_Name', css_class='input-xlarge'),
 
         FormActions(
             Submit('create', 'Create', css_class="btn btn-primary btn-me me-2"),
