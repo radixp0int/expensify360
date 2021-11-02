@@ -283,20 +283,23 @@
 
                         <div class="card-body">
                             <ul class="list-group list-group-flush list my--3">
-                                {% for grp, member_list in groups.items %}
+                                {% for grp, member_list in organizations.items %}
                                     <h2 class="fs-5 fw-bold mb-0">{{ grp }}</h2>
                                     <form action={% url 'create_proj' %} name="org" method="get">
                                     {% csrf_token %}
                                         <input type="hidden" name="org-name" value="{{ grp }}">
                                         <input type="submit" value="create project" class="btn btn-primary">
-                                            Create Project
                                     </form>
 
                                     <ul class="list-group list-group-flush list my--4">
-                                    {% for k in grp.projects.keys %}
-                                        <li class="list-group-item">
-                                            <h3 class="offset-4">{{ k }}</h3>
-                                        </li>
+                                    {% for org, prjs in projects.items %}
+                                        {% if org == grp %}
+                                            {% for p in prjs %}
+                                                <li class="list-group-item">
+                                                    <h3 class="offset-4">{{ p }}</h3>
+                                                </li>
+                                            {% endfor %}
+                                        {% endif %}
                                     {% endfor %}
                                     </ul>
 

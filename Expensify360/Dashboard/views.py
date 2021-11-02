@@ -7,12 +7,20 @@ from Dashboard.models import *
 
 @login_required
 def homepage(request):
-    context = {}
-    groups = request.user.groups.all()
-    for g in groups:
-        context[g] = list(Group.objects.get(id=g.id).user_set.all())
-        context[g].remove(request.user)
-    return render(request, 'homepage.html', {'groups': context})
+    org_user_dict = {}
+    prj_org_dict = {}
+    orgs = Organization.objects.filter(_manager=request.user.username)
+    prjs = Project.objects.filter(_manager=request.user.username)
+    for g in orgs:
+        org_user_dict[g.name] = list(Organization.objects.get(id=g.id).user_set.all())
+        org_user_dict[g.name].remove(request.user)
+    for g in prjs:
+        if g.org not in prj_org_dict.keys():
+            prj_org_dict[g.org] = [g.name]
+        else:
+            prj_org_dict[g.org] += [g.name]
+
+    return render(request, 'homepage.html', {'organizations': org_user_dict, 'projects': prj_org_dict})
 
 
 @login_required
