@@ -296,7 +296,7 @@
 
                                     <ul class="list-group list-group-flush list my--4">
                                     {% for org, prjs in projects.items %}
-                                        {% if org == grp %}
+                                        {% if org.name == grp %}
                                             {% for p in prjs %}
                                                 <li class="list-group-item">
                                                     <h3 class="offset-4">{{ p }}</h3>

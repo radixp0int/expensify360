@@ -45,7 +45,7 @@ class ManageUsers(forms.Form):
     helper.form_class = 'bootstrap4'
     helper.layout = Layout(
         FormActions(
-            Submit('add-user', 'Add User', css_class="btn btn-primary btn-me me-2")
+            Submit('add-user', 'Add User', css_class="btn btn-primary btn-me me-2"),
         )
     )
 
@@ -60,19 +60,50 @@ class RemoveUser(forms.Form):
 
         FormActions(
             Submit('remove-user', 'Remove User', css_class="btn btn-primary btn-me me-2"),
-            HTML("<a href={% url 'home' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
         )
     )
 
 
-class MakeUser(forms.Form):
+class SubmitOrCancel(forms.Form):
     helper = FormHelper()
     helper.form_class = 'bootstrap4'
     helper.layout = Layout(
 
         FormActions(
-            Submit('submit', 'Submit', css_class="btn btn-primary btn-me me-2"),
+            Submit('register', 'Submit', css_class="btn btn-primary btn-me me-2"),
             HTML("<a href={% url 'user_management' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
+        )
+    )
+
+
+class AddToGroup(forms.Form):
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+
+        FormActions(
+            Submit('add-group', 'Add To Group', css_class="btn btn-primary btn-me me-2"),
+        )
+    )
+
+
+class UserNameForm(forms.Form):
+    Username = forms.CharField()
+
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+        Field('Username', css_class='input-xlarge')
+    )
+
+
+class SelectGroupForm(forms.Form):
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+
+        FormActions(
+            Submit('select_group', 'Add', css_class="btn btn-primary btn-me me-2"),
         )
     )
 

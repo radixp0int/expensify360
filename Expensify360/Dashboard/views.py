@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -65,25 +67,81 @@ def proj_success(request):
     return render(request, template_name='proj_success.html')
 
 
+@login_required
 def manage_users(request):
     if request.method == 'POST':
-        if 'submit' in request.POST:
-            form = UserCreationForm(request.POST or None)
+        for k, v in request.POST.items():
+            messages.success(request, k)
+            messages.success(request, v)
+
+        if 'register' in request.POST:
+            # then we're registering a user
+            form = UserCreationForm(request.POST)
             if form.is_valid():
-                user = form.save()
+                user = User.objects.create_user(**form.cleaned_data)
                 messages.success(request, f'{user.username} Added Successfully')
-                return render(request, 'user_management.html', {'add': ManageUsers(), 'rem': RemoveUser()})
+                return redirect(to='user_success.html')
+            else:
+                messages.error(request, 'Could Not Add User')
+                return render(request, 'add_user.html',
+                              {'add': UserCreationForm(), 'submit_or_cancel': SubmitOrCancel()})
+
         elif 'add-user' in request.POST:
-            return render(request, 'add_user.html', {'add': UserCreationForm(), 'submit_or_cancel': MakeUser()})
+            # we want the registration form
+            return render(request, 'add_user.html', {'add': UserCreationForm(), 'submit_or_cancel': SubmitOrCancel()})
+
         elif 'remove-user' in request.POST:
             name = request.POST.get('Username')
             try:
                 user = User.objects.get(username=request.POST.get('Username'))
                 user.delete()
                 messages.success(request, f'{name} Deleted Successfully')
+                return render(
+                    request,
+                    'user_management.html',
+                    {'add': ManageUsers(), 'rem': RemoveUser(), 'add_to_group': AddToGroup()}
+                )
             except User.DoesNotExist:
                 messages.error(request, f'{name} Does Not Exist')
-                rem = RemoveUser()
-                return render(request, 'user_management.html', {'add': ManageUsers(), 'rem': rem})
-    rem = RemoveUser()
-    return render(request, 'user_management.html', {'add': ManageUsers(), 'rem': rem})
+
+        elif 'add-group' in request.POST:
+            # take me to group add form
+            return render(
+                request,
+                'add_to_group.html',
+                {
+                    'orgs': list(Organization.objects.filter(manager=request.user)),
+                    'user_name': UserNameForm(),
+                    'done_or_cancel': SubmitOrCancel(),
+                    'select': SelectGroupForm()
+                }
+            )
+
+        else:
+            form = SelectGroupForm(request.POST)
+            if form.is_valid():
+                u = User.objects.get(username=request.POST.get('username'))
+                org = Organization.objects.get(name=request.POST.get('org-name'))
+                u.groups.add(org)
+                messages.success(request, f'{u.username} Added To {org}')
+                return render(
+                    request,
+                    'add_to_group.html',
+                    {
+                        'orgs': list(Organization.objects.filter(manager=request.user)),
+                        'user_name': UserNameForm(),
+                        'done_or_cancel': SubmitOrCancel(),
+                        'select': SelectGroupForm()
+                    }
+                )
+    # otherwise just render the options
+    return render(
+        request,
+        'user_management.html',
+        {'add': ManageUsers(), 'rem': RemoveUser(), 'add_to_group': AddToGroup()}
+    )
+
+
+def user_success(request):
+    return render(request, template_name='user_success.html')
+
