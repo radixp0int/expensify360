@@ -11,10 +11,10 @@ from django.contrib import messages
 def homepage(request):
     org_user_dict = {}
     prj_org_dict = {}
-    orgs = Organization.objects.filter(_manager=request.user.username)
-    prjs = Project.objects.filter(_manager=request.user.username)
+    orgs = Organization.objects.filter(manager=request.user)
+    prjs = Project.objects.filter(manager=request.user)
     for g in orgs:
-        org_user_dict[g.name] = list(Organization.objects.get(id=g.id).user_set.all())
+        org_user_dict[g.name] = list(Organization.objects.get(name=g.name).user_set.all())
         org_user_dict[g.name].remove(request.user)
     for g in prjs:
         if g.org not in prj_org_dict.keys():
@@ -32,7 +32,7 @@ def create_org(request):
         if form.is_valid():
             org = Organization.create(
                 name=form.cleaned_data['Organization_Name'],
-                manager=request.user.username,
+                manager=request.user,
             )
             org.save()
             request.user.groups.add(org)
@@ -45,11 +45,11 @@ def create_proj(request):
     if request.method == 'POST':
         form = CreateProjForm(request.POST)
         if form.is_valid():
-            org_name = request.GET.get('org-name')
+            org = Organization.objects.get(name=request.GET.get('org-name'))
             prj = Project.create(
                 name=form.cleaned_data['Project_Name'],
-                manager=request.user.username,
-                org_name=org_name
+                manager=request.user,
+                org=org
             )
             prj.save()
             request.user.groups.add(prj)

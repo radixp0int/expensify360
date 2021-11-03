@@ -4,7 +4,7 @@ from django.db import models as m
 
 class Organization(models.Group):
 
-    _manager = m.CharField(max_length=30, null=True)
+    manager = m.ForeignKey(models.User, on_delete=m.CASCADE)
 
     @classmethod
     def create(cls, name=None, manager=None):
@@ -13,19 +13,11 @@ class Organization(models.Group):
         org.manager = manager
         return org
 
-    @property
-    def manager(self):
-        return self._manager
-
-    @manager.setter
-    def manager(self, username):
-        self._manager = username
-
 
 class Project(models.Group):
 
-    _manager = m.CharField(max_length=30, null=True)
-    _org = m.CharField(max_length=30, null=True)
+    manager = m.ForeignKey(models.User, on_delete=m.CASCADE)
+    org = m.ForeignKey(Organization, on_delete=m.CASCADE)
     group_ptr_id = m.OneToOneField(
         auto_created=True,
         on_delete=m.deletion.CASCADE,
@@ -36,25 +28,9 @@ class Project(models.Group):
     )
 
     @classmethod
-    def create(cls, name=None, manager=None, org_name=None):
-        prj = cls(name=name, manager=manager, _org=org_name)
-        prj.org = org_name
+    def create(cls, name=None, manager=None, org=None):
+        prj = cls(name=name, manager=manager, org=org)
+        prj.org = org
         prj.name = name
-        prj.manager = manager
+        prj.manager = manager   # this is expected to be the manager object itself
         return prj
-
-    @property
-    def manager(self):
-        return self._manager
-
-    @manager.setter
-    def manager(self, username):
-        self._manager = username
-
-    @property
-    def org(self):
-        return self._org
-
-    @org.setter
-    def org(self, name):
-        self._org = name
