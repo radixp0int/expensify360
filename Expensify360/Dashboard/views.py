@@ -72,9 +72,6 @@ def manage_users(request):
     if request.method == 'POST':
 
         if 'register' in request.POST:
-            for k, v in request.POST.items():
-                messages.success(request, k)
-                messages.success(request, v)
             # then we're registering a user
             form = UserCreationForm(request.POST)
             if form.is_valid():
