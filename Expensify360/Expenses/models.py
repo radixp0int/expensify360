@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Request(models.Model):
     # General
     userID = models.CharField(max_length=151)
