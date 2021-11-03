@@ -3,6 +3,7 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Field, HTML
 from crispy_forms.bootstrap import FormActions
+from django.contrib.auth.forms import UserCreationForm
 
 # crispy docs: https://django-crispy-forms.readthedocs.io/en/latest/
 
@@ -70,7 +71,7 @@ class SubmitOrCancel(forms.Form):
     helper.layout = Layout(
 
         FormActions(
-            Submit('register', 'Submit', css_class="btn btn-primary btn-me me-2"),
+            Submit('register', 'Create Account', css_class="btn btn-primary btn-me me-2"),
             HTML("<a href={% url 'user_management' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
         )
     )

@@ -70,25 +70,25 @@ def proj_success(request):
 @login_required
 def manage_users(request):
     if request.method == 'POST':
-        for k, v in request.POST.items():
-            messages.success(request, k)
-            messages.success(request, v)
 
         if 'register' in request.POST:
+            for k, v in request.POST.items():
+                messages.success(request, k)
+                messages.success(request, v)
             # then we're registering a user
             form = UserCreationForm(request.POST)
             if form.is_valid():
-                user = User.objects.create_user(**form.cleaned_data)
+                user = form.save()
                 messages.success(request, f'{user.username} Added Successfully')
-                return redirect(to='user_success.html')
+                return redirect(to='user_success')
             else:
                 messages.error(request, 'Could Not Add User')
                 return render(request, 'add_user.html',
-                              {'add': UserCreationForm(), 'submit_or_cancel': SubmitOrCancel()})
+                              {'add': UserCreationForm(), 'done_or_cancel': SubmitOrCancel()})
 
         elif 'add-user' in request.POST:
             # we want the registration form
-            return render(request, 'add_user.html', {'add': UserCreationForm(), 'submit_or_cancel': SubmitOrCancel()})
+            return render(request, 'add_user.html', {'add': UserCreationForm(), 'done_or_cancel': SubmitOrCancel()})
 
         elif 'remove-user' in request.POST:
             name = request.POST.get('Username')
