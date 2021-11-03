@@ -2,19 +2,25 @@ from django import forms
 from .models import Request
 
 
+class GeneralForm(forms.ModelForm):
+    class Meta:
+        model = Request
+        fields = ('expenseDate',)
+
+
 class MileageForm(forms.ModelForm):
     class Meta:
         model = Request
-        fields = ('expenseDate', 'miles', 'mileageRate', 'mileageTotal')
+        fields = ('miles', 'mileageRate', 'mileageTotal')
 
 
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Request
-        fields = ('expenseDate', 'expenseCost', 'tax', 'shipping', 'expenseTotal')
+        fields = ('expenseCost', 'tax', 'shipping', 'expenseTotal')
 
 
 class HoursForm(forms.ModelForm):
     class Meta:
         model = Request
-        fields = ('expenseDate', 'hours', 'hourlyRate', 'hourTotal')
+        fields = ('hours', 'hourlyRate', 'hourTotal')

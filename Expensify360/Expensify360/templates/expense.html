@@ -7,22 +7,40 @@
 
     <div id="alert"></div>
 
-    <form id="mileage-form">
-        {% csrf_token %}
-        {{ mileageForm|crispy }}
-    </form>
+    <div class="container float-left">
 
-    <form id="expense-form">
-        {% csrf_token %}
-        {{ expenseForm|crispy }}
-    </form>
+        <script> function toggleForm(formID) {
+            const form = document.getElementById(formID);
+            form.hidden = !form.hidden;
+        }
+        </script>
 
-    <form id="hours-form">
-        {% csrf_token %}
-        {{ hoursForm|crispy }}
-    </form>
+        <button class="btn btn-outline-primary" type="button" ID="MileageToggle" onclick='toggleForm("mileage-form")'>Mileage</button>
+        <button class="btn btn-outline-primary" type="button" ID="MileageToggle" onclick='toggleForm("expense-form")'>Expense</button>
+        <button class="btn btn-outline-primary" type="button" ID="MileageToggle" onclick='toggleForm("hours-form")'>Hours</button>
 
-    <div>
+        <form id="general-form">
+            {% csrf_token %}
+            {{ generalForm|crispy }}
+        </form>
+
+        <form id="mileage-form">
+            {% csrf_token %}
+            {{ mileageForm|crispy }}
+        </form>
+
+        <form id="expense-form">
+            {% csrf_token %}
+            {{ expenseForm|crispy }}
+        </form>
+
+        <form id="hours-form">
+            {% csrf_token %}
+            {{ hoursForm|crispy }}
+        </form>
+
         <button class="btn btn-primary" type="button">Submit Expense</button>
+        <button class="btn btn-secondary" type="button">Clear Form</button>
     </div>
+
 {% endblock %}
