@@ -293,7 +293,7 @@
                                         <input type="hidden" name="org-name" value="{{ grp }}">
                                         <input type="submit" value="create project" class="btn btn-primary">
                                     </form>
-
+                                    <!-- TODO: organize users by project, put unass. under 'unassigned' -->
                                     <ul class="list-group list-group-flush list my--4">
                                     {% for org, prjs in projects.items %}
                                         {% if org.name == grp %}

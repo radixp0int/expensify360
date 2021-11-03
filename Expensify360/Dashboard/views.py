@@ -69,6 +69,8 @@ def proj_success(request):
 
 @login_required
 def manage_users(request):
+    # TODO: add back button across this ui
+    # TODO: success message for delete user
     if request.method == 'POST':
 
         if 'register' in request.POST:
