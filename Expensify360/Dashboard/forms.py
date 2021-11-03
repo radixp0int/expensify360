@@ -77,7 +77,6 @@ class MakeUser(forms.Form):
     )
 
 
-    
 class ManageGroups(forms.Form):
     pass
     # TODO: edit group name
