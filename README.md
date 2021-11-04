@@ -6,7 +6,7 @@
 
 Expensify360 is a business expense tool created by:
 
-- ✨Abbi✨
+- ✨Abbi ✨
 - ✨Christian ✨
 - ✨Dominic ✨
 - ✨Eduardo ✨
@@ -61,7 +61,8 @@ Open your favorite Terminal and run these commands.
 Run Django:
 
 ```sh
-something
+cd Expensify360/
+python manage.py runserver
 ```
 
 ## License

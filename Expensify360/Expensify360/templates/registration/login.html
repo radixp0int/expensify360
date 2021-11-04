@@ -4,17 +4,16 @@
 
 {% block content %}
 
-<!--Login-->
-<div class="container py-5">
-	<h1>Login</h1>
+    <!--Login-->
+    <div class="container py-5">
+        <h1>Login</h1>
 
-	<form method="POST">
-		{% csrf_token %}
-		{{ form |crispy }}
-		<input type="submit" value="Login">
-	</form>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form |crispy }}
+            <input class="btn btn-primary" type="submit" value="Login">
+            <a class="btn btn-link" href="{% url 'signup' %}" role="button">Register</a>
+        </form>
 
-    <a href="{% url 'signup' %}" >Register</a>
-
-</div>
+    </div>
 {% endblock %}
