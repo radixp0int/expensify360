@@ -2,7 +2,8 @@ import re
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from Dashboard.models import *
@@ -13,6 +14,7 @@ from django.contrib import messages
 def homepage(request):
     org_user_dict = {}
     prj_org_dict = {}
+    # TODO: make sure users show up in every org/prj they belong to
     orgs = Organization.objects.filter(manager=request.user)
     prjs = Project.objects.filter(manager=request.user)
     for g in orgs:
@@ -36,9 +38,13 @@ def create_org(request):
                 name=form.cleaned_data['Organization_Name'],
                 manager=request.user,
             )
-            org.save()
-            request.user.groups.add(org)
-        return redirect('org_success')
+            try:
+                org.save()
+                request.user.groups.add(org)
+                messages.success(request, f'{org} Created')
+            except IntegrityError:
+                messages.error(request, f'{org} already exists')
+    # either way render an empty form
     return render(request, 'create_org.html', {'form': CreateOrgForm()})
 
 
@@ -53,18 +59,14 @@ def create_proj(request):
                 manager=request.user,
                 org=org
             )
-            prj.save()
-            request.user.groups.add(prj)
-        return redirect('proj_success')
+            try:
+                prj.save()
+                request.user.groups.add(prj)
+                messages.success(request, f'{prj} Project Created in {org}')
+            except IntegrityError:
+                messages.error(request, f'{prj} already exists')
+    # either way render an empty form
     return render(request, 'create-proj.html', {'form': CreateProjForm()})
-
-
-def org_success(request):
-    return render(request, template_name='org_success.html')
-
-
-def proj_success(request):
-    return render(request, template_name='proj_success.html')
 
 
 @login_required
@@ -78,12 +80,11 @@ def manage_users(request):
             form = UserCreationForm(request.POST)
             if form.is_valid():
                 user = form.save()
-                messages.success(request, f'{user.username} Added Successfully')
-                return redirect(to='user_success')
+                messages.success(request, f'{user.username} Added')
             else:
                 messages.error(request, 'Could Not Add User')
-                return render(request, 'add_user.html',
-                              {'add': UserCreationForm(), 'done_or_cancel': SubmitOrCancel()})
+            # either way render an empty form
+            return render(request, 'add_user.html', {'add': UserCreationForm(), 'done_or_cancel': SubmitOrCancel()})
 
         elif 'add-user' in request.POST:
             # we want the registration form
@@ -116,13 +117,16 @@ def manage_users(request):
                 }
             )
 
-        else:
+        else:   # adding user to group
             form = SelectGroupForm(request.POST)
             if form.is_valid():
-                u = User.objects.get(username=request.POST.get('username'))
-                org = Organization.objects.get(name=request.POST.get('org-name'))
-                u.groups.add(org)
-                messages.success(request, f'{u.username} Added To {org}')
+                try:
+                    u = User.objects.get(username=request.POST.get('username'))
+                    org = Organization.objects.get(name=request.POST.get('org-name'))
+                    u.groups.add(org)
+                    messages.success(request, f'{u.username} Added To {org}')
+                except User.DoesNotExist:
+                    messages.error(request, 'User Does Not Exist')
                 return render(
                     request,
                     'add_to_group.html',
@@ -140,7 +144,4 @@ def manage_users(request):
         {'add': ManageUsers(), 'rem': RemoveUser(), 'add_to_group': AddToGroup()}
     )
 
-
-def user_success(request):
-    return render(request, template_name='user_success.html')
 
