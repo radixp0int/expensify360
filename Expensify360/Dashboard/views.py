@@ -1,4 +1,5 @@
 import re
+from contextlib import suppress
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -12,21 +13,39 @@ from django.contrib import messages
 
 @login_required
 def homepage(request):
-    org_user_dict = {}
-    prj_org_dict = {}
-    # TODO: make sure users show up in every org/prj they belong to
-    orgs = Organization.objects.filter(manager=request.user)
-    prjs = Project.objects.filter(manager=request.user)
-    for g in orgs:
-        org_user_dict[g.name] = list(Organization.objects.get(name=g.name).user_set.all())
-        org_user_dict[g.name].remove(request.user)
-    for g in prjs:
-        if g.org not in prj_org_dict.keys():
-            prj_org_dict[g.org] = [g.name]
-        else:
-            prj_org_dict[g.org] += [g.name]
+    context = {'organizations': []}
 
-    return render(request, 'homepage.html', {'organizations': org_user_dict, 'projects': prj_org_dict})
+    orgs = Organization.objects.filter(manager=request.user).all()
+    prjs = Project.objects.filter(manager=request.user).all()
+
+    for g in orgs:
+        if g.name == 'Unassigned':
+            continue
+        i = Org()
+        i.name = g.name
+        i.proj_list = []
+        for proj in prjs:
+            if proj.org == g:
+                p = Org()
+                p.name = proj.name
+                p.users = [u for u in Project.objects.get(name=p.name).user_set.all()]
+                messages.success(request, f'{p.users}')
+                i.proj_list.append(p)
+        context['organizations'].append(i)
+
+        all_users = g.user_set.all()
+        assigned = [u for x in i.proj_list for u in users(x)]
+        unassigned = set(all_users) - set(assigned)
+        if len(unassigned) != 0:
+            g = Org()
+            g.name = 'Unassigned'
+            g.users = list(unassigned)
+            i.proj_list.append(g)
+
+    return render(request, 'homepage.html', context)
+
+
+def users(x): return x.users
 
 
 @login_required
@@ -71,8 +90,8 @@ def create_proj(request):
 
 @login_required
 def manage_users(request):
-    # TODO: add back button across this ui
-    # TODO: success message for delete user
+    # TODO: add remove user from group option
+    # TODO add user to project option
     if request.method == 'POST':
 
         if 'register' in request.POST:
@@ -117,7 +136,7 @@ def manage_users(request):
                 }
             )
 
-        else:   # adding user to group
+        else:  # adding user to group
             form = SelectGroupForm(request.POST)
             if form.is_valid():
                 try:
@@ -145,3 +164,6 @@ def manage_users(request):
     )
 
 
+class Org(object):
+    # magic class
+    pass

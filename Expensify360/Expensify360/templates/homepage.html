@@ -12,6 +12,7 @@
 {% block content %}
 
     <div class="py-4">
+    <!--
         <div class="dropdown">
             <button class="btn btn-gray-800 d-inline-flex align-items-center me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
@@ -158,6 +159,7 @@
         </div>
     </div>
     <div class="row">
+
         <div class="col-12 col-xl-8">
             <div class="row">
                 <div class="col-12 mb-4">
@@ -273,6 +275,7 @@
                         </div>
                     </div>
                 </div>
+            -->
                 <div class="col-12 col-xxl-6 mb-4">
                     <div class="card border-0 shadow">
                         <div class="card-header border-bottom d-flex align-items-center justify-content-between">
@@ -286,45 +289,36 @@
 
                         <div class="card-body">
                             <ul class="list-group list-group-flush list my--3">
-                                {% for grp, member_list in organizations.items %}
-                                    <h2 class="fs-5 fw-bold mb-0">{{ grp }}</h2>
+                                {% for org in organizations %}
+                                    <h2 class="fs-5 fw-bold mb-0">{{ org.name }}</h2>
                                     <form action={% url 'create_proj' %} name="org" method="get">
                                     {% csrf_token %}
-                                        <input type="hidden" name="org-name" value="{{ grp }}">
+                                        <input type="hidden" name="org-name" value="{{ org.name }}">
                                         <input type="submit" value="create project" class="btn btn-primary">
                                     </form>
-                                    <!-- TODO: organize users by project, put unass. under 'unassigned' -->
                                     <ul class="list-group list-group-flush list my--4">
-                                    {% for org, prjs in projects.items %}
-                                        {% if org.name == grp %}
-                                            {% for p in prjs %}
-                                                <li class="list-group-item">
-                                                    <h3 class="offset-4">{{ p }}</h3>
-                                                </li>
-                                            {% endfor %}
-                                        {% endif %}
-                                    {% endfor %}
-                                    </ul>
-
-                                    <ul class="list-group list-group-flush list my--4">
-                                    <div class="container-fluid">
-                                    {% for member in member_list %}
-                                        <li class="list-group-item px-0">
-                                                <div class="col-auto"></div>
-                                                <div class="col-auto ms--2">
-                                                    <h4 class="h6 mb-0">
-                                                        <a href="#">{{ member.username }}</a>
-                                                    </h4>
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="bg-success dot rounded-circle me-1"></div>
-                                                            <small>Something</small>
-                                                    </div>
+                                        {% for prj in org.proj_list %}
+                                            <li class="list-group item my--4">
+                                                <div class="container-fluid">
+                                                    <h4 class="h4 mb-0">{{ prj.name }}</h4>
                                                 </div>
-                                        </li>
-                                    {% endfor %}
-                                    </div>
-                                    </ul>
+                                                    {% for member in prj.users %}
+                                                        <li class="list-group-item px-0">
+                                                            <div class="col-auto"></div>
+                                                                <div class="col-auto ms--2">
+                                                                    <h4 class="h6 mb-0">
+                                                                        {{ member }}
+                                                                    </h4>
+                                                                <div class="d-flex align-items-center">
+                                                            <div class="bg-success dot rounded-circle me-1"></div>
+                                                                    <small>placeholder</small>
+                                                                </div>
+                                                                </div>
+                                                        </li>
+                                                    {% endfor %}
+                                        {% endfor %}
                                 {% endfor %}
+                                </ul>
                             </ul>
                         </div>
                     </div>
