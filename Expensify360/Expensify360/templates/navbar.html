@@ -17,18 +17,21 @@
   <div class="collapse navbar-collapse" id="collapsibleNavbar">
     <ul class="navbar-nav">
         {% if user.is_authenticated %}
-        <li class="nav-item">
-        <a class="nav-link" href={% url 'logout' %}>Logout</a>
-        </li>
+            <li class="nav-item">
+                <a class="btn btn-primary" href="{{ request.META.HTTP_REFERER }}">Go Back</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href={% url 'logout' %}>Logout</a>
+            </li>
         {% else %}
-        <li class="nav-item">
-            <a class="nav-link" href={% url 'login' %}>Login</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href={% url 'signup' %}>Register</a>
-        </li>
+            <li class="nav-item">
+                <a class="nav-link" href={% url 'login' %}>Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href={% url 'signup' %}>Register</a>
+            </li>
         {% endif %}
-        <!--add more links here-->
+            <!--add more links here-->
     </ul>
   </div>
 </nav>
