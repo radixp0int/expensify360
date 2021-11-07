@@ -57,11 +57,12 @@ class RemoveUser(forms.Form):
     helper = FormHelper()
     helper.form_class = 'bootstrap4'
     helper.layout = Layout(
-        Field('Username', css_class='input-xlarge'),
 
         FormActions(
             Submit('remove-user', 'Remove User', css_class="btn btn-primary btn-me me-2"),
-        )
+        ),
+
+        Field('Username', css_class='input-xlarge')
     )
 
 
@@ -83,7 +84,18 @@ class AddToGroup(forms.Form):
     helper.layout = Layout(
 
         FormActions(
-            Submit('add-group', 'Add To Group', css_class="btn btn-primary btn-me me-2"),
+            Submit('add-group', 'Add User To Organization', css_class="btn btn-primary btn-me me-2"),
+        )
+    )
+
+
+class AddToProject(forms.Form):
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+
+        FormActions(
+            Submit('add-project', 'Add User To Project', css_class="btn btn-primary btn-me me-2"),
         )
     )
 

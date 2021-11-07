@@ -29,12 +29,11 @@ def homepage(request):
                 p = Org()
                 p.name = proj.name
                 p.users = [u for u in Project.objects.get(name=p.name).user_set.all()]
-                messages.success(request, f'{p.users}')
                 i.proj_list.append(p)
         context['organizations'].append(i)
 
         all_users = g.user_set.all()
-        assigned = [u for x in i.proj_list for u in users(x)]
+        assigned = [u for x in i.proj_list for u in x.users]
         unassigned = set(all_users) - set(assigned)
         if len(unassigned) != 0:
             g = Org()
@@ -43,9 +42,6 @@ def homepage(request):
             i.proj_list.append(g)
 
     return render(request, 'homepage.html', context)
-
-
-def users(x): return x.users
 
 
 @login_required
@@ -93,7 +89,6 @@ def manage_users(request):
     # TODO: add remove user from group option
     # TODO add user to project option
     if request.method == 'POST':
-
         if 'register' in request.POST:
             # then we're registering a user
             form = UserCreationForm(request.POST)
@@ -136,16 +131,20 @@ def manage_users(request):
                 }
             )
 
-        else:  # adding user to group
+        elif 'org-name' in request.POST:
+            # adding user to group
             form = SelectGroupForm(request.POST)
             if form.is_valid():
                 try:
-                    u = User.objects.get(username=request.POST.get('username'))
+                    user = User.objects.get(username=request.POST.get('username'))
                     org = Organization.objects.get(name=request.POST.get('org-name'))
-                    u.groups.add(org)
-                    messages.success(request, f'{u.username} Added To {org}')
+                    user.groups.add(org)
+                    messages.success(request, f'{user.username} Added To {org}')
                 except User.DoesNotExist:
-                    messages.error(request, 'User Does Not Exist')
+                    bad_name = request.POST.get('username')
+                    if len(bad_name) == 0:
+                        messages.error(request, 'Please Enter a Username')
+                    messages.error(request, f"User '{bad_name}' Does Not Exist")
                 return render(
                     request,
                     'add_to_group.html',
@@ -156,11 +155,55 @@ def manage_users(request):
                         'select': SelectGroupForm()
                     }
                 )
+
+        elif 'add-project' in request.POST:
+            # take me to project add form
+            return render(
+                request,
+                'add_to_project.html',
+                {
+                    'orgs': list(Project.objects.filter(manager=request.user)),
+                    'user_name': UserNameForm(),
+                    'done_or_cancel': SubmitOrCancel(),
+                    'select': SelectGroupForm()
+                }
+            )
+
+        elif 'project-name' in request.POST:
+            # add user to project
+            form = SelectGroupForm(request)
+            if form.is_valid():
+                try:
+                    user = User.objects.get(username=request.POST.get('username'))
+                    org = Project.objects.get(name=request.POST.get('project-name'))
+                    user.groups.add(org)
+                    messages.success(request, f'{user.username} Added To {org}')
+                except User.DoesNotExist:
+                    bad_name = request.POST.get('username')
+                    if len(bad_name) == 0:
+                        messages.error(request, 'Please Enter a Username')
+                    messages.error(request, f"User '{bad_name}' Does Not Exist")
+                return render(
+                    request,
+                    'add_to_project.html',
+                    {
+                        'orgs': list(Project.objects.filter(manager=request.user)),
+                        'user_name': UserNameForm(),
+                        'done_or_cancel': SubmitOrCancel(),
+                        'select': SelectGroupForm()
+                    }
+                )
+
     # otherwise just render the options
     return render(
         request,
         'user_management.html',
-        {'add': ManageUsers(), 'rem': RemoveUser(), 'add_to_group': AddToGroup()}
+        context={
+            'add': ManageUsers(),
+            'rem': RemoveUser(),
+            'add_to_group': AddToGroup(),
+            'add_to_project': AddToProject()
+        }
     )
 
 

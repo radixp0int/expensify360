@@ -2,18 +2,35 @@
 
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="container">
-        <h1 class="h1">Add User</h1>
-        {% crispy add %}
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header border-bottom d-flex align-items-center">
+                {% crispy add %}
+            </div>
+        </div>
     </div>
 
-    <div class="container">
-        <h1 class="h1">Remove User</h1>
-        {% crispy rem %}
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header border-bottom d-flex align-items-center">
+                {% crispy add_to_group %}
+            </div>
+        </div>
     </div>
 
-    <div class="container">
-        <h1 class="h1">Add User To Group</h1>
-        {% crispy add_to_group %}
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header border-bottom d-flex align-items-center">
+                {% crispy add_to_project %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header border-bottom d-flex align-items-center">
+                {% crispy rem %}
+            </div>
+        </div>
     </div>
     {% endblock %}
