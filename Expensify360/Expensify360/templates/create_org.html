@@ -1,0 +1,9 @@
+{% extends 'header.html' %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="container">
+        <h1 class="h1">Create New Organization</h1>
+        {% crispy form %}
+    </div>
+    {% endblock %}

@@ -21,4 +21,6 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('', include('Pages.urls')),  # do this for every app in project, see Pages.urls
     path('', include('Expenses.urls')),
+    path('', include('Dashboard.urls')),  # do this for every app in project, see Pages.urls
+    path('', include('Pages.urls'))
 ]
