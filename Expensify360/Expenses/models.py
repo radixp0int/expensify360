@@ -6,6 +6,8 @@ class Request(models.Model):
     userID = models.CharField(max_length=151)
     expenseDate = models.DateField()
     submissionDate = models.DateField(auto_now_add=True)
+    organization = models.CharField(max_length=151)
+    project = models.CharField(max_length=151)
 
     # Mileage Specific
     miles = models.DecimalField(max_digits=8, decimal_places=1)

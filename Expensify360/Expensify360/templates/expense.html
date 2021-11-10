@@ -28,28 +28,13 @@
         <button class="btn btn-outline-primary" type="button" ID="ExpenseToggle" onclick='toggleForm("expense-form", "ExpenseToggle")'>Expense</button>
         <button class="btn btn-outline-primary" type="button" ID="HourToggle" onclick='toggleForm("hours-form", "HourToggle")'>Hours</button>
 
-        <form id="general-form">
+        <form method="post" id="mileage-form">
             {% csrf_token %}
-            {{ generalForm|crispy }}
-        </form>
-
-        <form id="mileage-form" hidden>
-            {% csrf_token %}
-            {{ mileageForm|crispy }}
-        </form>
-
-        <form id="expense-form" hidden>
-            {% csrf_token %}
-            {{ expenseForm|crispy }}
-        </form>
-
-        <form id="hours-form" hidden>
-            {% csrf_token %}
-            {{ hoursForm|crispy }}
+            {{ form|crispy }}
+            <input type="submit" value="Submit">
         </form>
 
         <button class="btn btn-primary" type="button">Submit Expense</button>
-        <button class="btn btn-secondary" type="button">Clear Form</button>
     </div>
 
 {% endblock %}

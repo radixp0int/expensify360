@@ -1,19 +1,29 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from .forms import *
+
+import datetime
 
 
 # @login_required
 def expense(request):
-    generalForm = GeneralForm(request.POST or None)
-    mileageForm = MileageForm(request.POST or None)
-    expenseForm = ExpenseForm(request.POST or None)
-    hoursForm = HoursForm(request.POST or None)
+    current_user = request.user
+    today = datetime.date.today()
+
+    if request.method == 'POST':
+        form = mileageEntryForm(request.POST)
+        if form.is_valid():
+            userID = form.cleaned_data['userID']
+            expenseDate = form.cleaned_data['expenseDate']
+
+            print(userID, expenseDate)
+    else:
+        form = mileageEntryForm(initial={'userID': current_user,
+                                     'expenseDate': today})
 
     context = {
-        'generalForm': generalForm,
-        'mileageForm': mileageForm,
-        'expenseForm': expenseForm,
-        'hoursForm': hoursForm,
+        'form': form,
     }
+
     return render(request, 'expense.html', context)
