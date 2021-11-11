@@ -10,5 +10,3 @@ class mileageEntryForm(forms.Form):
     miles = forms.DecimalField(label='Miles Driven')
     mileageRate = forms.DecimalField(label='Rate Per Mile')
     mileageTotal = forms.DecimalField(label='Total Cost')
-
-
