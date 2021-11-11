@@ -10,8 +10,12 @@ import datetime
 
 # @login_required
 def expense(request):
+    # Grab the current user ID to pre-populate the form
     current_user = request.user
+
+    # Get current date and time and convert it to USA format
     today = datetime.date.today()
+    today = today.strftime("%m/%d/%Y")
 
     if request.method == 'POST':
         form = mileageEntryForm(request.POST)
@@ -36,6 +40,7 @@ def expense(request):
             mileageInfo.save()
             print(userID, expenseDate)
 
+    # Load a clean copy of the mileage entry form
     form = mileageEntryForm(initial={'userID': current_user,
                                      'expenseDate': today})
 
