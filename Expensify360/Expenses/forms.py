@@ -23,7 +23,7 @@ class expenseEntryForm(forms.Form):
     submissionDate = forms.DateField(label='Submission Date')
     organization = forms.CharField(label='Organization')
     project = forms.CharField(label='Project')
-    filePath = forms.FileField(label='Receipt Upload')
+    file = forms.FileField(label='Receipt Upload')
     expenseCost = forms.DecimalField(label='Item Cost')
     tax = forms.DecimalField(label='Tax')
     shipping = forms.DecimalField(label='Shipping Cost')
