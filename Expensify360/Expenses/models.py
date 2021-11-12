@@ -16,7 +16,7 @@ class Expense(models.Model):
     mileageTotal = models.DecimalField(max_digits=8, decimal_places=2, null=True, default=None)
 
     # Expense Specific
-    expensePhoto = models.FileField(upload_to='ExpenseFiles', null=True, default=None)
+    expensePhoto = models.FileField(null=True, default=None)
     expenseCost = models.DecimalField(max_digits=8, decimal_places=2, null=True, default=None)
     tax = models.DecimalField(max_digits=8, decimal_places=2, null=True, default=None)
     shipping = models.DecimalField(max_digits=8, decimal_places=2, null=True, default=None)
