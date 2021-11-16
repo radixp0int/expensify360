@@ -8,8 +8,7 @@
 
     <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
 
-    <div id="alert">
-
+    <div class="forms" id="alert">
         <form method="post" id="expense-form" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form|crispy }}
