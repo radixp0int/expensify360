@@ -140,14 +140,6 @@ class SelectManagerForm(forms.Form):
     )
 
 
-class ManageGroups(forms.Form):
-    pass
-    # TODO: edit group name
-    # TODO: delete group
-
-
-
-
 '''
 crispy gist, here for reference. from https://gist.github.com/maraujop/1838193
 

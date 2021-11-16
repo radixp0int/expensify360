@@ -1,49 +1,49 @@
-import re
-from contextlib import suppress
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from Dashboard.models import *
 from django.contrib import messages
-from django import forms
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Field, HTML
-from crispy_forms.bootstrap import FormActions
 
 
 @login_required
 def homepage(request):
+
+    # get the set of all organizations and projects managed by this user.
     context = {'organizations': []}
 
-    orgs = Organization.objects.filter(manager=request.user).all()
-    prjs = Project.objects.filter(manager=request.user).all()
+    user_organizations = Organization.objects.filter(manager=request.user).all()
+    # all projects where user is manager or second_manager
+    user_projects = set(
+        Project.objects.filter(manager=request.user).all()
+    ).union(
+        set(Project.objects.filter(second_manager__username=request.user.username))
+    )
 
-    for g in orgs:
-        if g.name == 'Unassigned':
-            continue
-        i = Org()
-        i.name = g.name
-        i.proj_list = []
-        for proj in prjs:
-            if proj.org == g:
-                p = Org()
-                p.name = proj.name
-                p.users = [u for u in Project.objects.get(name=p.name).user_set.all()]
-                i.proj_list.append(p)
-        context['organizations'].append(i)
+    for organization in user_organizations:
+        # these proxies are used to structure data passed to template
+        # because we can't access db in template
+        proxy_organization = Org()
+        proxy_organization.name = organization.name
+        proxy_organization.proj_list = []
+        for proj in user_projects:
+            if proj.org == organization:
+                proxy_project = Org()
+                proxy_project.name = proj.name
+                proxy_project.users = set(u for u in Project.objects.get(name=proxy_project.name).user_set.all())
+                proxy_organization.proj_list.append(proxy_project)
+        context['organizations'].append(proxy_organization)
 
-        all_users = g.user_set.all()
-        assigned = [u for x in i.proj_list for u in x.users]
+        all_users = organization.user_set.all()
+        assigned = [u for x in proxy_organization.proj_list for u in x.users]  # reference resolved at runtime
         unassigned = set(all_users) - set(assigned)
         if len(unassigned) != 0:
-            g = Org()
-            g.name = 'Unassigned'
-            g.users = list(unassigned)
-            i.proj_list.append(g)
+            unassigned_project = Org()
+            unassigned_project.name = 'Unassigned'
+            unassigned_project.users = list(unassigned)
+            proxy_organization.proj_list.append(unassigned_project)
 
     return render(request, 'homepage.html', context)
 
@@ -98,7 +98,8 @@ def create_proj(request):
 @login_required
 def manage_users(request):
     # TODO: add remove user from group option
-    # TODO add user to project option
+    # TODO: delete project / organization option, warn user on delete
+    # TODO: refactor delete user (should have its own page and add warning)
     if request.method == 'POST':
         print(request.POST)
         if 'register' in request.POST:
@@ -207,7 +208,7 @@ def manage_users(request):
                 )
 
         elif 'select_user_permissions' in request.POST:
-            return redirect(to='change_user_permissions') #manage_permissions(request)
+            return redirect(to='change_user_permissions')
 
     # otherwise just render the options
     return render(
@@ -228,8 +229,8 @@ class Org(object):
     pass
 
 
+@login_required
 def manage_permissions(request):
-    #TODO: need prime and second managers now :(
     print('select' in request.POST)
     if request.method == 'POST' and 'select' in request.POST:
         # we concat these with backtick in the template
@@ -238,21 +239,21 @@ def manage_permissions(request):
         print(projectname)
         user = User.objects.get(username=username)
         project = Project.objects.get(name=projectname)
-        messages.success(request, f'{request.POST} user{user}, proj{project}')
+        messages.success(request, f'User {user} Assigned as Project Manager for {project}')
         user.groups.add(project)
-        project.manager = user
+        project.second_manager = user
         project.save()
 
-    user_list = set([])  # no dupes here!
+    user_list = set()  # no dupes here!
     project_list = Project.objects.filter(manager=request.user).all()
     for project in project_list:
         for user in project.user_set.all():
             user_list.add(user)
     context = {
-        'form' : SelectManagerForm(),
+        'form': SelectManagerForm(),
         'users': user_list,
         'projects': [
-            {'name' : project, 'manager' : project.manager}
+            {'name': project, 'manager': project.second_manager}
             for project in project_list
         ]
     }
