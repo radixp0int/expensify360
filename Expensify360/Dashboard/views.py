@@ -11,7 +11,10 @@ from django.contrib import messages
 @login_required
 def homepage(request):
     # get the set of all organizations and projects managed by this user.
-    context = {'organizations': []}
+    context = {
+        'organizations': [],
+        'user_permissions': request.user.get_user_permissions()
+    }
 
     user_organizations = Organization.objects.filter(manager=request.user).all()
     # all projects where user is manager or second_manager
@@ -234,8 +237,6 @@ def manage_permissions(request):
     if request.method == 'POST' and 'select' in request.POST:
         # we concat these with backtick in the template
         username, projectname = tuple(request.POST.get('select').split('`'))
-        print(username)
-        print(projectname)
         user = User.objects.get(username=username)
         project = Project.objects.get(name=projectname)
         messages.success(request, f'User {user} Assigned as Project Manager for {project}')
