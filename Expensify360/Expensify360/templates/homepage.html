@@ -290,7 +290,7 @@
                         <div class="card-body">
                             <ul class="list-group list-group-flush list my--3">
                                 {% for org in organizations %}
-                                    <h2 class="fs-5 fw-bold mb-0">{{ org.name }}</h2>
+                                    <h1 class="alert-light fw-bold mb-10">{{ org.name }}</h1>
                                     <form action={% url 'create_proj' %} name="org" method="get">
                                     {% csrf_token %}
                                         <input type="hidden" name="org-name" value="{{ org.name }}">
@@ -311,7 +311,9 @@
                                                                     </h4>
                                                                 <div class="d-flex align-items-center">
                                                             <div class="bg-success dot rounded-circle me-1"></div>
-                                                                    <small>placeholder</small>
+                                                                    {% if member == prj.project_manager %}
+                                                                        <small>Project Manager</small>
+                                                                    {% endif %}
                                                                 </div>
                                                                 </div>
                                                         </li>

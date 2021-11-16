@@ -10,7 +10,6 @@ from django.contrib import messages
 
 @login_required
 def homepage(request):
-
     # get the set of all organizations and projects managed by this user.
     context = {'organizations': []}
 
@@ -32,6 +31,7 @@ def homepage(request):
             if proj.org == organization:
                 proxy_project = Org()
                 proxy_project.name = proj.name
+                proxy_project.project_manager = proj.second_manager
                 proxy_project.users = set(u for u in Project.objects.get(name=proxy_project.name).user_set.all())
                 proxy_organization.proj_list.append(proxy_project)
         context['organizations'].append(proxy_organization)
@@ -231,7 +231,6 @@ class Org(object):
 
 @login_required
 def manage_permissions(request):
-    print('select' in request.POST)
     if request.method == 'POST' and 'select' in request.POST:
         # we concat these with backtick in the template
         username, projectname = tuple(request.POST.get('select').split('`'))

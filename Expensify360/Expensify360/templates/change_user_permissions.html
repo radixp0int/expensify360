@@ -16,10 +16,13 @@
                             <h6 class="h6">Managed by {{ project.manager }}</h6>
                             <form method="post">
                             {% csrf_token %}
-                                <select name="select" onchange="this.form.submit()" class="form-control">
-                            {% for user in users %}
-                                <option name="option" value="{{ user }}`{{ project.name }}">{{ user }}</option>
-                            {% endfor %}
+                                <select name="select" initial onchange="this.form.submit()" class="form-control">
+                                    <option value="none" selected disabled>
+                                        Change Project Manager...
+                                    </option>
+                                    {% for user in users %}
+                                        <option name="option" value="{{ user }}`{{ project.name }}">{{ user }}</option>
+                                    {% endfor %}
                             </select>
                             </form>
                         </h1>
