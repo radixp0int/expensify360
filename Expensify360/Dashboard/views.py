@@ -10,6 +10,7 @@ from django.contrib import messages
 
 @login_required
 def homepage(request):
+    print(request.user.get_user_permissions())
     # get the set of all organizations and projects managed by this user.
     context = {
         'organizations': [],
