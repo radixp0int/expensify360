@@ -5,14 +5,28 @@
 {% block content %}
     <h1> Expense Entry </h1>
 
-    <div id="alert"></div>
+    <style>
+        h1 {
+            padding-top: 25px;
+            padding-bottom: 20px;
+            text-align: center;
+        }
+
+        div {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+    </style>
+
+    <div id="alert">
 
         <form method="post" id="expense-form" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form|crispy }}
-            <input type="submit" value="Submit">
+            <div class="col text-center" style="padding-top: 20px;">
+                <input class="btn btn-lg btn-success" type="submit" value="Submit">
+            </div>
         </form>
-
     </div>
 
 {% endblock %}
