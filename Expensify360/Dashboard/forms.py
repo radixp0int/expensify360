@@ -3,7 +3,6 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Field, HTML
 from crispy_forms.bootstrap import FormActions
-from django.contrib.auth.forms import UserCreationForm
 
 # crispy docs: https://django-crispy-forms.readthedocs.io/en/latest/
 
@@ -39,8 +38,6 @@ class CreateProjForm(forms.Form):
     
 
 class ManageUsers(forms.Form):
-    
-    # TODO: add user to project
 
     helper = FormHelper()
     helper.form_class = 'bootstrap4'
@@ -100,6 +97,17 @@ class AddToProject(forms.Form):
     )
 
 
+class ChangePermissionsButton(forms.Form):
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+
+        FormActions(
+            Submit('select_user_permissions', 'Assign Project Managers', css_class="btn btn-primary btn-me me-2"),
+        )
+    )
+
+
 class UserNameForm(forms.Form):
     Username = forms.CharField()
 
@@ -121,12 +129,23 @@ class SelectGroupForm(forms.Form):
     )
 
 
+class SelectManagerForm(forms.Form):
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+
+        FormActions(
+            Submit('select_manager', 'Assign Manager', css_class="btn btn-primary btn-me me-2"),
+        )
+    )
+
+
 class ManageGroups(forms.Form):
     pass
     # TODO: edit group name
     # TODO: delete group
-    # TODO: add user
-    # TODO: change manager
+
+
 
 
 '''

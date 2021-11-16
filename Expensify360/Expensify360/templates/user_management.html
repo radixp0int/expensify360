@@ -2,6 +2,7 @@
 
 {% load crispy_forms_tags %}
 {% block content %}
+    <!-- TODO: no reason this couldn't be a for loop -->
     <div class="col-12 col-xxl-6 mb-4">
         <div class="card border-0 shadow">
             <div class="card-header border-bottom d-flex align-items-center">
@@ -30,6 +31,14 @@
         <div class="card border-0 shadow">
             <div class="card-header border-bottom d-flex align-items-center">
                 {% crispy rem %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header border-bottom d-flex align-items-center">
+                {% crispy delegate_project %}
             </div>
         </div>
     </div>

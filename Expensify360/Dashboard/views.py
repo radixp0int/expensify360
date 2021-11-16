@@ -9,6 +9,10 @@ from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from Dashboard.models import *
 from django.contrib import messages
+from django import forms
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Submit, Field, HTML
+from crispy_forms.bootstrap import FormActions
 
 
 @login_required
@@ -68,9 +72,16 @@ def create_proj(request):
     if request.method == 'POST':
         form = CreateProjForm(request.POST)
         if form.is_valid():
+            name = form.cleaned_data['Project_Name']
+
+            # check for reserved char
+            if '`' in name:
+                messages.error(request, "Backtick ' ` ' Not Allowed in Project Name!")
+                return render(request, 'create-proj.html', {'form': form})
+
             org = Organization.objects.get(name=request.GET.get('org-name'))
             prj = Project.create(
-                name=form.cleaned_data['Project_Name'],
+                name=name,
                 manager=request.user,
                 org=org
             )
@@ -89,6 +100,7 @@ def manage_users(request):
     # TODO: add remove user from group option
     # TODO add user to project option
     if request.method == 'POST':
+        print(request.POST)
         if 'register' in request.POST:
             # then we're registering a user
             form = UserCreationForm(request.POST)
@@ -194,6 +206,9 @@ def manage_users(request):
                     }
                 )
 
+        elif 'select_user_permissions' in request.POST:
+            return redirect(to='change_user_permissions') #manage_permissions(request)
+
     # otherwise just render the options
     return render(
         request,
@@ -202,7 +217,8 @@ def manage_users(request):
             'add': ManageUsers(),
             'rem': RemoveUser(),
             'add_to_group': AddToGroup(),
-            'add_to_project': AddToProject()
+            'add_to_project': AddToProject(),
+            'delegate_project': ChangePermissionsButton()
         }
     )
 
@@ -210,3 +226,34 @@ def manage_users(request):
 class Org(object):
     # magic class
     pass
+
+
+def manage_permissions(request):
+    #TODO: need prime and second managers now :(
+    print('select' in request.POST)
+    if request.method == 'POST' and 'select' in request.POST:
+        # we concat these with backtick in the template
+        username, projectname = tuple(request.POST.get('select').split('`'))
+        print(username)
+        print(projectname)
+        user = User.objects.get(username=username)
+        project = Project.objects.get(name=projectname)
+        messages.success(request, f'{request.POST} user{user}, proj{project}')
+        user.groups.add(project)
+        project.manager = user
+        project.save()
+
+    user_list = set([])  # no dupes here!
+    project_list = Project.objects.filter(manager=request.user).all()
+    for project in project_list:
+        for user in project.user_set.all():
+            user_list.add(user)
+    context = {
+        'form' : SelectManagerForm(),
+        'users': user_list,
+        'projects': [
+            {'name' : project, 'manager' : project.manager}
+            for project in project_list
+        ]
+    }
+    return render(request, 'change_user_permissions.html', context)
