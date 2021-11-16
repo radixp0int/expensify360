@@ -277,9 +277,9 @@
                 </div>
             -->
                 <div class="col-12 col-xxl-6 mb-4">
-                    <div class="card border-0 shadow">
+                    <div class="card border-primary">
                         <div class="card-header border-bottom d-flex align-items-center justify-content-between">
-                            <h2 class="fs-5 fw-bold mb-0">Organizations</h2>
+                            <h2 class="offset-xl-10 text-muted">Organizations</h2>
                             <!-- ignore the errors pycharm throws below -->
                             <div class="nav-item">
                             <a href={% url 'create_org' %} class="btn btn-sm btn-primary">Create Organization</a>
@@ -290,37 +290,36 @@
                         <div class="card-body">
                             <ul class="list-group list-group-flush list my--3">
                                 {% for org in organizations %}
+                                    <div class="card-deck justify-content-between">
                                     <h1 class="alert-light fw-bold mb-10">{{ org.name }}</h1>
                                     <form action={% url 'create_proj' %} name="org" method="get">
                                     {% csrf_token %}
                                         <input type="hidden" name="org-name" value="{{ org.name }}">
                                         <input type="submit" value="create project" class="btn btn-primary">
                                     </form>
-                                    <ul class="list-group list-group-flush list my--4">
+                                    </div>
                                         {% for prj in org.proj_list %}
-                                            <li class="list-group item my--4">
-                                                <div class="container-fluid">
+                                            <div class="popover-body bg-secondary my-4">
+                                                <div class="popover-header bg-secondary">
                                                     <h4 class="h4 mb-0">{{ prj.name }}</h4>
+                                                    <h6 class="h6 text-light font-italic">Project</h6>
                                                 </div>
                                                     {% for member in prj.users %}
-                                                        <li class="list-group-item px-0">
-                                                            <div class="col-auto"></div>
-                                                                <div class="col-auto ms--2">
-                                                                    <h4 class="h6 mb-0">
+                                                        <li class="list-inline">
+                                                                <div class="modal-header">
+                                                                    <h4 class="h4 text-light">
                                                                         {{ member }}
                                                                     </h4>
-                                                                <div class="d-flex align-items-center">
-                                                            <div class="bg-success dot rounded-circle me-1"></div>
-                                                                    {% if member == prj.project_manager %}
-                                                                        <small>Project Manager</small>
-                                                                    {% endif %}
-                                                                </div>
+                                                                            {% if member == prj.project_manager %}
+                                                                                <small class="mx-1 font-italic bg-primary rounded">Project Manager</small>
+                                                                            {% endif %}
                                                                 </div>
                                                         </li>
+
                                                     {% endfor %}
+                                            </div>
                                         {% endfor %}
                                 {% endfor %}
-                                </ul>
                             </ul>
                         </div>
                     </div>
