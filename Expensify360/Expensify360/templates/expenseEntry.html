@@ -1,22 +1,12 @@
 {% extends 'header.html' %}
 {% load crispy_forms_filters %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block content %}
     <h1> Expense Entry </h1>
 
-    <style>
-        h1 {
-            padding-top: 25px;
-            padding-bottom: 20px;
-            text-align: center;
-        }
-
-        div {
-            padding-left: 20px;
-            padding-right: 20px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
 
     <div id="alert">
 
