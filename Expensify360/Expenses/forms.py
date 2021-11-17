@@ -12,8 +12,10 @@ class mileageEntryForm(forms.Form):
     submissionDate = forms.DateField(label='Submission Date')
     organization = forms.CharField(label='Organization')
     project = forms.CharField(label='Project')
-    miles = forms.DecimalField(label='Miles Driven')
-    mileageRate = forms.DecimalField(label='Rate Per Mile')
+    miles = forms.DecimalField(label='Miles Driven',
+                               widget=forms.NumberInput(attrs={'onchange' : "UpdateExpenseTotal();"}))
+    mileageRate = forms.DecimalField(label='Rate Per Mile',
+                                     widget=forms.NumberInput(attrs={'onchange' : "UpdateExpenseTotal();"}))
     mileageTotal = forms.DecimalField(label='Total Cost')
 
 
