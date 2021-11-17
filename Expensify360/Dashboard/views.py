@@ -10,7 +10,6 @@ from django.contrib import messages
 
 @login_required
 def homepage(request):
-    # get the set of all organizations and projects managed by this user.
     context = {
         'organizations': [],
         'user_permissions': request.user.get_user_permissions()
@@ -40,6 +39,7 @@ def homepage(request):
             unassigned_project.name = 'Unassigned'
             unassigned_project.users = list(unassigned)
             proxy_organization.proj_list.append(unassigned_project)
+        print(context)
 
     return render(request, 'homepage.html', context)
 

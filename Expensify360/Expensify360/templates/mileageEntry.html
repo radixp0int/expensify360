@@ -1,18 +1,21 @@
 {% extends 'header.html' %}
 {% load crispy_forms_filters %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block content %}
     <h1> Mileage Entry </h1>
 
-    <div id="alert"></div>
+    <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
 
+    <div class="forms" id="alert">
         <form method="post" id="mileage-form">
             {% csrf_token %}
             {{ form|crispy }}
-            <input type="submit" value="Submit">
+            <div class="col text-center" style="padding-top: 20px;">
+                <input class="btn btn-lg btn-success" type="submit" value="Submit">
+            </div>
         </form>
-
     </div>
 
 {% endblock %}
