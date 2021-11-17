@@ -13,10 +13,11 @@ class mileageEntryForm(forms.Form):
     organization = forms.CharField(label='Organization')
     project = forms.CharField(label='Project')
     miles = forms.DecimalField(label='Miles Driven',
-                               widget=forms.NumberInput(attrs={'onchange' : "UpdateExpenseTotal();"}))
+                               widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
     mileageRate = forms.DecimalField(label='Rate Per Mile',
-                                     widget=forms.NumberInput(attrs={'onchange' : "UpdateExpenseTotal();"}))
-    mileageTotal = forms.DecimalField(label='Total Cost')
+                                     widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
+    mileageTotal = forms.DecimalField(label='Total Cost',
+                                      widget=forms.NumberInput(attrs={'readonly': True}))
 
 
 class expenseEntryForm(forms.Form):
@@ -26,10 +27,14 @@ class expenseEntryForm(forms.Form):
     organization = forms.CharField(label='Organization')
     project = forms.CharField(label='Project')
     file = forms.FileField(label='Receipt Upload')
-    expenseCost = forms.DecimalField(label='Item Cost')
-    tax = forms.DecimalField(label='Tax')
-    shipping = forms.DecimalField(label='Shipping Cost')
-    expenseTotal = forms.DecimalField(label='Total Cost')
+    expenseCost = forms.DecimalField(label='Item Cost',
+                                     widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
+    tax = forms.DecimalField(label='Tax',
+                             widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
+    shipping = forms.DecimalField(label='Shipping Cost',
+                                  widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
+    expenseTotal = forms.DecimalField(label='Total Cost',
+                                      widget=forms.NumberInput(attrs={'readonly': True}))
 
 
 class timeEntryForm(forms.Form):

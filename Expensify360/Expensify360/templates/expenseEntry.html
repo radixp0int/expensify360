@@ -8,6 +8,34 @@
 
     <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
 
+    <script>
+        function UpdateExpenseTotal() {
+            var itemCost = parseFloat(document.getElementById("id_expenseCost").value);
+            var tax = parseFloat(document.getElementById("id_tax").value);
+            var shipping = parseFloat(document.getElementById("id_shipping").value);
+
+            if (itemCost > 0) {
+                if (tax > 0) {
+                    if (shipping > 0) {
+                        document.getElementById("id_expenseTotal").value = itemCost + tax + shipping;
+                    }
+                    else {
+                        document.getElementById("id_expenseTotal").value = itemCost + tax;
+                    }
+                }
+                else if (shipping > 0) {
+                    document.getElementById("id_expenseTotal").value = itemCost + shipping;
+                }
+                else {
+                    document.getElementById("id_expenseTotal").value = itemCost;
+                }
+            }
+            else {
+                document.getElementById("id_expenseTotal").value = 0;
+            }
+        }
+    </script>
+
     <div class="forms" id="alert">
         <form method="post" id="expense-form" enctype="multipart/form-data">
             {% csrf_token %}
