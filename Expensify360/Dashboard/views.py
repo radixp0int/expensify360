@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Permission
 from django.db import IntegrityError
@@ -45,6 +45,7 @@ def homepage(request):
 
 
 @login_required
+@permission_required('Dashboard.add_organization')
 def create_org(request):
     if request.method == 'POST':
         form = CreateOrgForm(request.POST)
@@ -64,6 +65,7 @@ def create_org(request):
 
 
 @login_required
+@permission_required('Dashboard.add_project')
 def create_proj(request):
     if request.method == 'POST':
         form = CreateProjForm(request.POST)
@@ -93,6 +95,7 @@ def create_proj(request):
 
 
 @login_required
+@permission_required('auth.add_user')
 def manage_users(request):
     # TODO: add remove user from group option
     # TODO: delete project / organization option, warn user on delete
@@ -224,6 +227,7 @@ def manage_users(request):
 
 
 @login_required
+@permission_required('Can add user')
 def manage_permissions(request):
     # TODO: permissions need to revert when non-manager project leads are removed
     if request.method == 'POST' and 'select' in request.POST:
