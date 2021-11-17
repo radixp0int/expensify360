@@ -43,6 +43,9 @@ class timeEntryForm(forms.Form):
     submissionDate = forms.DateField(label='Submission Date')
     organization = forms.CharField(label='Organization')
     project = forms.CharField(label='Project')
-    hours = forms.DecimalField(label='Hours Worked')
-    hourlyRate = forms.DecimalField(label='Hourly Rate')
-    hourTotal = forms.DecimalField(label='Total Cost')
+    hours = forms.DecimalField(label='Hours Worked',
+                               widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
+    hourlyRate = forms.DecimalField(label='Hourly Rate',
+                                    widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
+    hourTotal = forms.DecimalField(label='Total Cost',
+                                   widget=forms.NumberInput(attrs={'readonly': True}))
