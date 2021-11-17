@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
@@ -227,11 +227,6 @@ def manage_users(request):
     )
 
 
-class Org(object):
-    # magic class
-    pass
-
-
 @login_required
 def manage_permissions(request):
     if request.method == 'POST' and 'select' in request.POST:
@@ -239,10 +234,12 @@ def manage_permissions(request):
         username, projectname = tuple(request.POST.get('select').split('`'))
         user = User.objects.get(username=username)
         project = Project.objects.get(name=projectname)
-        messages.success(request, f'User {user} Assigned as Project Manager for {project}')
         user.groups.add(project)
         project.second_manager = user
         project.save()
+        permission = Permission.objects.get(name='Can add user') # this is used to give access to manage users
+        user.user_permissions.add(permission)
+        messages.success(request, f'User {user} Assigned as Project Manager for {project}')
 
     user_list = set()  # no dupes here!
     project_list = Project.objects.filter(manager=request.user).all()
@@ -258,3 +255,8 @@ def manage_permissions(request):
         ]
     }
     return render(request, 'change_user_permissions.html', context)
+
+
+class Org(object):
+    # magic class
+    pass
