@@ -54,6 +54,11 @@ Install Pipenv
 pip3 install pipenv
 ```
 
+install requirements
+```sh
+pip install -r requirements.txt
+```
+
 ## Development
 
 Open your favorite Terminal and run these commands.
