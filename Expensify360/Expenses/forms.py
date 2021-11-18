@@ -9,7 +9,6 @@ from crispy_forms.bootstrap import FormActions
 class mileageEntryForm(forms.Form):
     userID = forms.CharField(label='User ID')
     expenseDate = forms.DateField(label='Expense Date')
-    submissionDate = forms.DateField(label='Submission Date')
     organization = forms.CharField(label='Organization')
     project = forms.CharField(label='Project')
     miles = forms.DecimalField(label='Miles Driven',
@@ -23,7 +22,6 @@ class mileageEntryForm(forms.Form):
 class expenseEntryForm(forms.Form):
     userID = forms.CharField(label='User ID')
     expenseDate = forms.DateField(label='Expense Date')
-    submissionDate = forms.DateField(label='Submission Date')
     organization = forms.CharField(label='Organization')
     project = forms.CharField(label='Project')
     file = forms.FileField(label='Receipt Upload')
@@ -40,7 +38,6 @@ class expenseEntryForm(forms.Form):
 class timeEntryForm(forms.Form):
     userID = forms.CharField(label='User ID')
     expenseDate = forms.DateField(label='Expense Date')
-    submissionDate = forms.DateField(label='Submission Date')
     organization = forms.CharField(label='Organization')
     project = forms.CharField(label='Project')
     hours = forms.DecimalField(label='Hours Worked',

@@ -27,7 +27,6 @@ def mileageEntry(request):
         if form.is_valid():
             userID = form.cleaned_data['userID']
             expenseDate = form.cleaned_data['expenseDate']
-            submissionDate = form.cleaned_data['submissionDate']
             organization = form.cleaned_data['organization']
             project = form.cleaned_data['project']
             miles = form.cleaned_data['miles']
@@ -37,7 +36,6 @@ def mileageEntry(request):
 
             mileageInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
-                                  submissionDate=submissionDate,
                                   organization=organization,
                                   project=project,
                                   miles=miles,
@@ -74,7 +72,6 @@ def expenseEntry(request):
         if form.is_valid():
             userID = form.cleaned_data['userID']
             expenseDate = form.cleaned_data['expenseDate']
-            submissionDate = form.cleaned_data['submissionDate']
             organization = form.cleaned_data['organization']
             project = form.cleaned_data['project']
             file = request.FILES['file']
@@ -86,7 +83,6 @@ def expenseEntry(request):
 
             expenseInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
-                                  submissionDate=submissionDate,
                                   organization=organization,
                                   project=project,
                                   expensePhoto=file,
@@ -123,7 +119,6 @@ def timeEntry(request):
         if form.is_valid():
             userID = form.cleaned_data['userID']
             expenseDate = form.cleaned_data['expenseDate']
-            submissionDate = form.cleaned_data['submissionDate']
             organization = form.cleaned_data['organization']
             project = form.cleaned_data['project']
             hours = form.cleaned_data['hours']
@@ -133,7 +128,6 @@ def timeEntry(request):
 
             hourInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
-                                  submissionDate=submissionDate,
                                   organization=organization,
                                   project=project,
                                   hours=hours,
