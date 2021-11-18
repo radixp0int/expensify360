@@ -33,6 +33,7 @@ def mileageEntry(request):
             miles = form.cleaned_data['miles']
             mileageRate = form.cleaned_data['mileageRate']
             mileageTotal = form.cleaned_data['mileageTotal']
+            expenseType = "Mileage"
 
             mileageInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
@@ -41,7 +42,8 @@ def mileageEntry(request):
                                   project=project,
                                   miles=miles,
                                   mileageRate=mileageRate,
-                                  mileageTotal=mileageTotal, )
+                                  mileageTotal=mileageTotal,
+                                  expenseType=expenseType,)
             mileageInfo.save()
             print(userID, expenseDate)
             return HttpResponseRedirect('/expense')
@@ -80,6 +82,7 @@ def expenseEntry(request):
             tax = form.cleaned_data['tax']
             shipping = form.cleaned_data['shipping']
             expenseTotal = form.cleaned_data['expenseTotal']
+            expenseType = "Expense"
 
             expenseInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
@@ -90,7 +93,8 @@ def expenseEntry(request):
                                   expenseCost=expenseCost,
                                   tax=tax,
                                   shipping=shipping,
-                                  expenseTotal=expenseTotal,)
+                                  expenseTotal=expenseTotal,
+                                  expenseType=expenseType,)
             expenseInfo.save()
             return HttpResponseRedirect('/expense')
             # TODO FINISH FILE UPLOAD
@@ -125,6 +129,7 @@ def timeEntry(request):
             hours = form.cleaned_data['hours']
             hourlyRate = form.cleaned_data['hourlyRate']
             hourTotal = form.cleaned_data['hourTotal']
+            expenseType = "Time"
 
             hourInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
@@ -133,7 +138,8 @@ def timeEntry(request):
                                   project=project,
                                   hours=hours,
                                   hourlyRate=hourlyRate,
-                                  hourTotal=hourTotal, )
+                                  hourTotal=hourTotal,
+                               expenseType=expenseType,)
             hourInfo.save()
             print(userID, expenseDate)
             return HttpResponseRedirect('/expense')
