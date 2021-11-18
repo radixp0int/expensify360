@@ -4,9 +4,10 @@ from contextlib import suppress
 from numpy import datetime64
 import numpy as np
 import datetime
+import pandas as pd
 
 
-def preprocess(user, resolution='M', lookback=12): # TODO: add a lookback arg
+def preprocess(user, resolution='M', lookback=100):
     """
         resolution:char
         'Y'|'M'|'W'|'D'
@@ -30,18 +31,12 @@ def preprocess(user, resolution='M', lookback=12): # TODO: add a lookback arg
         # short-circuit and return empty arrs
         print('no expenses for user')  # debug
         return np.array([]), np.array([])
-    sorted_by_date = sorted(expenses, key=lambda x: datetime64(x.expenseDate))
-    # t = np.arange(
-    #   datetime64(sorted_by_date[0].expenseDate), datetime64(sorted_by_date[-1].expenseDate)).astype(f'datetime64[{resolution}]')
-    t = np.arange(
-        np.datetime64(datetime.datetime.now()) - np.timedelta64(lookback, resolution),
-        np.datetime64(datetime.datetime.now())
-    )
 
-    t = np.array(set(t))
-    binned = np.zeros(len(t))
-
+    t = pd.date_range(end=datetime.datetime.now(), periods=lookback, freq=resolution)
+    t = np.unique(np.array(t).astype(f'datetime64[{resolution}]'))
+    binned = np.zeros(lookback)
     # aggregate according to resolution
+    sorted_by_date = sorted(expenses, key=lambda x: datetime64(x.expenseDate))
     for i, ele in enumerate(t):
         for expense in expenses:
             if (    # all this just to compare dates TODO: try just casting like in assignment to t
