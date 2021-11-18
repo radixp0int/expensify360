@@ -4,61 +4,45 @@
 {% load static %}
 
 {% block content %}
-    <h1> Enter An Expense </h1>
-    <h5 style="text-align:center"> Choose a type of expense to add </h5>
+<h1> Enter An Expense </h1>
+<h5 style="text-align:center"> Choose a type of expense to add </h5>
+<link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
 
-    <style>
-        h1 {
-            padding: 25px 20px 20px;
-            text-align: center;
-        }
-
-        p {
-            padding: 20px 20px 20px;
-            text-align: center;
-        }
-
-        div {
-            margin-left: auto;
-            margin-right: auto;
-            text-align: center;
-        }
-    </style>
-    <section class="container py-4 my-lg-3 py-sm-5">
-        <div id="expense-entry-menu" class="row">
-            {#Expense Item Tile#}
-            <div id="expense-tile" class="col-md-4 col-sm-6 mb-grid-gutter">
-                <a class="card border-0 shadow mb-3" onclick="location.href='/expense/ExpenseEntry'">
-                    <img class="card-img-top"
-                         src="{% static 'images/tiles/expense-item.jfif' %}"
-                         alt="Expense Entry">
-                    <div class="card-body py-4 text-center">
-                        <h3 class="h5 mt-1">Expense Item</h3>
-                    </div>
-                </a>
-            </div>
-            {#Mileage Tile#}
-            <div id="mileage-tile" class="col-md-4 col-sm-6 mb-grid-gutter">
-                <a class="card border-0 shadow mb-3" onclick="location.href='/expense/MileageEntry'"><img
-                        class="card-img-top"
-                        src="{% static 'images/tiles/mileage-expense.jfif' %}"
-                        alt="Mileage Entry">
-                    <div class="card-body py-4 text-center">
-                        <h3 class="h5 mt-1">Mileage Expense</h3>
-                    </div>
-                </a>
-            </div>
-            {#Time Entry Tile#}
-            <div id="time-tile" class="col-md-4 col-sm-6 mb-grid-gutter">
-                <a class="card border-0 shadow mb-3" onclick="location.href='/expense/TimeEntry'"><img
-                        class="card-img-top"
-                        src="{% static 'images/tiles/time-expense.jfif' %}"
-                        alt="Time Entry">
-                    <div class="card-body py-4 text-center">
-                        <h3 class="h5 mt-1">Time Entry</h3>
-                    </div>
-                </a>
-            </div>
+<section class="container py-4 my-lg-3 py-sm-5">
+    <div id="expense-entry-menu" class="row">
+        {#Expense Item Tile#}
+        <div id="expense-tile" class="col-md-4 col-sm-6 mb-grid-gutter">
+            <a class="card border-0 shadow mb-3" onclick="location.href='/expense/ExpenseEntry'">
+                <img class="card-img-top"
+                     src="{% static 'images/tiles/expense-item.jfif' %}"
+                     alt="Expense Entry">
+                <div class="card-body py-4 text-center">
+                    <h3 class="h5 mt-1">Expense Item</h3>
+                </div>
+            </a>
         </div>
-    </section>
+        {#Mileage Tile#}
+        <div id="mileage-tile" class="col-md-4 col-sm-6 mb-grid-gutter">
+            <a class="card border-0 shadow mb-3" onclick="location.href='/expense/MileageEntry'"><img
+                    class="card-img-top"
+                    src="{% static 'images/tiles/mileage-expense.jfif' %}"
+                    alt="Mileage Entry">
+                <div class="card-body py-4 text-center">
+                    <h3 class="h5 mt-1">Mileage Expense</h3>
+                </div>
+            </a>
+        </div>
+        {#Time Entry Tile#}
+        <div id="time-tile" class="col-md-4 col-sm-6 mb-grid-gutter">
+            <a class="card border-0 shadow mb-3" onclick="location.href='/expense/TimeEntry'"><img
+                    class="card-img-top"
+                    src="{% static 'images/tiles/time-expense.jfif' %}"
+                    alt="Time Entry">
+                <div class="card-body py-4 text-center">
+                    <h3 class="h5 mt-1">Time Entry</h3>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
 {% endblock %}
