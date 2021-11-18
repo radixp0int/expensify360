@@ -8,6 +8,17 @@
 
     <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
 
+    <script>
+        function UpdateExpenseTotal() {
+            var miles = document.getElementById("id_miles").value;
+            var rate = document.getElementById("id_mileageRate").value;
+
+            if ((rate > 0) && (miles > 0)) {
+                document.getElementById("id_mileageTotal").value = miles * rate;
+            }
+        }
+    </script>
+
     <div class="forms" id="alert">
         <form method="post" id="mileage-form">
             {% csrf_token %}

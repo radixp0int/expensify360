@@ -9,6 +9,7 @@ class Expense(models.Model):
     organization = models.CharField(max_length=151)
     project = models.CharField(max_length=151)
     isApproved = models.CharField(max_length=50, default="Pending")
+    expenseType = models.CharField(max_length=50, default="", null=True)
 
     # Mileage Specific
     miles = models.DecimalField(max_digits=8, decimal_places=1, null=True, default=None)
