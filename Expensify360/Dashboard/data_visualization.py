@@ -3,9 +3,10 @@ from Dashboard.models import Organization, Project
 from contextlib import suppress
 from numpy import datetime64
 import numpy as np
+import datetime
 
 
-def preprocess(user, resolution='M'): # TODO: add a lookback arg
+def preprocess(user, resolution='M', lookback=12): # TODO: add a lookback arg
     """
         resolution:char
         'Y'|'M'|'W'|'D'
@@ -23,6 +24,7 @@ def preprocess(user, resolution='M'): # TODO: add a lookback arg
     expenses = []
     for name in group_names:
         with suppress(Exception):
+            # TODO: once approval logic is done, only get approved expenses here
             expenses += Expense.objects.filter(organization=name).all()
     if len(expenses) == 0:
         # short-circuit and return empty arrs
@@ -32,7 +34,10 @@ def preprocess(user, resolution='M'): # TODO: add a lookback arg
     # t = np.arange(
     #   datetime64(sorted_by_date[0].expenseDate), datetime64(sorted_by_date[-1].expenseDate)).astype(f'datetime64[{resolution}]')
     t = np.arange(
-        datetime64('1988-07-09'), datetime64(sorted_by_date[-1].expenseDate)).astype(f'datetime64[{resolution}]') # only for debug!!!
+        np.datetime64(datetime.datetime.now()) - np.timedelta64(lookback, resolution),
+        np.datetime64(datetime.datetime.now())
+    )
+
     t = np.array(set(t))
     binned = np.zeros(len(t))
 
