@@ -6,41 +6,65 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- these libs are actually local, in /External Libraries -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark" id="main-nav">
-  <a class="navbar-brand" href={% url 'home' %}>Expensify360</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="collapsibleNavbar">
-    <ul class="navbar-nav">
-        {% if user.is_authenticated %}
+    <a class="navbar-brand bg-primary rounded my-1 mx-2 p-2" href={% url 'home' %}>Expensify360</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+            {% if user.is_authenticated %}
             <li class="nav-item">
-                <a class="btn btn-primary" href="{{ request.META.HTTP_REFERER }}">Go Back</a>
+                <a class="btn btn-outline-secondary mx-2" href="{{ request.META.HTTP_REFERER }}">Go Back</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href={% url 'logout' %}>Logout</a>
+                <a class="btn btn-outline-secondary mx-2" href={% url 'expense' %}>Log Expense</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href={% url 'expense' %}>Log Expense</a>
+                <a class="btn btn-outline-secondary mx-2" href='#'>Expense Manager</a>
             </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-            <!--TODO: account management link -->
                 <a class="nav-link" href='#'>{{ user.username }}</a>
             </li>
+            <li class="nav-item">
+                <a class="btn btn-outline-secondary mx-2" data-target="#logout-modal" data-toggle="modal" href='#'>Logout</a>
+            </li>
+        </ul>
+        <div id="logout-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="logout-modal-title">Warning</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Would you like to log out?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a class="btn-lg btn-outline-secondary mx-2" href={% url 'logout' %}>Yes</a>
+                        <button class="btn-lg btn-primary" class="close" data-dismiss="modal"> No </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% else %}
-            <li class="nav-item">
-                <a class="nav-link" href={% url 'login' %}>Login</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href={% url 'signup' %}>Register</a>
-            </li>
+        <li class="nav-item">
+            <a class="btn btn-outline-secondary mx-2" href={% url 'login' %}>Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-outline-secondary mx-2" href={% url 'signup' %}>Register</a>
+        </li>
         {% endif %}
-            <!--add more links here-->
-    </ul>
-  </div>
+        <!--add more links here-->
+        </ul>
+    </div>
 </nav>

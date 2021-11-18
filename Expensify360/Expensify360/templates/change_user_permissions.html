@@ -1,0 +1,34 @@
+{% extends 'header.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-10 shadow">
+            <div class="card-header border-bottom d-flex align-items-center justify-content-between">
+                <h2 class="fs-5 fw-bold mb-0">Edit User Permissions</h2>
+            </div>
+
+            <div class="card-body">
+                <ul class="list-group list-group-flush list my--3">
+                    {% for project in projects %}
+                        <h1 class="h2 text-muted">
+
+                            {{ project.name }}
+                            <h6 class="h6">Managed by {{ project.manager }}</h6>
+                            <form method="post">
+                            {% csrf_token %}
+                                <select name="select" onchange="this.form.submit()" class="form-control">
+                                    <option value="none" selected disabled>
+                                        Change Project Manager...
+                                    </option>
+                                    {% for user in users %}
+                                        <option name="option" value="{{ user }}`{{ project.name }}">{{ user }}</option>
+                                    {% endfor %}
+                            </select>
+                            </form>
+                        </h1>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

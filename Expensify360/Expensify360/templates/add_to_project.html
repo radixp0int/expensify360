@@ -1,0 +1,23 @@
+{% extends 'header.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="container-fluid">
+        <h1 class="h1">Add User To Project</h1>
+        {% csrf_token %}
+        <div class ="offset-4">
+            <div>
+                    <form action='#' name="org" method="post">
+                        {% csrf_token %}
+                        Username
+                        <input type="text" name="username" value="" class="form-control">
+                        {% for grp in orgs %}
+                            {{ grp }}
+                        <input type="hidden" name="project-name" value="{{ grp }}">
+                        <input type="submit" value="Add" class="btn btn-primary">
+                        {% endfor %}
+                    </form>
+                </div>
+        </div>
+        <a href={% url 'user_management' %} class="btn btn-sm btn-primary">Done</a>
+    </div>
+{% endblock %}
