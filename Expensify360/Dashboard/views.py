@@ -1,11 +1,14 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from Dashboard.models import *
 from django.contrib import messages
+from Dashboard.data_visualization import preprocess
+import plotly.graph_objects as go
+from plotly.offline import plot
 
 
 @login_required
@@ -39,7 +42,10 @@ def homepage(request):
             unassigned_project.name = 'Unassigned'
             unassigned_project.users = list(unassigned)
             proxy_organization.proj_list.append(unassigned_project)
-        print(context)
+
+    # plots #
+    x, y = preprocess(request.user)
+    context['plot'] = scatter(x, y)
 
     return render(request, 'homepage.html', context)
 
@@ -261,3 +267,17 @@ def manage_permissions(request):
 class Org(object):
     # magic class
     pass
+
+def scatter(x, y):
+
+    trace = go.Scatter(x=x, y=y)
+
+    layout = dict(
+        title='Expenses',
+        xaxis=dict(range=[min(x), max(x)]),
+        yaxis=dict(range=[min(y), max(y)])
+    )
+
+    fig = go.Figure(data=[trace], layout=layout)
+    plot_div = plot(fig, output_type='div', include_plotlyjs=False)
+    return plot_div
