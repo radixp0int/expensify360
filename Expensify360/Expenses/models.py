@@ -61,7 +61,7 @@ class Expense(models.Model):
                 shipping=kwargs['shipping'],
                 expenseTotal = kwargs['expenseTotal']
             )
-        else: # trusting myself here
+        else:  # trusting myself here, don't use with user input
             e = cls(
                 userID=kwargs['userID'],
                 expenseDate=kwargs['expenseDate'],

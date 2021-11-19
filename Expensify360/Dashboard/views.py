@@ -6,9 +6,9 @@ from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from Dashboard.models import *
 from django.contrib import messages
-from Dashboard.data_visualization import preprocess
-import plotly.graph_objects as go
-from plotly.offline import plot
+from Dashboard.data_visualization import preprocess, make_test_data
+import pandas as pd
+import plotly.express as px
 
 
 @login_required
@@ -44,9 +44,16 @@ def homepage(request):
             proxy_organization.proj_list.append(unassigned_project)
 
     # plots #
-    x, y = preprocess(request.user)
-    context['plot'] = scatter(x, y)
+    # TODO: check if db table has changed and update if true.
+    try:
+        data = pd.read_csv('expense_data1.csv')
+    except FileNotFoundError:
+        x, y = preprocess(request.user)
+        data = pd.DataFrame({'Time': x, 'Expenses': y})
+        data.to_csv('expense_data.csv')
 
+    fig = px.scatter(data, x='Time', y='Expenses')
+    context['chart'] = fig.to_html()
     return render(request, 'homepage.html', context)
 
 
@@ -73,6 +80,7 @@ def create_org(request):
 @login_required
 @permission_required('Dashboard.add_project')
 def create_proj(request):
+    make_test_data(request.user)
     if request.method == 'POST':
         form = CreateProjForm(request.POST)
         if form.is_valid():
@@ -267,17 +275,3 @@ def manage_permissions(request):
 class Org(object):
     # magic class
     pass
-
-def scatter(x, y):
-
-    trace = go.Scatter(x=x, y=y)
-
-    layout = dict(
-        title='Expenses',
-        xaxis=dict(range=[min(x), max(x)]),
-        yaxis=dict(range=[min(y), max(y)])
-    )
-
-    fig = go.Figure(data=[trace], layout=layout)
-    plot_div = plot(fig, output_type='div', include_plotlyjs=False)
-    return plot_div

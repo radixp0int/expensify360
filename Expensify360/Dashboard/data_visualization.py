@@ -21,6 +21,7 @@ def get_expenses(user):
             expenses += Expense.objects.filter(organization=name).all()
     return expenses
 
+
 def preprocess(user, resolution='M', lookback=100):
     """
         resolution:char
