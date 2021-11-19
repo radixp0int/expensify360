@@ -8,6 +8,17 @@
 
     <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
 
+    <script>
+        function UpdateExpenseTotal() {
+            var hours = document.getElementById("id_hours").value;
+            var rate = document.getElementById("id_hourlyRate").value;
+
+            if ((hours > 0) && (rate > 0)) {
+                document.getElementById("id_hourTotal").value = hours * rate;
+            }
+        }
+    </script>
+
     <div class="forms" id="alert">
         <form method="post" id="time-form">
             {% csrf_token %}
