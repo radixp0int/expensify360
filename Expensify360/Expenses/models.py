@@ -30,3 +30,48 @@ class Expense(models.Model):
 
     def __str__(self):
         return str(self.userID)
+
+    @classmethod
+    def create(cls, **kwargs):
+        e_type = kwargs['expenseType']
+        if e_type == 'Mileage':
+            e = cls(
+                userID=kwargs['userID'],
+                expenseDate=kwargs['expenseDate'],
+                organization=kwargs['organization'],
+                project=kwargs['project'],
+                isApproved=kwargs['isApproved'],
+                expenseType=e_type,
+                miles=kwargs['miles'],
+                mileageRate=kwargs['mileageRate'],
+                mileageTotal=kwargs['mileageTotal']
+            )
+
+        elif e_type == 'Expense':
+            e = cls(
+                userID=kwargs['userID'],
+                expenseDate=kwargs['expenseDate'],
+                organization=kwargs['organization'],
+                project=kwargs['project'],
+                isApproved=kwargs['isApproved'],
+                expenseType=e_type,
+                expensePhoto=kwargs['expensePhoto'],
+                expenseCost=kwargs['expenseCost'],
+                tax=kwargs['tax'],
+                shipping=kwargs['shipping'],
+                expenseTotal = kwargs['expenseTotal']
+            )
+        else: # trusting myself here
+            e = cls(
+                userID=kwargs['userID'],
+                expenseDate=kwargs['expenseDate'],
+                organization=kwargs['organization'],
+                project=kwargs['project'],
+                isApproved=kwargs['isApproved'],
+                expenseType=e_type,
+                hours=kwargs['hours'],
+                hourlyRate=kwargs['hourlyRate'],
+                hourTotal=kwargs['hourTotal']
+            )
+        return e
+
