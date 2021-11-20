@@ -16,6 +16,15 @@ class Org(object):
     pass
 
 
+def expense_total(expense, expense_type):
+    if str.upper(expense_type) == 'MILEAGE':
+        return expense.mileageTotal
+    if str.upper(expense_type) == 'EXPENSE':
+        return expense.expenseTotal
+    if str.upper(expense_type) == 'HOURS':
+        return expense.hourTotal
+
+
 def project_manager_permissions():
     return [perm for perm in Permission.objects.filter(PROJECT_LEAD_PERMISSIONS)]
 
@@ -44,7 +53,7 @@ def get_expenses(user):
 
 def get_expense_records(user, filter_function=None):
     # fields:
-    #   requestor
+    #   requester
     #   expense date
     #   date submitted
     #   project
@@ -55,10 +64,15 @@ def get_expense_records(user, filter_function=None):
 
     expenses = get_expenses(user)
     if filter_function: expense = any(filter_function in expenses)
-    records = Org()
-    records.expense_dict = {
+    records = {
         expense: Org()
         for expense in expenses
     }
-    for expense in records.expense_dict.values():
-        expense.requestor = expense
+    for expense, proxy in records.items():
+        proxy.requester = expense.userID # username
+        proxy.expense_date = expense.expenseDate
+        proxy.submission_date = expense.submissionDate
+        proxy.project = expense.project
+        proxy.status = expense.isApproved
+        proxy.type = expense.expenseType
+        proxy.amount =
