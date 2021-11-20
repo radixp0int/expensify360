@@ -278,8 +278,3 @@ def manage_permissions(request):
         ]
     }
     return render(request, 'change_user_permissions.html', context)
-
-
-class Org(object):
-    # magic class
-    pass

@@ -1,10 +1,18 @@
 from django.contrib.auth.models import Permission
+from models import Organization
+from Expenses.models import Expense
+from contextlib import suppress
+
 
 PROJECT_LEAD_PERMISSIONS = (
     'Expenses.add_expense',
     'Expenses.view_expense',
     'Expenses.change_expense',
     'Expenses.delete_expense')
+
+
+class Org(object):
+    pass
 
 
 def project_manager_permissions():
@@ -17,3 +25,17 @@ def is_manager(user):
 
 def is_project_manager(user):
     return set(project_manager_permissions()).intersection(user.user_permissions) != set([])
+
+
+def get_expenses(user):
+    # expense uses charfields so we need a list of names for groups this user manages
+    organizations = Organization.objects.filter(manager=user).all()
+
+    group_names = [organization.name for organization in organizations]
+    # group_names += [project.name for project in projects]
+    expenses = []
+    for name in group_names:
+        with suppress(Exception):
+            # TODO: once approval logic is done, need an arg to select by status
+            expenses += Expense.objects.filter(organization=name).all()
+    return expenses

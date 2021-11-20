@@ -5,22 +5,7 @@ from numpy import datetime64
 import numpy as np
 import datetime
 import pandas as pd
-
-
-def get_expenses(user):
-    # expense uses charfields so we need a list of names for groups this user manages
-    organizations = Organization.objects.filter(manager=user).all()
-    # TODO: arg for getting expenses by project, or for a project lead
-    #projects = Project.objects.filter(manager=user).all()  # might want this?
-
-    group_names = [organization.name for organization in organizations]
-    # group_names += [project.name for project in projects]
-    expenses = []
-    for name in group_names:
-        with suppress(Exception):
-            # TODO: once approval logic is done, need an arg to select by status
-            expenses += Expense.objects.filter(organization=name).all()
-    return expenses
+from Expensify360.toolkit import *
 
 
 def preprocess(user, resolution='M', lookback=100):
@@ -52,15 +37,6 @@ def preprocess(user, resolution='M', lookback=100):
                 elif expense.hourTotal:
                     binned[i] += float(expense.hourTotal)
     return t, binned
-
-
-class Org(object):
-    pass
-
-
-def get_expense_records(user):
-
-    return
 
 
 def make_test_data(user):
