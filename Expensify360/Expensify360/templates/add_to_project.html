@@ -6,14 +6,12 @@
         {% csrf_token %}
         <div class ="offset-4">
             <div>
-                    <form action='#' name="org" method="post">
+                    <form action='' name="org" method="post">
                         {% csrf_token %}
                         Username
                         <input type="text" name="username" value="" class="form-control">
                         {% for grp in orgs %}
-                            {{ grp }}
-                        <input type="hidden" name="project-name" value="{{ grp }}">
-                        <input type="submit" value="Add" class="btn btn-primary">
+                            <input type="submit" name="project-name" value="{{ grp }}" class="btn btn-primary">
                         {% endfor %}
                     </form>
                 </div>
