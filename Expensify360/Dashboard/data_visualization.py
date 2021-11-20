@@ -58,6 +58,11 @@ class Org(object):
     pass
 
 
+def get_expense_records(user):
+
+    return
+
+
 def make_test_data(user):
     organizations = []
     # call me from a view. BUT FIRST

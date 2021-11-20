@@ -10,6 +10,7 @@ from Dashboard.data_visualization import preprocess, make_test_data
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from Expensify360.toolkit import *
 
 
 @login_required
@@ -281,6 +282,13 @@ def manage_permissions(request):
         username, projectname = tuple(request.POST.get('select').split('`'))
         user = User.objects.get(username=username)
         project = Project.objects.get(name=projectname)
+        # remove permission from current lead iff they are not a manager
+        print(request.user.get_user_permissions())
+        if project.second_manager != project.manager:
+            project.second_manager.user_permissions.delete(
+                PROJECT_LEAD_PERMISSIONS
+            )
+        user.user_permissions.add(PROJECT_LEAD_PERMISSIONS)
         project.second_manager = user
         project.users.add(user)
         project.save()
