@@ -54,16 +54,24 @@ def get_expenses(user):
 
 
 def get_expense_records(user, filter_function=None):
-    # fields:
-    #   requester
-    #   expense date
-    #   date submitted
-    #   project
-    #   status
-    #   type
-    #   amount
-    # TODO anything else?
+    """
+        args:
+            user: manager user object
+            filter_function: optional, function that takes
+                an expense object and returns a bool. Used to filter
+                expenses by a criteria i.e. approval status, requester, etc.
 
+        returns:
+            a dict[expense object: data].
+            fields are attributes of data objects:
+                data.requester:str, username of requester
+                data.expense_date:datetime
+                data.submission:datetime
+                data.project:str, name of project for this expense
+                data.status:str, approval status
+                data.type:str, in ['Mileage', 'Expense', 'Hours']
+                data.amount:float, expense total
+    """
     expenses = get_expenses(user)
     if filter_function: expenses = [e for e in expenses if filter_function(e)]
     records = {
