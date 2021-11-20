@@ -6,6 +6,7 @@ import numpy as np
 import datetime
 import pandas as pd
 
+
 def get_expenses(user):
     # expense uses charfields so we need a list of names for groups this user manages
     organizations = Organization.objects.filter(manager=user).all()

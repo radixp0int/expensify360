@@ -47,7 +47,7 @@ def homepage(request):
     # plots #
     # TODO: check if db table has changed and update if true.
     try:
-        data = pd.read_csv('expense_data1.csv')
+        data = pd.read_csv('expense_data.csv')
     except FileNotFoundError:
         x, y = preprocess(request.user)
         data = pd.DataFrame({'Time': x, 'Expenses': y})
@@ -275,6 +275,7 @@ def manage_users(request):
 @permission_required('Can add user')
 def manage_permissions(request):
     # TODO: permissions need to revert when non-manager project leads are removed
+    # TODO: project leads need expense permissions
     if request.method == 'POST' and 'select' in request.POST:
         # we concat these with backtick in the template
         username, projectname = tuple(request.POST.get('select').split('`'))
