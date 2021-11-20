@@ -16,4 +16,4 @@ def is_manager(user, organization=None, project=None):
 
 
 def is_project_manager(user, project=None):
-    return PROJECT_LEAD_PERMISSIONS.a
+    return set(project_manager_permissions()).intersection(user.user_permissions) != set([])
