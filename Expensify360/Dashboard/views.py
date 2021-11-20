@@ -246,8 +246,6 @@ def manage_users(request):
 @login_required
 @permission_required('Can add user')
 def manage_permissions(request):
-    # TODO: permissions need to revert when non-manager project leads are removed
-    # TODO: project leads need expense permissions
     if request.method == 'POST' and 'select' in request.POST:
         # we concat these with backtick in the template
         username, projectname = tuple(request.POST.get('select').split('`'))
