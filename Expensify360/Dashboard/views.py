@@ -253,8 +253,9 @@ def manage_permissions(request):
         project = Project.objects.get(name=projectname)
         # remove permission from current lead iff they are not a manager
         if project.second_manager != project.manager:
-            project.second_manager.user_permissions = []
-        user.user_permissions.add(project_manager_permissions())
+            project.second_manager.user_permissions.set([])
+        if not is_manager(user):
+            user.user_permissions.set(project_manager_permissions())
         project.second_manager = user
         project.users.add(user)
         project.save()

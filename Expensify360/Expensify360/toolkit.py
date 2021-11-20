@@ -5,10 +5,10 @@ from contextlib import suppress
 
 
 PROJECT_LEAD_PERMISSIONS = (
-    'Expenses.add_expense',
-    'Expenses.view_expense',
-    'Expenses.change_expense',
-    'Expenses.delete_expense'
+    'add_expense',
+    'view_expense',
+    'change_expense',
+    'delete_expense'
 )
 
 
@@ -38,7 +38,10 @@ def project_manager_permissions():
     """
     :return: list of Permission objects a project manager must have
     """
-    return [perm for perm in Permission.objects.filter(PROJECT_LEAD_PERMISSIONS)]
+    perms = []
+    for perm in PROJECT_LEAD_PERMISSIONS:
+        perms.append(list(Permission.objects.filter(codename=perm))[0])
+    return perms
 
 
 def is_manager(user):
@@ -46,7 +49,7 @@ def is_manager(user):
     :param user: User object
     :return: bool, True if user is manager else False
     """
-    return Permission.objects.get(codename='Dashboard.add_organization') in user.user_permissions
+    return Permission.objects.get(codename='add_organization') in user.user_permissions.all()
 
 
 def is_project_manager(user):
