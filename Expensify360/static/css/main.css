@@ -22,3 +22,23 @@ section {
     padding-left: 20px;
     padding-right: 20px;
 }
+
+#expense-grid {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.table-space {
+    margin-top: 20px;
+    margin-left: 40px;
+    margin-right: 100px;
+}
+
+.btn-space {
+    margin-right: 10px;
+}

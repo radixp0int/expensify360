@@ -1,0 +1,133 @@
+{% extends 'header.html' %}
+{% load static %}
+
+{% block content %}
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
+        <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-grid.css">
+        <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-theme-alpine.css">
+{#        {% block scripts %}#}
+{#            <script src="{% static '/js/main.js' %}"></script>#}
+{#        {% endblock %}#}
+    </head>
+    <body>
+    <h1> Expense Manager </h1>
+    </body>
+
+    <section>
+        <div style="margin-right:100px">
+            <table id="expense-table" style="width:100%;"
+                   class="table table-striped table-bordered table-sm table-space">
+                <thead class="thead-dark">
+                <tr>
+                    {#                <th scope="col">##}
+                    {#                </th>#}
+                    <th scope="col">User Name
+                    </th>
+                    <th scope="col">Expense Type
+                    </th>
+                    <th scope="col">Status
+                    </th>
+                    <th scope="col">Expense Date
+                    </th>
+                    <th scope="col">Cost
+                    </th>
+                    <th scope="col">Approve
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Tiger Nixon</td>
+                    <td>Business Expense</td>
+                    <td>Pending</td>
+                    <td>2021/04/25</td>
+                    <td>$32,800.00</td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-sm btn-space">Approve</button>
+                        <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Garrett Winters</td>
+                    <td>Time Expense</td>
+                    <td>Pending</td>
+                    <td>2021/06/25</td>
+                    <td>$12,990.00</td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-sm btn-space">Approve</button>
+                        <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Ashton Cox</td>
+                    <td>Business Expense</td>
+                    <td>Pending</td>
+                    <td>2021/06/25</td>
+                    <td>$2,800.00</td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-sm btn-space">Approve</button>
+                        <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Cedric Kelly</td>
+                    <td>Mileage Expense</td>
+                    <td>Pending</td>
+                    <td>2021/11/25</td>
+                    <td>$300.89</td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-sm btn-space">Approve</button>
+                        <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Airi Satou</td>
+                    <td>Mileage Expense</td>
+                    <td>Pending</td>
+                    <td>2021/06/25</td>
+                    <td>$890.98</td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-sm btn-space">Approve</button>
+                        <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
+                    </td>
+                </tr>
+                <td>Brielle Williamson</td>
+                <td>Business Expense</td>
+                <td>Pending</td>
+                <td>2021/07/25</td>
+                <td>$1,000.98</td>
+                <td>
+                    <button type="button" class="btn btn-success btn-sm btn-space">Approve</button>
+                    <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
+                </td>
+                </tr>
+                <tr>
+                    <td>Colleen Hurst</td>
+                    <td>Time Expense</td>
+                    <td>Pending</td>
+                    <td>2021/09/25</td>
+                    <td>$760.98</td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-sm btn-space">Approve</button>
+                        <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Donna Snider</td>
+                    <td>Business Expense</td>
+                    <td>Pending</td>
+                    <td>2021/10/21</td>
+                    <td>$90.98</td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-sm btn-space">Approve</button>
+                        <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endblock %}
