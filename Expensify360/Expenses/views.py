@@ -147,3 +147,7 @@ def timeEntry(request):
     }
 
     return render(request, 'timeEntry.html', context)
+
+
+def expense_approval(request):
+    pass
