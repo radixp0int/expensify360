@@ -48,11 +48,11 @@ def homepage(request):
     # plots #
     # TODO: check if db table has changed and update if true.
     try:
-        data = pd.read_csv('expense_data.csv')
+        data = pd.read_pickle('expense_data')
     except FileNotFoundError:
         x, y = preprocess(request.user)
         data = pd.DataFrame({'Time': x, 'Expenses': y})
-        data.to_csv('expense_data.csv')
+        data.to_pickle('expense_data')
 
     fig = px.scatter(data, x='Time', y='Expenses')
     context['chart'] = fig.to_html()
@@ -283,12 +283,9 @@ def manage_permissions(request):
         user = User.objects.get(username=username)
         project = Project.objects.get(name=projectname)
         # remove permission from current lead iff they are not a manager
-        print(request.user.get_user_permissions())
         if project.second_manager != project.manager:
-            project.second_manager.user_permissions.delete(
-                PROJECT_LEAD_PERMISSIONS
-            )
-        user.user_permissions.add(PROJECT_LEAD_PERMISSIONS)
+            project.second_manager.user_permissions = []
+        user.user_permissions.add(project_manager_permissions())
         project.second_manager = user
         project.users.add(user)
         project.save()
