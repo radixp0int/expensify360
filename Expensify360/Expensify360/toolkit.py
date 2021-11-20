@@ -8,7 +8,8 @@ PROJECT_LEAD_PERMISSIONS = (
     'Expenses.add_expense',
     'Expenses.view_expense',
     'Expenses.change_expense',
-    'Expenses.delete_expense')
+    'Expenses.delete_expense'
+)
 
 
 class Org(object):
@@ -39,3 +40,25 @@ def get_expenses(user):
             # TODO: once approval logic is done, need an arg to select by status
             expenses += Expense.objects.filter(organization=name).all()
     return expenses
+
+
+def get_expense_records(user, filter_function=None):
+    # fields:
+    #   requestor
+    #   expense date
+    #   date submitted
+    #   project
+    #   status
+    #   type
+    #   amount
+    # TODO anything else?
+
+    expenses = get_expenses(user)
+    if filter_function: expense = any(filter_function in expenses)
+    records = Org()
+    records.expense_dict = {
+        expense: Org()
+        for expense in expenses
+    }
+    for expense in records.expense_dict.values():
+        expense.requestor = expense
