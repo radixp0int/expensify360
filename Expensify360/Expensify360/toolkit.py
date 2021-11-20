@@ -13,10 +13,17 @@ PROJECT_LEAD_PERMISSIONS = (
 
 
 class Org(object):
+    """
+    magic class. used as dynamic struct
+    """
     pass
 
 
 def expense_total(expense):
+    """
+    :param: expense: expense object
+    :return: expense total for expense passed as arg
+    """
     expense_type = expense.expenseType
     if str.upper(expense_type) == 'MILEAGE':
         return expense.mileageTotal
@@ -28,18 +35,33 @@ def expense_total(expense):
 
 
 def project_manager_permissions():
+    """
+    :return: list of Permission objects a project manager must have
+    """
     return [perm for perm in Permission.objects.filter(PROJECT_LEAD_PERMISSIONS)]
 
 
 def is_manager(user):
+    """
+    :param user: User object
+    :return: bool, True if user is manager else False
+    """
     return Permission.objects.get(codename='Dashboard.add_organization') in user.user_permissions
 
 
 def is_project_manager(user):
+    """
+    :param user: User object
+    :return: bool, True if user is a project manager else False
+    """
     return set(project_manager_permissions()).intersection(user.user_permissions) != set([])
 
 
 def get_expenses(user):
+    """
+    :param user: User object, a manager
+    :return: list of Expense objects for which user is responsible
+    """
     # expense uses charfields so we need a list of names for groups this user manages
     organizations = Organization.objects.filter(manager=user).all()
 
@@ -55,13 +77,12 @@ def get_expenses(user):
 
 def get_expense_records(user, filter_function=None):
     """
-        args:
-            user: manager user object
-            filter_function: optional, function that takes
+            :param user: manager user object
+            :param filter_function: optional, function that takes
                 an expense object and returns a bool. Used to filter
                 expenses by a criteria i.e. approval status, requester, etc.
 
-        returns:
+        :return:
             a dict[expense object: data].
             fields are attributes of data objects:
                 data.requester:str, username of requester
