@@ -1,5 +1,5 @@
 from django.contrib.auth.models import Permission
-from models import Organization
+from Dashboard.models import Organization
 from Expenses.models import Expense
 from contextlib import suppress
 
