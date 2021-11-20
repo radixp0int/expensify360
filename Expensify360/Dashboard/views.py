@@ -16,34 +16,9 @@ from Expensify360.toolkit import *
 @login_required
 def homepage(request):
     context = {
-        'organizations': [],
+        'organizations': get_organization_structure(request),
         'user_permissions': request.user.get_user_permissions()
     }
-    user_organizations = [organization for organization in request.user.organization_set.all()]
-    user_projects = [project for project in request.user.project_set.all()]
-    for organization in user_organizations:
-        # these proxies are used to structure data passed to template
-        # because we can't access db in template
-        proxy_organization = Org()
-        proxy_organization.name = organization.name
-        proxy_organization.proj_list = []
-        for proj in user_projects:
-            if proj.org == organization:
-                proxy_project = Org()
-                proxy_project.name = proj.name
-                proxy_project.project_manager = proj.second_manager
-                proxy_project.users = set(u for u in Project.objects.get(name=proxy_project.name).users.all())
-                proxy_organization.proj_list.append(proxy_project)
-        context['organizations'].append(proxy_organization)
-
-        all_users = organization.users.all()
-        assigned = [u for x in proxy_organization.proj_list for u in x.users]  # reference resolved at runtime
-        unassigned = set(all_users) - set(assigned)
-        if len(unassigned) != 0:
-            unassigned_project = Org()
-            unassigned_project.name = 'Unassigned'
-            unassigned_project.users = list(unassigned)
-            proxy_organization.proj_list.append(unassigned_project)
 
     # plots #
     # TODO: check if db table has changed and update if true.
