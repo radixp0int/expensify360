@@ -179,7 +179,7 @@ def make_test_data(user, num_to_generate=500):
     all distributions are uniform
     in their respective ranges.
     """
-    organizations = get_organization_structure()
+    organizations = get_organization_structure(user)
     base_date = np.datetime64('2001-09-11')
     days_since = 7374 # to nov 18 2021
     type_list = ['Mileage', 'Expense', 'Hours']
