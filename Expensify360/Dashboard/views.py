@@ -7,8 +7,9 @@ from django.contrib import messages
 from Dashboard.data_visualization import preprocess
 import pandas as pd
 import plotly.express as px
-#import plotly.graph_objects as go
+import plotly.graph_objects as go
 from Expensify360.toolkit import *
+from sklearn.svm import SVR
 
 
 @login_required
@@ -20,15 +21,15 @@ def homepage(request):
 
     # plots #
     # TODO: check if db table has changed and update if true.
-    #make_test_data(request.user)
     try:
         data = pd.read_pickle('expense_data')
     except FileNotFoundError:
         x, y = preprocess(request.user)
-        data = pd.DataFrame({'Time': x, 'Expenses': y})
+        svr_rbf = SVR(kernel='rbf', C=100, gamma=0.1, epsilon=0.1)
+        X = np.arange(x.shape[0]).reshape(-1, 1)
+        data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': svr_rbf.fit(X, y).predict(X)})
         data.to_pickle('expense_data')
-
-    fig = px.scatter(data, x='Time', y='Expenses')
+    fig = px.line(data, x='Time', y=['Expenses', 'Trend'])
     context['chart'] = fig.to_html()
 
     return render(request, 'homepage.html', context)
