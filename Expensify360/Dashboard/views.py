@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from django.contrib import messages
@@ -21,6 +20,7 @@ def homepage(request):
 
     # plots #
     # TODO: check if db table has changed and update if true.
+    #make_test_data(request.user)
     try:
         data = pd.read_pickle('expense_data')
     except FileNotFoundError:
@@ -57,7 +57,6 @@ def create_org(request):
 @login_required
 @permission_required('Dashboard.add_project')
 def create_proj(request):
-    make_test_data(request.user)
     if request.method == 'POST':
         form = CreateProjForm(request.POST)
         if form.is_valid():
