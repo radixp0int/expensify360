@@ -4,19 +4,18 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
-from Dashboard.models import *
 from django.contrib import messages
-from Dashboard.data_visualization import preprocess, make_test_data
+from Dashboard.data_visualization import preprocess
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
+#import plotly.graph_objects as go
 from Expensify360.toolkit import *
 
 
 @login_required
 def homepage(request):
     context = {
-        'organizations': get_organization_structure(request),
+        'organizations': get_organization_structure(request=request),
         'user_permissions': request.user.get_user_permissions()
     }
 
@@ -93,7 +92,6 @@ def manage_users(request):
     # TODO: delete project / organization option, warn user on delete
     # TODO: refactor delete user (should have its own page and add warning)
     if request.method == 'POST':
-        print(request.POST)
         if 'register' in request.POST:
             # then we're registering a user
             form = UserCreationForm(request.POST)

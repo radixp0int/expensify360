@@ -2,6 +2,8 @@ from django.contrib.auth.models import Permission
 from Dashboard.models import Organization, Project
 from Expenses.models import Expense
 from contextlib import suppress
+import numpy as np
+from django.db import IntegrityError
 
 
 PROJECT_LEAD_PERMISSIONS = (
@@ -34,22 +36,27 @@ def expense_total(expense):
     return 0.0  # silent failure
 
 
-def get_organization_structure(request, include_unassigned_users=True):
+def get_organization_structure(user=None, request=None, include_unassigned_users=True):
     """
-    :param request: HttpRequest
+    :param user: User, required if request not passed
+    :param request: HttpRequest, required if user not passed
     :param include_unassigned_users: default=True, so users not assigned a project
     will be returned in a project named 'Unassigned
     :return: a list of organization proxies. fields are attributes, access like
-        ith_organization = get_organization_structure(request)[i] |
+        ith_organization = get_organization_structure(request=request)[i] |
         ith_organization.name:str |
         ith_organization.proj_list: list of projects proxies in this organization with attributes |
         .proj_list.name:str |
         .proj_list.project_manager:User |
-        .proj_list.users:set of User objects assigned to this project
+        .proj_list.users:set of User objects assigned to this project.
+    :raises ValueError: if neither request nor user is passed
     """
+    if not user and not request:
+        raise ValueError('user and request may not both be None')
+    if request: user = request.user
     organization_list = []
-    user_organizations = [organization for organization in request.user.organization_set.all()]
-    user_projects = [project for project in request.user.project_set.all()]
+    user_organizations = [organization for organization in user.organization_set.all()]
+    user_projects = [project for project in user.project_set.all()]
     for organization in user_organizations:
         # these proxies are used to structure data passed to template
         # because we can't access db in template
@@ -153,3 +160,100 @@ def get_expense_records(user, filter_function=None):
         proxy.type = expense.expenseType
         proxy.amount = expense_total(expense)
     return records
+
+
+def make_test_data(user, num_to_generate=500):
+    """
+    :param user: User, a manager
+    :param num_to_generate:int, optional, default=500
+    :return None:
+    call me from a view. BUT FIRST
+    make sure there is a manager
+    and users who are members of
+    at least 1 project.
+    Also this will no longer
+    dump ~num_to_generate / 3 dino
+    pics on your device :) but instead
+    write a url to an image to expensePhoto
+    where applicable.
+    all distributions are uniform
+    in their respective ranges.
+    """
+    organizations = get_organization_structure()
+    base_date = np.datetime64('2001-09-11')
+    days_since = 7374 # to nov 18 2021
+    type_list = ['Mileage', 'Expense', 'Hours']
+    for i in range(num_to_generate):
+        rng = np.random.default_rng()
+        proxy_organization = rng.choice(organizations)
+        organization = Organization.objects.get(name=proxy_organization.name)
+        proxy_project = rng.choice(proxy_organization.proj_list)
+        project = Project.objects.get(name=proxy_project.name)
+        u = rng.choice(list(proxy_project.users))
+        # General
+        userID = u.username
+        expenseDate = str(base_date + rng.choice(days_since))
+        organization = organization
+        project = project
+        isApproved = 'Approved'
+        expenseType = rng.choice(type_list)
+        if expenseType == type_list[0]:
+            # Mileage Specific
+            miles = rng.choice(3000) + 10.0 # must be nonzero!
+            mileageRate = 0.53
+            mileageTotal = miles * mileageRate
+            expense = Expense.create(
+                userID=userID,
+                expenseDate=expenseDate,
+                organization=organization,
+                project=project,
+                isApproved=isApproved,
+                expenseType=expenseType,
+                miles=miles,
+                mileageRate=mileageRate,
+                mileageTotal=mileageTotal
+            )
+        elif expenseType == type_list[1]:
+            # Expense Specific
+            expensePhoto = 'http://blog.everythingdinosaur.co.uk/wp-content/uploads/2017/12/chris_packham_rex2jpg.jpg'
+            expenseCost = rng.choice(10000) + 10.0
+            tax = .07
+            shipping = rng.choice(1000)
+            expenseTotal = (expenseCost + shipping) * tax
+            expense = Expense.create(
+                userID=userID,
+                expenseDate=expenseDate,
+                organization=organization,
+                project=project,
+                isApproved=isApproved,
+                expenseType=expenseType,
+                expenseCost=expenseCost,
+                expensePhoto=expensePhoto,
+                tax=tax,
+                shipping=shipping,
+                expenseTotal=expenseTotal
+            )
+        else:
+            # Hours Specific
+            hours = rng.choice(100) + 10.0
+            hourlyRate = 40.0
+            hourTotal = hours * hourlyRate
+            expense = Expense.create(
+                userID=userID,
+                expenseDate=expenseDate,
+                organization=organization,
+                project=project,
+                isApproved=isApproved,
+                expenseType=expenseType,
+                hours=hours,
+                hourTotal=hourTotal,
+                hourlyRate=hourlyRate
+            )
+        with suppress(IntegrityError):
+            # super tiny probability this
+            # will generate a dupe expense
+            # in that case it just won't
+            # be saved
+            expense.save()
+
+
