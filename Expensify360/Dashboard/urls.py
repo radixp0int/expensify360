@@ -10,5 +10,5 @@ urlpatterns = [
     path('add_user/', views.manage_users, name='add_user'),
     path('add_to_group/', views.manage_users, name='add_to_group'),
     path('add_to_project/', views.manage_users, name='add_to_project'),
-    path('user_management/change_user_permissions/', views.manage_permissions, name='change_user_permissions')
+    path('user_management/change_user_permissions/', views.manage_permissions, name='change_user_permissions'),
     ]
