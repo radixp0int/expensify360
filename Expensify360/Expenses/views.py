@@ -140,7 +140,7 @@ def timeEntry(request):
     else:
         # Load a clean copy of the time entry form
         form = timeEntryForm(initial={'userID': current_user,
-                                         'expenseDate': today})
+                                      'expenseDate': today})
 
     context = {
         'form': form,
@@ -149,5 +149,7 @@ def timeEntry(request):
     return render(request, 'timeEntry.html', context)
 
 
+# @login_required
 def expense_approval(request):
-    pass
+    context = {}
+    return render(request, 'expense_approval.html', context)
