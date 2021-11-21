@@ -1,90 +1,26 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
-from Dashboard.models import *
 from django.contrib import messages
-from Dashboard.data_visualization import preprocess, make_test_data
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
+from Dashboard.data_visualization import *
 
 
 @login_required
 def homepage(request):
-    context = {
-        'organizations': [],
-        'user_permissions': request.user.get_user_permissions()
-    }
-    user_organizations = [organization for organization in request.user.organization_set.all()]
-    user_projects = [project for project in request.user.project_set.all()]
-    for organization in user_organizations:
-        # these proxies are used to structure data passed to template
-        # because we can't access db in template
-        proxy_organization = Org()
-        proxy_organization.name = organization.name
-        proxy_organization.proj_list = []
-        for proj in user_projects:
-            if proj.org == organization:
-                proxy_project = Org()
-                proxy_project.name = proj.name
-                proxy_project.project_manager = proj.second_manager
-                proxy_project.users = set(u for u in Project.objects.get(name=proxy_project.name).users.all())
-                proxy_organization.proj_list.append(proxy_project)
-        context['organizations'].append(proxy_organization)
-
-        all_users = organization.users.all()
-        assigned = [u for x in proxy_organization.proj_list for u in x.users]  # reference resolved at runtime
-        unassigned = set(all_users) - set(assigned)
-        if len(unassigned) != 0:
-            unassigned_project = Org()
-            unassigned_project.name = 'Unassigned'
-            unassigned_project.users = list(unassigned)
-            proxy_organization.proj_list.append(unassigned_project)
-
+    context = {'organizations': get_organization_structure(request=request),
+               'user_permissions': request.user.get_user_permissions()
+               }
     # plots #
-    # TODO: check if db table has changed and update if true.
+    lookback = 200
+    resolution = 'D'
     try:
-        data = pd.read_csv('expense_data.csv')
+        vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
     except FileNotFoundError:
-        x, y = preprocess(request.user)
-        data = pd.DataFrame({'Time': x, 'Expenses': y})
-        data.to_csv('expense_data.csv')
-
-    fig = px.scatter(data, x='Time', y='Expenses')
-    context['chart'] = fig.to_html()
-
-    # table #
-    headerColor = 'grey'
-    rowEvenColor = 'lightgrey'
-    rowOddColor = 'white'
-
-    table = go.Figure(data=[go.Table(
-        header=dict(
-            values=['<b>EXPENSES</b>', '<b>Q1</b>', '<b>Q2</b>', '<b>Q3</b>', '<b>Q4</b>'],
-            line_color='darkslategray',
-            fill_color=headerColor,
-            align=['left', 'center'],
-            font=dict(color='white', size=12)
-        ),
-        cells=dict(
-            values=[
-                ['Salaries', 'Office', 'Merchandise', 'Legal', '<b>TOTAL</b>'],
-                [1200000, 20000, 80000, 2000, 12120000],
-                [1300000, 20000, 70000, 2000, 130902000],
-                [1300000, 20000, 120000, 2000, 131222000],
-                [1400000, 20000, 90000, 2000, 14102000]],
-            line_color='darkslategray',
-            # 2-D list of colors for alternating rows
-            fill_color=[[rowOddColor, rowEvenColor, rowOddColor, rowEvenColor, rowOddColor] * 5],
-            align=['left', 'center'],
-            font=dict(color='darkslategray', size=11)
-        ))
-    ])
-    context['table'] = table.to_html()
-
+        vm = VisualizationManager(user=request.user, resolution=resolution, lookback=lookback)
+        VisualizationManager.save(vm)
+    context['chart'] = vm.create_plot()
     return render(request, 'homepage.html', context)
 
 
@@ -111,7 +47,6 @@ def create_org(request):
 @login_required
 @permission_required('Dashboard.add_project')
 def create_proj(request):
-    make_test_data(request.user)
     if request.method == 'POST':
         form = CreateProjForm(request.POST)
         if form.is_valid():
@@ -146,7 +81,6 @@ def manage_users(request):
     # TODO: delete project / organization option, warn user on delete
     # TODO: refactor delete user (should have its own page and add warning)
     if request.method == 'POST':
-        print(request.POST)
         if 'register' in request.POST:
             # then we're registering a user
             form = UserCreationForm(request.POST)
@@ -274,13 +208,16 @@ def manage_users(request):
 @login_required
 @permission_required('Can add user')
 def manage_permissions(request):
-    # TODO: permissions need to revert when non-manager project leads are removed
-    # TODO: project leads need expense permissions
     if request.method == 'POST' and 'select' in request.POST:
         # we concat these with backtick in the template
         username, projectname = tuple(request.POST.get('select').split('`'))
         user = User.objects.get(username=username)
         project = Project.objects.get(name=projectname)
+        # remove permission from current lead iff they are not a manager
+        if project.second_manager != project.manager:
+            project.second_manager.user_permissions.set([])
+        if not is_manager(user):
+            user.user_permissions.set(project_manager_permissions())
         project.second_manager = user
         project.users.add(user)
         project.save()
@@ -302,8 +239,3 @@ def manage_permissions(request):
         ]
     }
     return render(request, 'change_user_permissions.html', context)
-
-
-class Org(object):
-    # magic class
-    pass
