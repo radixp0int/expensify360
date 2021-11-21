@@ -1,12 +1,11 @@
 import pickle
-
 from numpy import datetime64
 import datetime
-import pandas as pd
 from Expensify360.toolkit import *
 import pandas as pd
 import plotly.express as px
 from sklearn.svm import SVR
+import asyncio # don't delete, not used here but is needed to use this class properly
 
 
 class VisualizationManager:
@@ -16,6 +15,7 @@ class VisualizationManager:
         self.user = user
         self.lookback = lookback
         self.name = f'{self.lookback}_{self.resolution}_{self.user}'
+        self.fig = None
 
     def preprocess(self):
         """
@@ -53,13 +53,13 @@ class VisualizationManager:
             data = pd.read_pickle(f'{self.name}_data')
         except FileNotFoundError:
             x, y = self.preprocess()
+            if x.shape[0] < 1: return None
             svr_rbf = SVR(kernel='rbf', C=100, gamma=0.1, epsilon=0.1)
             X = np.arange(x.shape[0]).reshape(-1, 1)
             data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': svr_rbf.fit(X, y).predict(X)})
             data.to_pickle(f'{self.name}_data')
-        fig = px.line(data, x='Time', y=['Expenses', 'Trend']).to_html()
-
-        return fig
+        self.fig = px.line(data, x='Time', y=['Expenses', 'Trend']).to_html()
+        return self.fig
 
     @classmethod
     def save(cls, instance):

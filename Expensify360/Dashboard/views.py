@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from django.contrib import messages
 from Dashboard.data_visualization import *
+from asgiref.sync import sync_to_async
 
 
 @login_required
@@ -12,16 +13,23 @@ def homepage(request):
     context = {'organizations': get_organization_structure(request=request),
                'user_permissions': request.user.get_user_permissions()
                }
+    if is_manager(request.user):
+        context = get_chart(request, context)
+    return render(request, 'homepage.html', context)
+
+
+def get_chart(request, context):
     # plots #
     lookback = 200
-    resolution = 'D'
+    resolution = 'M'
     try:
         vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
     except FileNotFoundError:
         vm = VisualizationManager(user=request.user, resolution=resolution, lookback=lookback)
         VisualizationManager.save(vm)
+    #chart = sync_to_async(vm.create_plot(), thread_sensitive=True)
     context['chart'] = vm.create_plot()
-    return render(request, 'homepage.html', context)
+    return context
 
 
 @login_required

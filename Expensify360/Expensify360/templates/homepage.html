@@ -9,16 +9,9 @@
 
 {% block title %} Dashboard {% endblock %}
 
-<!-- TODO: Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
-
 {% block content %}
     <div>
-        {{ chart | safe }}
-    </div>
-
-    <div>
-        {{ table | safe }}
+        {{ chart | safe}}
     </div>
 
     <div class="py-4">
@@ -79,6 +72,3 @@
     </div>
 
 {% endblock content %}
-
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
