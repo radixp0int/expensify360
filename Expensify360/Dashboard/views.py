@@ -4,34 +4,23 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from django.contrib import messages
-from Dashboard.data_visualization import preprocess
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-from Expensify360.toolkit import *
-from sklearn.svm import SVR
+from Dashboard.data_visualization import *
 
 
 @login_required
 def homepage(request):
-    context = {
-        'organizations': get_organization_structure(request=request),
-        'user_permissions': request.user.get_user_permissions()
-    }
-
+    context = {'organizations': get_organization_structure(request=request),
+               'user_permissions': request.user.get_user_permissions()
+               }
     # plots #
-    # TODO: check if db table has changed and update if true.
+    lookback = 200
+    resolution = 'D'
     try:
-        data = pd.read_pickle('expense_data')
+        vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
     except FileNotFoundError:
-        x, y = preprocess(request.user)
-        svr_rbf = SVR(kernel='rbf', C=100, gamma=0.1, epsilon=0.1)
-        X = np.arange(x.shape[0]).reshape(-1, 1)
-        data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': svr_rbf.fit(X, y).predict(X)})
-        data.to_pickle('expense_data')
-    fig = px.line(data, x='Time', y=['Expenses', 'Trend'])
-    context['chart'] = fig.to_html()
-
+        vm = VisualizationManager(user=request.user, resolution=resolution, lookback=lookback)
+        VisualizationManager.save(vm)
+    context['chart'] = vm.create_plot()
     return render(request, 'homepage.html', context)
 
 
