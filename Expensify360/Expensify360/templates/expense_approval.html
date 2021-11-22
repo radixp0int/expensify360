@@ -2,22 +2,21 @@
 {% load static %}
 
 {% block content %}
-    <head>
+    <head role="expense-manager">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
         <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-grid.css">
         <link rel="stylesheet" href="https://unpkg.com/ag-grid-community/dist/styles/ag-theme-alpine.css">
-        {#        {% block scripts %}#}
-        {#            <script src="{% static '/js/main.js' %}"></script>#}
-        {#        {% endblock %}#}
+        {% block scripts %}
+            <script src="{% static '/js/main.js' %}"></script>
+        {% endblock %}
     </head>
     <body>
     <h1> Expense Manager </h1>
     </body>
-
     <section>
-        <div style="margin-right:100px">
+        <div style="margin-right:100px" id="expense-alerts">
             <table id="expense-table" style="width:100%;"
                    class="table table-striped table-bordered table-sm table-space">
                 <thead class="thead-dark">
@@ -40,28 +39,47 @@
                 </thead>
                 <tbody>
 
-                <tr data-toggle="collapse" data-target="#accordion" class="clickable">
+                <tr>
                     <td>Project 001</td>
                     <td>Tiger Nixon</td>
                     <td>Business Expense</td>
-                    <td>Pending</td>
+                    <td data-toggle="collapse" data-target="#accordionOne" class="clickable">
+                        Pending
+                        <button type="button" class="btn btn-link btn-sm" role="button" aria-label="accordionOne">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </td>
                     <td>2021/04/25</td>
                     <td>$32,800.00</td>
                     <td>
-                        <button type="button" class="btn btn-success btn-sm btn-space">Approve</button>
+                        <button id="liveAlertBtn" type="button" class="btn btn-success btn-sm btn-space">Approve
+                        </button>
                         <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
                     </td>
                 </tr>
                 <tr>
                     <td colspan="3">
-                        <div id="accordion-1" class="collapse" aria-hidden="true">Summary of the Expense 1</div>
+                        <div id="accordionOne" class="collapse" aria-hidden="true">Summary of the Expense 1</div>
                     </td>
                 </tr>
                 <tr>
                     <td>Project 002</td>
                     <td>Garrett Winters</td>
                     <td>Time Expense</td>
-                    <td>Pending</td>
+                    <td data-toggle="collapse" data-target="#accordionTwo" class="clickable">
+                        Pending
+                        <button type="button" class="btn btn-link btn-sm" role="button" aria-label="accordionTwo">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </td>
                     <td>2021/06/25</td>
                     <td>$12,990.00</td>
                     <td>
@@ -70,10 +88,24 @@
                     </td>
                 </tr>
                 <tr>
+                    <td colspan="3">
+                        <div id="accordionTwo" class="collapse" aria-hidden="true">Summary of the Expense 2</div>
+                    </td>
+                </tr>
+                <tr>
                     <td>Project 003</td>
                     <td>Ashton Cox</td>
                     <td>Business Expense</td>
-                    <td>Pending</td>
+                    <td data-toggle="collapse" data-target="#accordionThree" class="clickable">
+                        Pending
+                        <button type="button" class="btn btn-link btn-sm" role="button" aria-label="accordionThree">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </td>
                     <td>2021/06/25</td>
                     <td>$2,800.00</td>
                     <td>
@@ -82,10 +114,24 @@
                     </td>
                 </tr>
                 <tr>
+                    <td colspan="3">
+                        <div id="accordionThree" class="collapse" aria-hidden="true">Summary of the Expense 3</div>
+                    </td>
+                </tr>
+                <tr>
                     <td>Project 004</td>
                     <td>Cedric Kelly</td>
                     <td>Mileage Expense</td>
-                    <td>Pending</td>
+                    <td data-toggle="collapse" data-target="#accordionFour" class="clickable">
+                        Pending
+                        <button type="button" class="btn btn-link btn-sm" role="button" aria-label="accordionFour">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </td>
                     <td>2021/11/25</td>
                     <td>$300.89</td>
                     <td>
@@ -94,21 +140,49 @@
                     </td>
                 </tr>
                 <tr>
+                    <td colspan="3">
+                        <div id="accordionFour" class="collapse" aria-hidden="true">Summary of the Expense 4</div>
+                    </td>
+                </tr>
+                <tr>
                     <td>Project 003</td>
                     <td>Airi Satou</td>
                     <td>Mileage Expense</td>
-                    <td>Pending</td>
+                    <td data-toggle="collapse" data-target="#accordionFive" class="clickable">
+                        Pending
+                        <button type="button" class="btn btn-link btn-sm" role="button" aria-label="accordionFour">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </td>
                     <td>2021/06/25</td>
                     <td>$890.98</td>
                     <td>
                         <button type="button" class="btn btn-success btn-sm btn-space">Approve</button>
                         <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
                     </td>
+                <tr>
+                    <td colspan="3">
+                        <div id="accordionFive" class="collapse" aria-hidden="true">Summary of the Expense 5</div>
+                    </td>
+                </tr>
                 </tr>
                 <td>Project 002</td>
                 <td>Brielle Williamson</td>
                 <td>Business Expense</td>
-                <td>Pending</td>
+                <td data-toggle="collapse" data-target="#accordionSix" class="clickable">
+                    Pending
+                    <button type="button" class="btn btn-link btn-sm" role="button" aria-label="accordionSix">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-chevron-down" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                  d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </td>
                 <td>2021/07/25</td>
                 <td>$1,000.98</td>
                 <td>
@@ -116,11 +190,23 @@
                     <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
                 </td>
                 </tr>
+                <td colspan="3">
+                    <div id="accordionSix" class="collapse" aria-hidden="true">Summary of the Expense 6</div>
+                </td>
                 <tr>
                     <td>Project 001</td>
                     <td>Colleen Hurst</td>
                     <td>Time Expense</td>
-                    <td>Pending</td>
+                    <td data-toggle="collapse" data-target="#accordionSeven" class="clickable">
+                        Pending
+                        <button type="button" class="btn btn-link btn-sm" role="button" aria-label="accordionSeven">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </td>
                     <td>2021/09/25</td>
                     <td>$760.98</td>
                     <td>
@@ -128,11 +214,23 @@
                         <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
                     </td>
                 </tr>
+                <td colspan="3">
+                    <div id="accordionSeven" class="collapse" aria-hidden="true">Summary of the Expense 7</div>
+                </td>
                 <tr>
                     <td>Project 002</td>
                     <td>Donna Snider</td>
                     <td>Business Expense</td>
-                    <td>Pending</td>
+                    <td data-toggle="collapse" data-target="#accordionEight" class="clickable">
+                        Pending
+                        <button type="button" class="btn btn-link btn-sm" role="button" aria-label="accordionEight">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </td>
                     <td>2021/10/21</td>
                     <td>$90.98</td>
                     <td>
@@ -140,8 +238,28 @@
                         <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
                     </td>
                 </tr>
+                <td colspan="3">
+                    <div id="accordionEight" class="collapse" aria-hidden="true">Summary of the Expense 8</div>
+                </td>
                 </tbody>
             </table>
         </div>
     </section>
+
+    {# Page Pagination #}
+    <nav aria-label="...">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link">Previous</a>
+            </li>
+            <li class="page-item active" aria-current="page">
+                <a class="page-link" href="#">1</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">2</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Next</a></li>
+        </ul>
+    </nav>
 {% endblock %}
