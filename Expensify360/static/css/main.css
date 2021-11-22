@@ -7,6 +7,14 @@ h5 {
     padding: 20px 20px 20px 20px;
 }
 
+nav .navbar-nav .nav-item li a {
+    color: white !important;
+}
+
+.navbar-custom {
+    background-color: #10185C;
+}
+
 section {
     margin-left: auto;
     margin-right: auto;
@@ -41,4 +49,8 @@ table {
 
 .btn-space {
     margin-right: 10px;
+}
+
+.alert {
+    display: none;
 }
