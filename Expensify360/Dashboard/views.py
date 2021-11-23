@@ -14,12 +14,12 @@ def homepage(request):
                'user_permissions': request.user.get_user_permissions()
                }
     if is_manager(request.user):
-        context = get_chart(request, context)
+        context['chart'] = get_chart(request)
     return render(request, 'homepage.html', context)
 
 
-def get_chart(request, context):
-    # plots #
+# not a view
+def get_chart(request):
     lookback = 200
     resolution = 'M'
     try:
@@ -27,9 +27,8 @@ def get_chart(request, context):
     except FileNotFoundError:
         vm = VisualizationManager(user=request.user, resolution=resolution, lookback=lookback)
         VisualizationManager.save(vm)
-    #chart = sync_to_async(vm.create_plot(), thread_sensitive=True)
-    context['chart'] = vm.create_plot()
-    return context
+    chart = vm.create_plot()
+    return chart
 
 
 @login_required

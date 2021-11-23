@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     # First Party Apps
     'Dashboard',
     'Expenses',
-    'Pages',
+    'Accounts',
 
     # Default Apps
     'django.contrib.admin',

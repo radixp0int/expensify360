@@ -1,4 +1,4 @@
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, User
 from Dashboard.models import Organization, Project
 from Expenses.models import Expense
 from contextlib import suppress
@@ -257,3 +257,60 @@ def make_test_data(user, num_to_generate=500):
             expense.save()
 
 
+def make_demo():
+    """
+        runserver and go to /magic to run. Not safe to run
+        if any users/projects/organizations already in db.
+    """
+    accounts = {
+        'Thorstein_Veblen': 'tvpassword',
+        'John_Kenneth_Galbraith': 'jkgpassword',
+        'Joan_Robinson': 'jrpassword',
+    }
+
+    organization_name = 'NOFX'
+    projects = ['Punk in Drublic', 'So Long and Thanks for All the Shoes']
+
+    for name, pword in accounts.items():
+        try:
+            User.objects.create_user(username=name, password=pword)
+            print(f'user: {name}, password: {pword} created')
+        except IntegrityError:
+            print(f'user {name} already exists, skipping...')
+
+    boss = User.objects.get(username=list(accounts.keys())[0])
+    boss.is_staff = True
+    boss.is_admin = True
+    boss.is_superuser = True
+    boss.user_permissions.set([perm for perm in Permission.objects.all()])
+    boss.save()
+
+    organization = Organization.create(
+        name=organization_name,
+        manager=boss,
+    )
+    try:
+        organization.save()
+        print(f'organization {organization_name} created')
+    except IntegrityError:
+        print(f'Warning: organization {organization_name} already exists.')
+    for user in list(accounts.keys()):
+        Organization.objects.get(name=organization_name).users.add(User.objects.get(username=user))
+
+    for name in projects:
+        project_lead = list(accounts.keys())[1]
+        project = Project.create(
+            name=name,
+            manager=boss,
+            second_manager=User.objects.get(username=project_lead),
+            org=Organization.objects.get(name=organization_name)
+        )
+        project.save()
+        print(f'project {name} created. Project lead: {project_lead}')
+        User.objects.get(username=project_lead).user_permissions.set(project_manager_permissions())
+        for user in list(accounts.keys()):
+            Project.objects.get(name=name).users.add(User.objects.get(username=user))
+            print(f'user {user} added to {name}')
+    print('generating expense data...')
+    make_test_data(user=boss)
+    return
