@@ -16,8 +16,8 @@ class CreateOrgForm(forms.Form):
         Field('Organization_Name', css_class='input-xlarge'),
 
         FormActions(
-            Submit('create', 'Create', css_class="btn btn-primary btn-me me-2"),
-            HTML("<a href={% url 'home' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
+            Submit('create', 'Create', css_class="btn btn-success btn-me me-2"),
+            HTML("<a href={% url 'home' %} class='btn btn-danger btn-me me-2'>Cancel</a>")
         )
     )
 
@@ -31,8 +31,8 @@ class CreateProjForm(forms.Form):
         Field('Project_Name', css_class='input-xlarge'),
 
         FormActions(
-            Submit('create', 'Create', css_class="btn btn-primary btn-me me-2"),
-            HTML("<a href={% url 'home' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
+            Submit('create', 'Create', css_class="btn btn-success btn-me me-2"),
+            HTML("<a href={% url 'home' %} class='btn btn-danger btn-me me-2'>Cancel</a>")
         )
     )
     
@@ -69,8 +69,8 @@ class SubmitOrCancel(forms.Form):
     helper.layout = Layout(
 
         FormActions(
-            Submit('register', 'Create Account', css_class="btn btn-primary btn-me me-2"),
-            HTML("<a href={% url 'user_management' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
+            Submit('register', 'Create Account', css_class="btn btn-success btn-me me-2"),
+            HTML("<a href={% url 'user_management' %} class='btn btn-danger btn-me me-2'>Cancel</a>")
         )
     )
 

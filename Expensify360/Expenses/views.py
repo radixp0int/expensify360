@@ -147,9 +147,3 @@ def timeEntry(request):
     }
 
     return render(request, 'timeEntry.html', context)
-
-
-# @login_required
-def expense_approval(request):
-    context = {}
-    return render(request, 'expense_approval.html', context)
