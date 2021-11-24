@@ -33,8 +33,8 @@ def get_chart(request):
     return chart
 
 
-# @login_required
-# @permission_required('Dashboard.add_organization')
+@login_required
+@permission_required('Dashboard.add_organization')
 def create_org(request):
     if request.method == 'POST':
         form = CreateOrgForm(request.POST)
@@ -214,8 +214,8 @@ def manage_users(request):
     )
 
 
-# @login_required
-# @permission_required('Can add user')
+@login_required
+@permission_required('Can add user')
 def manage_permissions(request):
     if request.method == 'POST' and 'select' in request.POST:
         # we concat these with backtick in the template
