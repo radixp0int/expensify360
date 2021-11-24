@@ -4,8 +4,8 @@ import datetime
 from Expensify360.toolkit import *
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objs as go
 from sklearn.svm import SVR
-import asyncio # don't delete, not used here but is needed to use this class properly
 
 
 class VisualizationManager:
@@ -16,6 +16,15 @@ class VisualizationManager:
         self.lookback = lookback
         self.name = f'{self.lookback}_{self.resolution}_{self.user}'
         self.fig = None
+
+    # TODO: need update method to call when data changes
+    def update(self, request, expense):
+        pass
+
+    # TODO add a summary method
+    def summary(self):
+        # expenses [up/down] x% since last [period] and [increasing/decreasing] x1%/[period]
+        pass
 
     def preprocess(self):
         """
@@ -48,7 +57,6 @@ class VisualizationManager:
         return t, binned
 
     def create_plot(self):
-        # TODO: check if db table has changed and update if true.
         try:
             data = pd.read_pickle(f'{self.name}_data')
         except FileNotFoundError:
@@ -58,8 +66,12 @@ class VisualizationManager:
             X = np.arange(x.shape[0]).reshape(-1, 1)
             data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': svr_rbf.fit(X, y).predict(X)})
             data.to_pickle(f'{self.name}_data')
+        # TODO change this chart
+        # TODO at least x timesteps
         self.fig = px.line(data, x='Time', y=['Expenses', 'Trend']).to_html()
         return self.fig
+
+    # TODO load and save data methods
 
     @classmethod
     def save(cls, instance):
