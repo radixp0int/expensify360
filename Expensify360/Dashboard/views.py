@@ -5,13 +5,15 @@ from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from django.contrib import messages
 from Dashboard.data_visualization import *
+from Expensify360.toolkit import *
 from asgiref.sync import sync_to_async
 
 
 @login_required
 def homepage(request):
     context = {'organizations': get_organization_structure(request=request),
-               'user_permissions': request.user.get_user_permissions()
+               'user_permissions': request.user.get_user_permissions(),
+               'can_manage_expenses': is_project_manager(request.user)
                }
     if is_manager(request.user):
         context['chart'] = get_chart(request)
@@ -31,8 +33,8 @@ def get_chart(request):
     return chart
 
 
-@login_required
-@permission_required('Dashboard.add_organization')
+# @login_required
+# @permission_required('Dashboard.add_organization')
 def create_org(request):
     if request.method == 'POST':
         form = CreateOrgForm(request.POST)
@@ -212,8 +214,8 @@ def manage_users(request):
     )
 
 
-@login_required
-@permission_required('Can add user')
+# @login_required
+# @permission_required('Can add user')
 def manage_permissions(request):
     if request.method == 'POST' and 'select' in request.POST:
         # we concat these with backtick in the template
@@ -246,3 +248,9 @@ def manage_permissions(request):
         ]
     }
     return render(request, 'change_user_permissions.html', context)
+
+
+@login_required
+def expense_approval(request):
+    context = {}
+    return render(request, 'expense_approval.html', context)
