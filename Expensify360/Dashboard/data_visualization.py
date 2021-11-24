@@ -6,6 +6,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 from sklearn.svm import SVR
+import glob
 
 
 class VisualizationManager:
@@ -16,10 +17,6 @@ class VisualizationManager:
         self.lookback = lookback
         self.name = f'{self.lookback}_{self.resolution}_{self.user}'
         self.fig = None
-
-    # TODO: need update method to call when data changes
-    def update(self, request, expense):
-        pass
 
     # TODO add a summary method
     def summary(self):
@@ -57,6 +54,15 @@ class VisualizationManager:
         return t, binned
 
     def create_plot(self):
+        data = self.load_data()
+        # TODO change this chart
+        # TODO at least x timesteps
+        self.fig = px.line(data, x='Time', y=['Expenses', 'Trend']).to_html()
+        return self.fig
+
+    # TODO load and save data methods
+
+    def load_data(self):
         try:
             data = pd.read_pickle(f'{self.name}_data')
         except FileNotFoundError:
@@ -66,12 +72,12 @@ class VisualizationManager:
             X = np.arange(x.shape[0]).reshape(-1, 1)
             data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': svr_rbf.fit(X, y).predict(X)})
             data.to_pickle(f'{self.name}_data')
-        # TODO change this chart
-        # TODO at least x timesteps
-        self.fig = px.line(data, x='Time', y=['Expenses', 'Trend']).to_html()
-        return self.fig
+        return data
 
-    # TODO load and save data methods
+    def update(self, user, expense):
+        date = np.datetime64(expense.expenseDate)
+        df = self.load_data()
+        df[df['Time'] == date] += expense_total(expense)
 
     @classmethod
     def save(cls, instance):
@@ -91,3 +97,16 @@ class VisualizationManager:
         # close file
         f.close()
         return instance
+
+    @classmethod
+    def load_all(cls, user):
+        instances = []
+        instance_files = glob.glob(f'*_{user.username}')
+        for i in instance_files:
+            instances.append(cls.load(i))
+        return instances
+
+    @classmethod
+    def update_all(cls, user, expense):
+        instances = cls.load(user)
+

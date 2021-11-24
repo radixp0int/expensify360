@@ -10,6 +10,7 @@ from asgiref.sync import sync_to_async
 
 @login_required
 def homepage(request):
+    VisualizationManager.load_all(request.user)
     context = {'organizations': get_organization_structure(request=request),
                'user_permissions': request.user.get_user_permissions()
                }

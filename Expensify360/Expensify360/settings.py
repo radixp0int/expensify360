@@ -45,23 +45,23 @@ INSTALLED_APPS = [
 
     # Third party Apps
     'crispy_forms',  # python package for bootstrap
-    'django_plotly_dash.apps.DjangoPlotlyDashConfig',
-    'channels',
-    'channels_redis'
+    #'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+    #'channels',
+    #'channels_redis'
 
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 ASGI_APPLICATION = 'Dashboard.routing.application'
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 8000), ],
-        }
-    }
-}
+#CHANNEL_LAYERS = {
+#    'default': {
+#        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#        'CONFIG': {
+#            'hosts': [('127.0.0.1', 8000), ],
+#        }
+#    }
+#}
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
