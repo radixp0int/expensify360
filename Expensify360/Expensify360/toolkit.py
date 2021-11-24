@@ -104,9 +104,9 @@ def is_manager(user):
 def is_project_manager(user):
     """
     :param user: User object
-    :return: bool, True if user is a project manager else False
+    :return: bool, True if user is a project manager or manager else false
     """
-    return set(project_manager_permissions()).intersection(user.user_permissions) != set([])
+    return set(project_manager_permissions()).intersection([perm for perm in user.user_permissions.all()]) != set([])
 
 
 def get_expenses(user):
