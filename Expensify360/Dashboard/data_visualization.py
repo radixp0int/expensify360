@@ -60,8 +60,6 @@ class VisualizationManager:
         self.fig = px.line(data, x='Time', y=['Expenses', 'Trend']).to_html()
         return self.fig
 
-    # TODO load and save data methods
-
     def load_data(self):
         try:
             data = pd.read_pickle(f'{self.name}_data')
@@ -77,7 +75,14 @@ class VisualizationManager:
     def update(self, user, expense):
         date = np.datetime64(expense.expenseDate)
         df = self.load_data()
-        df[df['Time'] == date] += expense_total(expense)
+        if df[df['Time'] == date]['Expenses'].shape[0] != 0:
+            df[df['Time'] == date]['Expenses'] += expense_total(expense)
+        else:
+            pass
+            # TODO append record
+        print(df[df['Time'] == date]['Expenses'])
+        print(expense.expenseDate)
+        df.to_pickle(f'{self.name}_data')
 
     @classmethod
     def save(cls, instance):
@@ -90,12 +95,15 @@ class VisualizationManager:
 
     @classmethod
     def load(cls, instance_name):
-        # read the pickle file
-        f = open(instance_name, 'rb')
-        # unpickle the dataframe
-        instance = pickle.load(f)
-        # close file
-        f.close()
+        try:
+            f = open(instance_name, 'rb')
+            instance = pickle.load(f)
+            f.close()
+        except FileNotFoundError:
+            # probably won't ever happen
+            user, resolution, lookback = instance_name.split('_', 2)
+            instance = cls(user, resolution=resolution, lookback=lookback)
+
         return instance
 
     @classmethod
@@ -108,5 +116,7 @@ class VisualizationManager:
 
     @classmethod
     def update_all(cls, user, expense):
-        instances = cls.load(user)
+        instances = cls.load_all(user)
+        for instance in instances:
+            instance.update(user, expense)
 
