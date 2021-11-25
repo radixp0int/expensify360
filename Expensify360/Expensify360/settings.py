@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'Dashboard',
     'Expenses',
     'Accounts',
+    'Expensify360',
 
     # Default Apps
     'django.contrib.admin',

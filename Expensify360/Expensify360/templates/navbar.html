@@ -12,6 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+{% block content %}
 <nav class="navbar navbar-expand-sm navbar-dark navbar-custom" id="main-nav" role="navigation">
     <a class="navbar-brand" href={% url 'home' %}>
         <img src="{% static 'images/logos/round-logo.png' %}"
@@ -30,11 +31,13 @@
                 <li class="nav-item active">
                     <a class="nav-link mx-2" href={% url 'expense' %}>Log Expense</a>
                 </li>
-                {% if can_manage_expenses %}
+                {% with ok=user|is_project_manager %}
+                {% if ok %}
                     <li class="nav-item active">
                         <a class="nav-link mx-2" href="{% url 'expense_approval' %}">Expense Manager</a>
                     </li>
                 {% endif %}
+                {% endwith %}
                 </ul>
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
@@ -104,3 +107,5 @@
         </ul>
     </div>
 </nav>
+
+{% endblock content %}

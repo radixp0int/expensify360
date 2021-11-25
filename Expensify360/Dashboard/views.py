@@ -13,7 +13,6 @@ from asgiref.sync import sync_to_async
 def homepage(request):
     context = {'organizations': get_organization_structure(request=request),
                'user_permissions': request.user.get_user_permissions(),
-               'can_manage_expenses': is_project_manager(request.user)
                }
     if is_manager(request.user):
         context['chart'] = get_chart(request)
