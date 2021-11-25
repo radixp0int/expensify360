@@ -13,7 +13,6 @@ from asgiref.sync import sync_to_async
 def homepage(request):
     context = {'organizations': get_organization_structure(request=request),
                'user_permissions': request.user.get_user_permissions(),
-               'can_manage_expenses': is_project_manager(request.user)
                }
     if is_manager(request.user):
         context['chart'] = get_chart(request)
@@ -24,6 +23,7 @@ def homepage(request):
 def get_chart(request):
     lookback = 200
     resolution = 'M'
+    # TODO add buttons to change resolution in template ['Y', 'M', 'W'] and lookback
     try:
         vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
     except FileNotFoundError:

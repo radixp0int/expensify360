@@ -4,8 +4,9 @@ import datetime
 from Expensify360.toolkit import *
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objs as go
 from sklearn.svm import SVR
-import asyncio # don't delete, not used here but is needed to use this class properly
+import glob
 
 
 class VisualizationManager:
@@ -16,6 +17,11 @@ class VisualizationManager:
         self.lookback = lookback
         self.name = f'{self.lookback}_{self.resolution}_{self.user}'
         self.fig = None
+
+    # TODO add a summary method
+    def summary(self):
+        # expenses [up/down] x% since last [period] and [increasing/decreasing] x1%/[period]
+        pass
 
     def preprocess(self):
         """
@@ -48,7 +54,13 @@ class VisualizationManager:
         return t, binned
 
     def create_plot(self):
-        # TODO: check if db table has changed and update if true.
+        data = self.load_data()
+        # TODO change this chart
+        # TODO at least x timesteps
+        self.fig = px.line(data, x='Time', y=['Expenses', 'Trend']).to_html()
+        return self.fig
+
+    def load_data(self):
         try:
             data = pd.read_pickle(f'{self.name}_data')
         except FileNotFoundError:
@@ -58,8 +70,19 @@ class VisualizationManager:
             X = np.arange(x.shape[0]).reshape(-1, 1)
             data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': svr_rbf.fit(X, y).predict(X)})
             data.to_pickle(f'{self.name}_data')
-        self.fig = px.line(data, x='Time', y=['Expenses', 'Trend']).to_html()
-        return self.fig
+        return data
+
+    def update(self, user, expense):
+        date = np.datetime64(expense.expenseDate)
+        df = self.load_data()
+        if df[df['Time'] == date]['Expenses'].shape[0] != 0:
+            df[df['Time'] == date]['Expenses'] += expense_total(expense)
+        else:
+            pass
+            # TODO append record
+        print(df[df['Time'] == date]['Expenses'])
+        print(expense.expenseDate)
+        df.to_pickle(f'{self.name}_data')
 
     @classmethod
     def save(cls, instance):
@@ -72,10 +95,28 @@ class VisualizationManager:
 
     @classmethod
     def load(cls, instance_name):
-        # read the pickle file
-        f = open(instance_name, 'rb')
-        # unpickle the dataframe
-        instance = pickle.load(f)
-        # close file
-        f.close()
+        try:
+            f = open(instance_name, 'rb')
+            instance = pickle.load(f)
+            f.close()
+        except FileNotFoundError:
+            # probably won't ever happen
+            user, resolution, lookback = instance_name.split('_', 2)
+            instance = cls(user, resolution=resolution, lookback=lookback)
+
         return instance
+
+    @classmethod
+    def load_all(cls, user):
+        instances = []
+        instance_files = glob.glob(f'*_{user.username}')
+        for i in instance_files:
+            instances.append(cls.load(i))
+        return instances
+
+    @classmethod
+    def update_all(cls, user, expense):
+        instances = cls.load_all(user)
+        for instance in instances:
+            instance.update(user, expense)
+

@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from Dashboard.data_visualization import VisualizationManager
 
 from .models import *
 from .forms import *
@@ -135,7 +136,6 @@ def timeEntry(request):
                                   hourTotal=hourTotal,
                                expenseType=expenseType,)
             hourInfo.save()
-            print(userID, expenseDate)
             return HttpResponseRedirect('/expense')
     else:
         # Load a clean copy of the time entry form
@@ -147,3 +147,11 @@ def timeEntry(request):
     }
 
     return render(request, 'timeEntry.html', context)
+
+
+# @login_required
+def expense_approval(request):
+    context = {}
+
+    VisualizationManager.update_all(request.user, expense)  # update viz dataset TODO test this
+    return render(request, 'expense_approval.html', context)
