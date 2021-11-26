@@ -28,11 +28,11 @@ def expense_total(expense):
     """
     expense_type = expense.expenseType
     if str.upper(expense_type) == 'MILEAGE':
-        return expense.mileageTotal
+        return float(expense.mileageTotal)
     if str.upper(expense_type) == 'EXPENSE':
-        return expense.expenseTotal
-    if str.upper(expense_type) == 'HOURS':
-        return expense.hourTotal
+        return float(expense.expenseTotal)
+    if str.upper(expense_type) == 'TIME' or str.upper(expense_type) == 'HOURS':
+        return float(expense.hourTotal)
     return 0.0  # silent failure
 
 
