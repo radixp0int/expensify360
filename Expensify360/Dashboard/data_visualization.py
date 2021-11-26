@@ -56,7 +56,8 @@ class VisualizationManager:
     def create_plot(self):
         data = self.load_data()
         # TODO change this chart
-        # TODO at least x timesteps
+        # TODO check for at least x timesteps
+        # TODO include forecast plot
         self.fig = px.line(data, x='Time', y=['Expenses', 'Trend']).to_html()
         return self.fig
 
@@ -72,14 +73,26 @@ class VisualizationManager:
             data.to_pickle(f'{self.name}_data')
         return data
 
-    def update(self, user, expense):
-        date = np.datetime64(expense.expenseDate)
+    def update(self, expense):
+        date = np.datetime64(expense.expenseDate).astype(f'datetime64[{self.resolution}]')
         df = self.load_data()
         if df[df['Time'] == date]['Expenses'].shape[0] != 0:
             df[df['Time'] == date]['Expenses'] += expense_total(expense)
         else:
-            pass
-            # TODO append record
+            # then append a new record
+            # but there could be empty timesteps
+            # between end of df and this record so
+            # fill-forward if needed
+            fill_forward = {'Time': [], 'Expense': []}
+            last_record_date = df['Time'].iloc[-1]
+            date_i = last_record_date + 1
+            while last_record_date != date:
+                fill_forward['Time'].append(date_i)
+                fill_forward['Expenses'].append(0.0)
+            fill_forward['Time'].append(date)
+            fill_forward['Expenses'].append(expense_total(expense))
+
+        # DEBUG
         print(df[df['Time'] == date]['Expenses'])
         print(expense.expenseDate)
         df.to_pickle(f'{self.name}_data')
@@ -100,9 +113,9 @@ class VisualizationManager:
             instance = pickle.load(f)
             f.close()
         except FileNotFoundError:
-            # probably won't ever happen
+            # probably won't ever happen, but just in case instatiate a new model
             user, resolution, lookback = instance_name.split('_', 2)
-            instance = cls(user, resolution=resolution, lookback=lookback)
+            instance = cls(user, resolution=resolution, lookback=lookback)  # up to user to save instance
 
         return instance
 
@@ -118,5 +131,5 @@ class VisualizationManager:
     def update_all(cls, user, expense):
         instances = cls.load_all(user)
         for instance in instances:
-            instance.update(user, expense)
+            instance.update(expense)
 

@@ -153,5 +153,5 @@ def timeEntry(request):
 def expense_approval(request):
     context = {}
 
-    VisualizationManager.update_all(request.user, expense)  # update viz dataset TODO test this
+    VisualizationManager.update_all(request.user, expense)  # update  viz dataset AFTER an expense is approved TODO test this
     return render(request, 'expense_approval.html', context)
