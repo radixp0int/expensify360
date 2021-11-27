@@ -28,11 +28,11 @@ def expense_total(expense):
     """
     expense_type = expense.expenseType
     if str.upper(expense_type) == 'MILEAGE':
-        return expense.mileageTotal
+        return float(expense.mileageTotal)
     if str.upper(expense_type) == 'EXPENSE':
-        return expense.expenseTotal
-    if str.upper(expense_type) == 'HOURS':
-        return expense.hourTotal
+        return float(expense.expenseTotal)
+    if str.upper(expense_type) == 'TIME' or str.upper(expense_type) == 'HOURS':
+        return float(expense.hourTotal)
     return 0.0  # silent failure
 
 
@@ -116,7 +116,6 @@ def get_expenses(user):
     """
     # expense uses charfields so we need a list of names for groups this user manages
     organizations = Organization.objects.filter(manager=user).all()
-
     group_names = [organization.name for organization in organizations]
     # group_names += [project.name for project in projects]
     expenses = []

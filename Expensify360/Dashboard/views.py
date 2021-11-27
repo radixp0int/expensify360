@@ -24,11 +24,8 @@ def get_chart(request):
     lookback = 200
     resolution = 'M'
     # TODO add buttons to change resolution in template ['Y', 'M', 'W'] and lookback
-    try:
-        vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
-    except FileNotFoundError:
-        vm = VisualizationManager(user=request.user, resolution=resolution, lookback=lookback)
-        VisualizationManager.save(vm)
+    vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
+    VisualizationManager.save(vm)
     chart = vm.create_plot()
     return chart
 

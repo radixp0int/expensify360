@@ -13,10 +13,11 @@ class VisualizationManager:
 
     def __init__(self, user, resolution='M', lookback=100):
         self.resolution = resolution
-        self.user = user
-        self.lookback = lookback
+        self.user = user    # this is a string!
+        self.lookback = int(lookback)
         self.name = f'{self.lookback}_{self.resolution}_{self.user}'
         self.fig = None
+        self._up_to_date = True
 
     # TODO add a summary method
     def summary(self):
@@ -31,10 +32,14 @@ class VisualizationManager:
 
             returns: tuple of x:datetime64, y:float
         """
-        expenses = get_expenses(self.user)
+        expenses = get_expenses(User.objects.get(username=self.user))
         if len(expenses) == 0: return np.array([]), np.array([])
 
-        t = pd.date_range(end=datetime.datetime.now(), periods=self.lookback, freq=self.resolution)
+        t = pd.date_range(
+            end=np.datetime64(datetime.datetime.now(), self.resolution) + np.timedelta64(1, self.resolution),
+            periods=self.lookback,
+            freq=self.resolution
+        )
         t = np.unique(np.array(t).astype(f'datetime64[{self.resolution}]'))
         binned = np.zeros(self.lookback)
         # aggregate according to resolution
@@ -44,53 +49,60 @@ class VisualizationManager:
                         np.datetime_as_string(datetime64(expense.expenseDate), unit=self.resolution) ==
                         np.datetime_as_string(datetime64(ele), unit=self.resolution)
                 ):
-                    # have to check this, 2 will be null
-                    if expense.expenseTotal:
-                        binned[i] += float(expense.expenseTotal)
-                    elif expense.mileageTotal:
-                        binned[i] += float(expense.mileageTotal)
-                    elif expense.hourTotal:
-                        binned[i] += float(expense.hourTotal)
-        return t, binned
+                    binned[i] += expense_total(expense)
+        x, y = t, binned
+        if x.shape[0] < 1: return ''
+        svr_rbf = SVR(kernel='rbf', degree=7, C=np.mean(y), gamma=0.1, epsilon=0.1)
+        X = np.arange(x.shape[0]).reshape(-1, 1)
+        data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': svr_rbf.fit(X, y).predict(X)})
+        data.to_pickle(f'{self.name}_data')
+        return data
 
     def create_plot(self):
         data = self.load_data()
-        # TODO change this chart
-        # TODO at least x timesteps
-        self.fig = px.line(data, x='Time', y=['Expenses', 'Trend']).to_html()
-        return self.fig
+        if data == '':
+            # indicates not enough data, silent fail
+            return data
+        # TODO include forecast plot
+        self.fig = go.Figure()  # lol go figure
+        self.fig.add_trace(go.Bar(x=data['Time'], y=data['Expenses'], name='Expenses'))
+        self.fig.add_trace(go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
+        self.fig.update_layout(legend_title_text='Expense History')
+        self.fig.update_xaxes(title_text='Time')
+        self.fig.update_yaxes(title_text='Dollars')
+        return self.fig.to_html()
 
     def load_data(self):
         try:
-            data = pd.read_pickle(f'{self.name}_data')
+            if self.up_to_date:
+                data = pd.read_pickle(f'{self.name}_data')
+            else:
+                print('processing data...')
+                t0 = datetime.datetime.now()
+                data = self.preprocess()
+                t1 = datetime.datetime.now()
+                print(f'done in {np.datetime64(t1) - np.datetime64(t0)}')
+                self.up_to_date = True
         except FileNotFoundError:
-            x, y = self.preprocess()
-            if x.shape[0] < 1: return None
-            svr_rbf = SVR(kernel='rbf', C=100, gamma=0.1, epsilon=0.1)
-            X = np.arange(x.shape[0]).reshape(-1, 1)
-            data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': svr_rbf.fit(X, y).predict(X)})
-            data.to_pickle(f'{self.name}_data')
+            data = self.preprocess()
         return data
 
-    def update(self, user, expense):
-        date = np.datetime64(expense.expenseDate)
-        df = self.load_data()
-        if df[df['Time'] == date]['Expenses'].shape[0] != 0:
-            df[df['Time'] == date]['Expenses'] += expense_total(expense)
+    @property
+    def up_to_date(self):
+        return self._up_to_date
+
+    @up_to_date.setter
+    def up_to_date(self, new_value):
+        if type(new_value) == bool:
+            self._up_to_date = new_value
+            VisualizationManager.save(self)
         else:
-            pass
-            # TODO append record
-        print(df[df['Time'] == date]['Expenses'])
-        print(expense.expenseDate)
-        df.to_pickle(f'{self.name}_data')
+            raise ValueError('up_to_date cannot be assigned to non-bool.')
 
     @classmethod
     def save(cls, instance):
-        # create a pickle file
         f = open(instance.name, 'wb')
-        # pickle the dictionary and write it to file
         pickle.dump(instance, f)
-        # close the file
         f.close()
 
     @classmethod
@@ -100,10 +112,10 @@ class VisualizationManager:
             instance = pickle.load(f)
             f.close()
         except FileNotFoundError:
-            # probably won't ever happen
-            user, resolution, lookback = instance_name.split('_', 2)
-            instance = cls(user, resolution=resolution, lookback=lookback)
-
+            # instantiate a new model if it doesn't exist
+            print(f'{instance_name} not found, creating...')
+            lookback, resolution, user = instance_name.split('_', 2)
+            instance = cls(user, resolution=resolution, lookback=lookback)  # up to user to save instance!
         return instance
 
     @classmethod
@@ -115,8 +127,7 @@ class VisualizationManager:
         return instances
 
     @classmethod
-    def update_all(cls, user, expense):
+    def update_all(cls, user):
         instances = cls.load_all(user)
         for instance in instances:
-            instance.update(user, expense)
-
+            instance.up_to_date = False
