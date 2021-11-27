@@ -152,15 +152,6 @@ def timeEntry(request):
 # @login_required
 def expense_approval(request):
     context = {}
-    e = Expense(userID='Joan_Robinson',
-                                  expenseDate='2021-11-26',
-                                  organization='NOFX',
-                                  project='Punk in Drublic',
-                                  hours=99,
-                                  hourlyRate=99,
-                                  hourTotal=9801,
-                               expenseType='Time')
-    e.save()
-    print('in manager')
-    VisualizationManager.update_all(request.user, e)  # update  viz dataset AFTER an expense is approved TODO test this
+
+    VisualizationManager.update_all(request.user)  # update viz datasets AFTER an expense is approved
     return render(request, 'expense_approval.html', context)

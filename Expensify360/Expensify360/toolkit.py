@@ -116,7 +116,6 @@ def get_expenses(user):
     """
     # expense uses charfields so we need a list of names for groups this user manages
     organizations = Organization.objects.filter(manager=user).all()
-
     group_names = [organization.name for organization in organizations]
     # group_names += [project.name for project in projects]
     expenses = []
