@@ -60,11 +60,15 @@ class VisualizationManager:
 
     def create_plot(self):
         data = self.load_data()
-        # TODO change this chart
         # TODO check for at least x timesteps
         # TODO include forecast plot
-        self.fig = px.line(data, x='Time', y=['Expenses', 'Trend']).to_html()
-        return self.fig
+        self.fig = go.Figure()  # lol go figure
+        self.fig.add_trace(go.Bar(x=data['Time'], y=data['Expenses'], name='Expenses'))
+        self.fig.add_trace(go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
+        self.fig.update_layout(legend_title_text='Expense History')
+        self.fig.update_xaxes(title_text='Time')
+        self.fig.update_yaxes(title_text='Dollars')
+        return self.fig.to_html()
 
     def load_data(self):
         try:
