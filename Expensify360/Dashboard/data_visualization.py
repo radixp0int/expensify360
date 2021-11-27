@@ -60,7 +60,9 @@ class VisualizationManager:
 
     def create_plot(self):
         data = self.load_data()
-        # TODO check for at least x timesteps
+        if data == '':
+            # indicates not enough data, silent fail
+            return data
         # TODO include forecast plot
         self.fig = go.Figure()  # lol go figure
         self.fig.add_trace(go.Bar(x=data['Time'], y=data['Expenses'], name='Expenses'))
