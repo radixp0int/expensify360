@@ -21,7 +21,7 @@ def homepage(request):
 
 # not a view
 def get_chart(request):
-    lookback = 200
+    lookback = 300
     resolution = 'M'
     # TODO add buttons to change resolution in template ['Y', 'M', 'W'] and lookback
     vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
