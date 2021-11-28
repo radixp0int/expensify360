@@ -11,7 +11,7 @@ import glob
 
 class VisualizationManager:
 
-    def __init__(self, user, resolution='M', lookback=100):
+    def __init__(self, user, resolution='M', lookback=100000):
         self.resolution = resolution
         self.user = user    # this is a string!
         self.lookback = int(lookback)
@@ -34,14 +34,19 @@ class VisualizationManager:
         """
         expenses = get_expenses(User.objects.get(username=self.user))
         if len(expenses) == 0: return np.array([]), np.array([])
-
+        now = np.datetime64(datetime.datetime.now(), self.resolution)
+        earliest_expense = sorted(expenses, key=lambda e: np.datetime64(e.expenseDate, self.resolution))[0]
+        earliest_date = np.datetime64(earliest_expense.expenseDate, self.resolution)
+        delta = int((now - earliest_date).astype(f'timedelta64[{self.resolution}]'))
+        n_periods = np.min((self.lookback, delta))
         t = pd.date_range(
-            end=np.datetime64(datetime.datetime.now(), self.resolution) + np.timedelta64(1, self.resolution),
-            periods=self.lookback,
+            end=now + np.timedelta64(1, self.resolution),
+            periods=n_periods+1,
             freq=self.resolution
         )
+
         t = np.unique(np.array(t).astype(f'datetime64[{self.resolution}]'))
-        binned = np.zeros(self.lookback)
+        binned = np.zeros(n_periods+1)
         # aggregate according to resolution
         for i, ele in enumerate(t):
             for expense in expenses:
@@ -51,7 +56,7 @@ class VisualizationManager:
                 ):
                     binned[i] += expense_total(expense)
         x, y = t, binned
-        if x.shape[0] < 1: return ''
+        if x.shape[0] < 1: return ''  # caller must check for this!
         svr_rbf = SVR(kernel='rbf', degree=7, C=np.mean(y), gamma=0.1, epsilon=0.1)
         X = np.arange(x.shape[0]).reshape(-1, 1)
         data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': svr_rbf.fit(X, y).predict(X)})
@@ -60,7 +65,7 @@ class VisualizationManager:
 
     def create_plot(self):
         data = self.load_data()
-        if data == '':
+        if type(data) == str:
             # indicates not enough data, silent fail
             return data
         # TODO include forecast plot
