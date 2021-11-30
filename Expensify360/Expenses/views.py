@@ -32,7 +32,7 @@ def mileageEntry(request):
             miles = form.cleaned_data['miles']
             mileageRate = form.cleaned_data['mileageRate']
             mileageTotal = form.cleaned_data['mileageTotal']
-            expenseType = "Mileage"
+            expenseType = "Mileage Expense"
 
             mileageInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
@@ -79,7 +79,7 @@ def expenseEntry(request):
             tax = form.cleaned_data['tax']
             shipping = form.cleaned_data['shipping']
             expenseTotal = form.cleaned_data['expenseTotal']
-            expenseType = "Expense"
+            expenseType = "Business Expense"
 
             expenseInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
@@ -93,7 +93,7 @@ def expenseEntry(request):
                                   expenseType=expenseType,)
             expenseInfo.save()
             return HttpResponseRedirect('/expense')
-            # TODO FINISH FILE UPLOAD
+
     else:
         # Load a clean copy of the expense entry form
         form = expenseEntryForm(initial={'userID': current_user,
@@ -124,7 +124,7 @@ def timeEntry(request):
             hours = form.cleaned_data['hours']
             hourlyRate = form.cleaned_data['hourlyRate']
             hourTotal = form.cleaned_data['hourTotal']
-            expenseType = "Time"
+            expenseType = "Time Expense"
 
             hourInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
