@@ -34,7 +34,7 @@
                 {% with ok=user|is_project_manager %}
                 {% if ok %}
                     <li class="nav-item active">
-                        <a class="nav-link mx-2" href="{% url 'expense_approval' %}">Expense Manager</a>
+                        <a class="nav-link mx-2" href="{% url 'expense_manager' %}">Expense Manager</a>
                     </li>
                 {% endif %}
                 {% endwith %}

@@ -149,9 +149,9 @@ def timeEntry(request):
     return render(request, 'timeEntry.html', context)
 
 
-# @login_required
-def expense_approval(request):
-    context = {}
-
-    VisualizationManager.update_all(request.user)  # update viz datasets AFTER an expense is approved
-    return render(request, 'expense_approval.html', context)
+# # @login_required
+# def expense_approval(request):
+#     context = {}
+#
+#     VisualizationManager.update_all(request.user)  # update viz datasets AFTER an expense is approved
+#     return render(request, 'expense_manager.html', context)
