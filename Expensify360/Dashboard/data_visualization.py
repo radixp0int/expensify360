@@ -32,11 +32,11 @@ class VisualizationManager:
 
             returns: tuple of x:datetime64, y:float
         """
-        expenses = get_expenses(User.objects.get(username=self.user))
-        if len(expenses) == 0: return np.array([]), np.array([])
+        expenses = list(get_expense_records(User.objects.get(username=self.user), filter_function=lambda x: x.isApproved == 'Approved').values())
+        if len(expenses) == 0: return None
         now = np.datetime64(datetime.datetime.now(), self.resolution)
-        earliest_expense = sorted(expenses, key=lambda e: np.datetime64(e.expenseDate, self.resolution))[0]
-        earliest_date = np.datetime64(earliest_expense.expenseDate, self.resolution)
+        earliest_expense = sorted(expenses, key=lambda e: np.datetime64(e.expense_date, self.resolution))[0]
+        earliest_date = np.datetime64(earliest_expense.expense_date, self.resolution)
         delta = int((now - earliest_date).astype(f'timedelta64[{self.resolution}]'))
         n_periods = np.min((self.lookback, delta))
         t = pd.date_range(
@@ -50,13 +50,13 @@ class VisualizationManager:
         # aggregate according to resolution
         for i, ele in enumerate(t):
             for expense in expenses:
-                if (  # all this just to compare dates TODO: try just casting like in assignment to t
-                        np.datetime_as_string(datetime64(expense.expenseDate), unit=self.resolution) ==
+                if (  # all this just to compare dates
+                        np.datetime_as_string(datetime64(expense.expense_date), unit=self.resolution) ==
                         np.datetime_as_string(datetime64(ele), unit=self.resolution)
                 ):
-                    binned[i] += expense_total(expense)
+                    binned[i] += expense.amount
         x, y = t, binned
-        if x.shape[0] < 1: return ''  # caller must check for this!
+        if x.shape[0] < 1: return None  # caller must check for this!
         svr_rbf = SVR(kernel='rbf', degree=7, C=np.mean(y), gamma=0.1, epsilon=0.1)
         X = np.arange(x.shape[0]).reshape(-1, 1)
         data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': svr_rbf.fit(X, y).predict(X)})
@@ -65,9 +65,9 @@ class VisualizationManager:
 
     def create_plot(self):
         data = self.load_data()
-        if type(data) == str:
+        if data is None:
             # indicates not enough data, silent fail
-            return data
+            return ''
         # TODO include forecast plot
         self.fig = go.Figure()  # lol go figure
         self.fig.add_trace(go.Bar(x=data['Time'], y=data['Expenses'], name='Expenses'))
