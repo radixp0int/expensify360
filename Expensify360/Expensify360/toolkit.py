@@ -143,9 +143,7 @@ def get_expense_records(user, filter_function=None):
                 data.amount:float, expense total
     """
     expenses = get_expenses(user)
-    for e in expenses:
-        print(e.isApproved)
-        print(filter_function(e))
+
     if filter_function: expenses = [e for e in expenses if filter_function(e)]
     records = {
         expense: Org()
