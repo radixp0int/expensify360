@@ -111,24 +111,22 @@ def is_project_manager(user):
 
 def get_expenses(user):
     """
-    :param user: User object, a manager
+    :param user: User object, a manager or project manager
     :return: list of Expense objects for which user is responsible
     """
-    # expense uses charfields so we need a list of names for groups this user manages
-    organizations = Organization.objects.filter(manager=user).all()
-    group_names = [organization.name for organization in organizations]
-    # group_names += [project.name for project in projects]
+    # expense uses charfields so we need a list of names for projects this user manages
+    projects = set(list(Project.objects.filter(manager=user).all()) + list(Project.objects.filter(second_manager=user)))
+    project_names = [project.name for project in projects]
     expenses = []
-    for name in group_names:
+    for name in project_names:
         with suppress(Exception):
-            # TODO: once approval logic is done, need an arg to select by status
-            expenses += Expense.objects.filter(organization=name).all()
+            expenses += Expense.objects.filter(project=name).all()
     return expenses
 
 
 def get_expense_records(user, filter_function=None):
     """
-            :param user: manager user object
+            :param user: manager or project manager user object
             :param filter_function: optional, function that takes
                 an expense object and returns a bool. Used to filter
                 expenses by a criteria i.e. approval status, requester, etc.
@@ -145,6 +143,9 @@ def get_expense_records(user, filter_function=None):
                 data.amount:float, expense total
     """
     expenses = get_expenses(user)
+    for e in expenses:
+        print(e.isApproved)
+        print(filter_function(e))
     if filter_function: expenses = [e for e in expenses if filter_function(e)]
     records = {
         expense: Org()
@@ -182,6 +183,7 @@ def make_test_data(user, num_to_generate=500):
     base_date = np.datetime64('2001-09-11')
     days_since = 7374 # to nov 18 2021
     type_list = ['Mileage', 'Expense', 'Hours']
+    status_choices = ['Approved', 'Pending', 'Denied']
     for i in range(num_to_generate):
         rng = np.random.default_rng()
         proxy_organization = rng.choice(organizations)
@@ -194,7 +196,7 @@ def make_test_data(user, num_to_generate=500):
         expenseDate = str(base_date + rng.choice(days_since))
         organization = organization
         project = project
-        isApproved = 'Approved'
+        isApproved = rng.choice(status_choices)
         expenseType = rng.choice(type_list)
         if expenseType == type_list[0]:
             # Mileage Specific
