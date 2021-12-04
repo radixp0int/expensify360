@@ -11,5 +11,5 @@ urlpatterns = [
     path('add_to_project/', views.manage_users, name='add_to_project'),
     path('user_management/', views.manage_users, name='user_management'),
     path('user_management/change_user_permissions/', views.manage_permissions, name='change_user_permissions'),
-    path('expense_approval/', views.expense_approval, name='expense_approval'),
+    path('expense_manager/', views.expense_manager, name='expense_manager'),
     ]

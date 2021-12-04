@@ -6,6 +6,7 @@ from Dashboard.forms import *
 from django.contrib import messages
 from Dashboard.data_visualization import *
 from Expensify360.toolkit import *
+from Expenses.models import *
 from asgiref.sync import sync_to_async
 
 
@@ -248,6 +249,36 @@ def manage_permissions(request):
 
 
 @login_required
-def expense_approval(request):
-    context = {}
-    return render(request, 'expense_approval.html', context)
+def expense_manager(request):
+    group_names = []
+    projects = [
+        project for project in
+        Project.objects.filter(
+        second_manager=request.user).all()]
+    group_names += [project.name for project in projects]
+    expenses_list = []  # query projects_led so .filter(second_manager=user).all()
+    for name in group_names:
+        with suppress(Exception):
+            # the only exception will be that the record is not found, this way we skip checking first
+            expenses_list += Expense.objects.filter(isApproved='Pending').filter(project=name).all()
+            # once approval logic is done, you can filter by status as well like
+
+    proxy_list = []
+
+    # Creating the structure and appending
+    for expense in expenses_list:
+        proxy_project = Org()
+        proxy_project.id = expense.id
+        proxy_project.project = expense.project
+        proxy_project.userID = expense.userID
+        proxy_project.expenseType = expense.expenseType
+        proxy_project.isApproved = expense.isApproved
+        proxy_project.expenseDate = expense.expenseDate
+        proxy_project.expenseTotal = expense_total(expense)
+        proxy_list.append(proxy_project)
+
+    context = {
+        'expenses': proxy_list
+    }
+    VisualizationManager.update_all(request.user)
+    return render(request, 'expense_manager.html', context)
