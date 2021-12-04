@@ -33,10 +33,10 @@
                 {% for expense in expenses %}
                     <tr>
                         <td>{{ expense.project }}</td>
-                        <td>{{ expense.userID }}</td>
-                        <td>{{ expense.expenseType }}</td>
+                        <td>{{ expense.requester }}</td>
+                        <td>{{ expense.type }}</td>
                         <td data-toggle="collapse" data-target="#accordion{{ expense.id }}" class="clickable">
-                            {{ expense.isApproved }}
+                            {{ expense.status }}
                             <button type="button" class="btn btn-link btn-sm" role="button"
                                     aria-label="accordion{{ expense.id }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -46,8 +46,8 @@
                                 </svg>
                             </button>
                         </td>
-                        <td>{{ expense.expenseDate }}</td>
-                        <td>${{ expense.expenseTotal|floatformat:2|intcomma }}</td>
+                        <td>{{ expense.expense_date }}</td>
+                        <td>${{ expense.amount|floatformat:2|intcomma }}</td>
                         <td>
                             <button id="liveAlertBtn{{ expense.id }}" type="button" class="btn btn-success btn-sm btn-space">Approve</button>
                             <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
