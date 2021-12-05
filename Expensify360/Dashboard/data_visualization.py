@@ -2,11 +2,10 @@ import pickle
 from numpy import datetime64
 import datetime
 from Expensify360.toolkit import *
-import pandas as pd
+from pandas import date_range, read_pickle, DataFrame
 import plotly.graph_objs as go
 from scipy.signal import savgol_filter
 import glob
-from contextlib import suppress
 
 
 class VisualizationManager:
@@ -39,7 +38,7 @@ class VisualizationManager:
         earliest_date = np.datetime64(earliest_expense.expense_date, self.resolution)
         delta = int((now - earliest_date).astype(f'timedelta64[{self.resolution}]'))
         n_periods = np.min((self.lookback, delta))
-        t = pd.date_range(
+        t = date_range(
             end=now + np.timedelta64(1, self.resolution),
             periods=n_periods+1,
             freq=self.resolution
@@ -61,9 +60,9 @@ class VisualizationManager:
         try:
             trend = savgol_filter(y, window_length=21, polyorder=3)
             trend[trend < 0] = 0.0
-        except ValueError: # this will be thrown for insufficient data
+        except ValueError:  # this will be thrown for insufficient data
             trend = None
-        data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': trend})
+        data = DataFrame({'Time': x, 'Expenses': y, 'Trend': trend})
         data.to_pickle(f'{self.name}_data')
         return data
 
@@ -85,7 +84,7 @@ class VisualizationManager:
     def load_data(self):
         try:
             if self.up_to_date:
-                data = pd.read_pickle(f'{self.name}_data')
+                data = read_pickle(f'{self.name}_data')
             else:
                 print('processing data...')
                 t0 = datetime.datetime.now()
