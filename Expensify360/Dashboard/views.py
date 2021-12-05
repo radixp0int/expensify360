@@ -1,13 +1,10 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from django.contrib import messages
 from Dashboard.data_visualization import *
 from Expensify360.toolkit import *
-from Expenses.models import *
-from asgiref.sync import sync_to_async
 
 
 @login_required

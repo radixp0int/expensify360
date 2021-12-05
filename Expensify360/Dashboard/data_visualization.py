@@ -3,9 +3,8 @@ from numpy import datetime64
 import datetime
 from Expensify360.toolkit import *
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objs as go
-from sklearn.svm import SVR
+from scipy.signal import savgol_filter
 import glob
 
 
@@ -57,9 +56,9 @@ class VisualizationManager:
                     binned[i] += expense.amount
         x, y = t, binned
         if x.shape[0] < 1: return None  # caller must check for this!
-        svr_rbf = SVR(kernel='rbf', degree=7, C=np.mean(y), gamma=0.1, epsilon=0.1)
-        X = np.arange(x.shape[0]).reshape(-1, 1)
-        data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': svr_rbf.fit(X, y).predict(X)})
+        trend = savgol_filter(y, window_length=21, polyorder=3)
+        trend[trend < 0] = 0.0
+        data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': trend})
         data.to_pickle(f'{self.name}_data')
         return data
 
