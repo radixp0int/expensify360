@@ -6,6 +6,7 @@ import pandas as pd
 import plotly.graph_objs as go
 from scipy.signal import savgol_filter
 import glob
+from contextlib import suppress
 
 
 class VisualizationManager:
@@ -56,8 +57,12 @@ class VisualizationManager:
                     binned[i] += expense.amount
         x, y = t, binned
         if x.shape[0] < 1: return None  # caller must check for this!
-        trend = savgol_filter(y, window_length=21, polyorder=3)
-        trend[trend < 0] = 0.0
+
+        try:
+            trend = savgol_filter(y, window_length=21, polyorder=3)
+            trend[trend < 0] = 0.0
+        except ValueError: # this will be thrown for insufficient data
+            trend = None
         data = pd.DataFrame({'Time': x, 'Expenses': y, 'Trend': trend})
         data.to_pickle(f'{self.name}_data')
         return data
@@ -70,7 +75,8 @@ class VisualizationManager:
         # TODO include forecast plot
         self.fig = go.Figure()  # lol go figure
         self.fig.add_trace(go.Bar(x=data['Time'], y=data['Expenses'], name='Expenses'))
-        self.fig.add_trace(go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
+        if data['Trend'] is not None:
+            self.fig.add_trace(go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
         self.fig.update_layout(legend_title_text='Expense History')
         self.fig.update_xaxes(title_text='Time')
         self.fig.update_yaxes(title_text='Dollars')
