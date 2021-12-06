@@ -13,8 +13,8 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 {% block content %}
-<nav class="navbar navbar-expand-sm navbar-dark navbar-custom" id="main-nav" role="navigation">
-    <a class="navbar-brand" href={% url 'home' %}>
+<nav class="navbar-expand-sm navbar-dark navbar-custom" id="main-nav" role="navigation">
+    <a class="navbar-brand btn-outline-secondary rounded" href={% url 'home' %}>
         <img src="{% static 'images/logos/round-logo.png' %}"
              width="32" height="32" class="d-inline-block align-top"
              alt="Expensify 360 round logo"> Expensify360
@@ -22,19 +22,19 @@
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="collapsibleNavbar">
-        <ul class="navbar-nav">
+    <div class="collapse navbar-collapse nav-pills" id="collapsibleNavbar">
+        <ul class="navbar-nav btn-group">
             {% if user.is_authenticated %}
                 <li class="nav-item active">
-                    <a class="nav-link mx-2" href="{{ request.META.HTTP_REFERER }}">Go Back</a>
+                    <a class="nav-link mx-2 btn-outline-secondary rounded" href="{{ request.META.HTTP_REFERER }}">Go Back</a>
                 </li>
                 <li class="nav-item active">
-                    <a class="nav-link mx-2" href={% url 'expense' %}>Log Expense</a>
+                    <a class="nav-link mx-2 btn-outline-secondary rounded" href={% url 'expense' %}>Log Expense</a>
                 </li>
                 {% with ok=user|is_project_manager %}
                 {% if ok %}
                     <li class="nav-item active">
-                        <a class="nav-link mx-2" href="{% url 'expense_manager' %}">Expense Manager</a>
+                        <a class="nav-link mx-2 btn-outline-secondary rounded" href="{% url 'expense_manager' %}">Expense Manager</a>
                     </li>
                 {% endif %}
                 {% endwith %}
@@ -46,7 +46,7 @@
                         </a>
                     </li>
                     <li class="nav-item active">
-                        <a class="nav-link" data-target="#logout-modal" data-toggle="modal"
+                        <a class="nav-link btn-outline-secondary rounded" data-target="#logout-modal" data-toggle="modal"
                            href='#'>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                  class="bi bi-box-arrow-right" viewBox="0 0 16 16">
