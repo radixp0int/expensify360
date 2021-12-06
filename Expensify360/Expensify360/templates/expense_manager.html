@@ -7,20 +7,23 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
         <script src="https://unpkg.com/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
-        {% block scripts %}
-            <script src="{% static '/js/main.js' %}"></script>
-        {% endblock %}
+        <style>
+            .hidden {
+                display: none;
+            }
+        </style>
     </head>
+
     <body>
     <h1> Expense Manager </h1>
     </body>
-    <section>
+    <section id="expenses">
         <div style="margin-right:100px" id="expense-alerts">
             <table id="expense-table" style="width:100%;"
                    class="table table-striped table-bordered table-sm table-space">
                 <thead class="thead-dark">
                 <tr>
-                    <th scope="col">Project</th>
+                    <th scope="col">Project Name</th>
                     <th scope="col">User Name</th>
                     <th scope="col">Expense Type</th>
                     <th scope="col">Status</th>
@@ -31,14 +34,14 @@
                 </thead>
                 <tbody>
                 {% for expense in expenses %}
-                    <tr>
+                    <tr class="expense-row hidden row-{{ forloop.counter }}">
                         <td>{{ expense.project }}</td>
                         <td>{{ expense.requester }}</td>
                         <td>{{ expense.type }}</td>
-                        <td data-toggle="collapse" data-target="#accordion{{ expense.id }}" class="clickable">
+                        <td data-toggle="collapse" data-target="#accordion{{ forloop.counter }}" class="clickable">
                             {{ expense.status }}
                             <button type="button" class="btn btn-link btn-sm" role="button"
-                                    aria-label="accordion{{ expense.id }}">
+                                    aria-label="accordion{{ forloop.counter }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                      class="bi bi-chevron-down" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd"
@@ -49,14 +52,17 @@
                         <td>{{ expense.expense_date }}</td>
                         <td>${{ expense.amount|floatformat:2|intcomma }}</td>
                         <td>
-                            <button id="liveAlertBtn{{ expense.id }}" type="button" class="btn btn-success btn-sm btn-space">Approve</button>
+                            <button onclick="fadeOutEffect(this);deleteRow(this);"
+                                    id="liveAlertBtn{{ forloop.counter }}" type="button"
+                                    class="btn btn-success btn-sm btn-space">Approve
+                            </button>
                             <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
                         </td>
                     </tr>
-                    <tr>
-                        <td colspan="3">
-                            <div id="accordion{{ expense.id }}" class="collapse" aria-hidden="true">
-                                Summary of the Expense
+                    <tr class="expense-row hidden row-{{ forloop.counter }}">
+                        <td colspan="6">
+                            <div id="accordion{{ forloop.counter }}" class="collapse" aria-hidden="true">
+                                Summary of the Expense {{ forloop.counter }}
                             </div>
                         </td>
                     </tr>
@@ -66,20 +72,53 @@
         </div>
     </section>
 
-    {# Page Pagination #}
-    <nav aria-label="...">
-        <ul class="pagination justify-content-center">
-            <li class="page-item disabled">
-                <a class="page-link">Previous</a>
-            </li>
-            <li class="page-item active" aria-current="page">
-                <a class="page-link" href="#">1</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#">2</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#">Next</a></li>
-        </ul>
-    </nav>
+    <section id="loadMoreRows">
+        <button type="button" class="btn btn-primary mt-3 mb-5" id="loadMore">Load More</button>
+    </section>
+
+    <script>
+        const loadMore = document.getElementById('loadMore');
+        const hid = [...document.querySelectorAll('.expense-row.hidden')];
+        hid.splice(0, 20).forEach(
+            elem => elem.classList.remove('hidden')
+        );
+
+        loadMore.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            hid.splice(0, 20).forEach(
+                elem => elem.classList.remove('hidden')
+            )
+
+            if (hid.length == 0) {
+                loadMore.classList.add('hidden');
+            }
+        });
+
+        function fadeOutEffect(btn) {
+            const fadeTarget = btn.parentNode.parentNode;
+            const fadeEffect = setInterval(function () {
+                if (!fadeTarget.style.opacity) {
+                    fadeTarget.style.opacity = 1;
+                }
+                if (fadeTarget.style.opacity > 0) {
+                    fadeTarget.style.opacity -= 0.1;
+                } else {
+                    clearInterval(fadeEffect);
+                }
+            }, 200);
+        }
+
+        function deleteRow(btn) {
+            const row = btn.parentNode.parentNode;
+            const rowClassName = row.className;
+
+            const elements = document.getElementsByClassName(rowClassName);
+            while (elements.length > 0) {
+                elements[0].parentNode.removeChild(elements[0]);
+            }
+        }
+
+    </script>
+
 {% endblock %}

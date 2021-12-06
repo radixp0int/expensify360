@@ -7,6 +7,10 @@ h5 {
     padding: 20px 20px 20px 20px;
 }
 
+.hidden {
+    display: none;
+}
+
 nav .navbar-nav .nav-item li a {
     color: white !important;
 }
@@ -53,4 +57,9 @@ table {
 
 .alert {
     display: none;
+}
+
+td {
+    margin: auto;
+    display: block;
 }
