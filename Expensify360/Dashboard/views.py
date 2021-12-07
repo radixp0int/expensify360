@@ -254,11 +254,13 @@ def expense_manager(request):
         expense.isApproved = new_status
         expense.save()
 
+    expenses = list(
+        get_expense_records(
+            request.user,
+            filter_function=lambda x: x.isApproved == 'Pending').values()
+    )
     context = {
-        'expenses': list(
-            get_expense_records(
-                request.user, filter_function=lambda x: x.isApproved == 'Pending').values()
-        )
+        'expenses': sorted(expenses, key=lambda x: x.expense_date, reverse=True)
     }
     VisualizationManager.update_all(request.user)  # only need to call after an approval has occurred
     return render(request, 'expense_manager.html', context)
