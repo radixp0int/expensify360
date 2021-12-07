@@ -5,7 +5,6 @@ from crispy_forms.layout import Layout, Submit, Field, HTML
 from crispy_forms.bootstrap import FormActions
 
 
-
 class mileageEntryForm(forms.Form):
     userID = forms.CharField(label='User ID')
     expenseDate = forms.DateField(label='Expense Date')

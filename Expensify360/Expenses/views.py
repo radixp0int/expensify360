@@ -2,11 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 
+from Dashboard.models import *
 from .models import *
 from .forms import *
 
 import datetime
 
+# https://simpleisbetterthancomplex.com/tutorial/2018/01/29/how-to-implement-dependent-or-chained-dropdown-list-with-django.html
 
 # @login_required
 def expense(request):
@@ -25,7 +27,7 @@ def mileageEntry(request):
     if request.method == 'POST':
         form = mileageEntryForm(request.POST)
         if form.is_valid():
-            userID = form.cleaned_data['userID']
+            userID = current_user
             expenseDate = form.cleaned_data['expenseDate']
             organization = form.cleaned_data['organization']
             project = form.cleaned_data['project']
@@ -47,8 +49,7 @@ def mileageEntry(request):
             return HttpResponseRedirect('/expense')
     else:
         # Load a clean copy of the mileage entry form
-        form = mileageEntryForm(initial={'userID': current_user,
-                                         'expenseDate': today})
+        form = mileageEntryForm(initial={'expenseDate': today})
 
         context = {
             'form': form,
@@ -70,7 +71,7 @@ def expenseEntry(request):
 
         print(form.errors)
         if form.is_valid():
-            userID = form.cleaned_data['userID']
+            userID = current_user
             expenseDate = form.cleaned_data['expenseDate']
             organization = form.cleaned_data['organization']
             project = form.cleaned_data['project']
@@ -96,8 +97,7 @@ def expenseEntry(request):
 
     else:
         # Load a clean copy of the expense entry form
-        form = expenseEntryForm(initial={'userID': current_user,
-                                         'expenseDate': today})
+        form = expenseEntryForm(initial={'expenseDate': today},)
 
         context = {
             'form': form,
@@ -117,7 +117,7 @@ def timeEntry(request):
     if request.method == 'POST':
         form = timeEntryForm(request.POST)
         if form.is_valid():
-            userID = form.cleaned_data['userID']
+            userID = current_user
             expenseDate = form.cleaned_data['expenseDate']
             organization = form.cleaned_data['organization']
             project = form.cleaned_data['project']
@@ -139,14 +139,51 @@ def timeEntry(request):
             return HttpResponseRedirect('/expense')
     else:
         # Load a clean copy of the time entry form
-        form = timeEntryForm(initial={'userID': current_user,
-                                      'expenseDate': today})
+        form = timeEntryForm(initial={'expenseDate': today})
 
     context = {
         'form': form,
     }
 
     return render(request, 'timeEntry.html', context)
+
+
+def editMileage(request):
+    # Grab the current user ID to pre-populate the form
+    current_user = request.user
+
+    if request.method == 'POST':
+        form = mileageEntryForm(request.POST)
+        if form.is_valid():
+            userID = current_user
+            expenseDate = form.cleaned_data['expenseDate']
+            organization = form.cleaned_data['organization']
+            project = form.cleaned_data['project']
+            miles = form.cleaned_data['miles']
+            mileageRate = form.cleaned_data['mileageRate']
+            mileageTotal = form.cleaned_data['mileageTotal']
+            expenseType = "Mileage Expense"
+
+            mileageInfo = Expense(userID=userID,
+                                  expenseDate=expenseDate,
+                                  organization=organization,
+                                  project=project,
+                                  miles=miles,
+                                  mileageRate=mileageRate,
+                                  mileageTotal=mileageTotal,
+                                  expenseType=expenseType, )
+            mileageInfo.save()
+            print(userID, expenseDate)
+            return HttpResponseRedirect('/expense')
+    else:
+        # Load a clean copy of the mileage entry form
+        form = mileageEntryForm(initial={'expenseDate': today})
+
+        context = {
+            'form': form,
+        }
+
+        return render(request, 'mileageEntry.html', context)
 
 
 # @login_required
