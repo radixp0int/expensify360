@@ -17,6 +17,12 @@ nav .navbar-nav .nav-item li a {
 
 .navbar-custom {
     background-color: #10185C;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0px;
+    padding-bottom: 5px;
+    width: 100%; /* Full width */
 }
 
 section {
