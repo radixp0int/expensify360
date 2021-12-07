@@ -8,6 +8,8 @@ from scipy.signal import savgol_filter
 import glob
 from sklearn.svm import SVR
 from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+from prophet import Prophet
 
 
 class VisualizationManager:
@@ -79,15 +81,25 @@ class VisualizationManager:
         #if data['Trend'] is not None:
             #self.fig.add_trace(go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
         # testing
-        x_pred = date_range(start=data['Time'].iloc[0], periods=data['Time'].shape[0]+6, freq=self.resolution+'S')
-        gpr = GaussianProcessRegressor()
-        svr_rbf = SVR(kernel='rbf', C=np.mean(data['Expenses']), gamma=0.1, epsilon=0.1)
+        x_pred = date_range(start=data['Time'].iloc[-30], periods=data['Time'].iloc[-30:].shape[0], freq=self.resolution+'S')
+        kernel = C(np.mean(data['Expenses']), (1e-1, 1e1)) * RBF(10, (1e-2, 1e2))
+        gpr = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=9)
+        #svr_rbf = SVR(kernel='rbf', C=np.mean(data['Expenses']), gamma=0.1, epsilon=0.1)
         y = data['Expenses'].iloc[1:]
         X = np.array(data['Expenses'].iloc[:-1]).reshape(-1, 1)
         #X = np.arange(data['Time'].shape[0]+6)[-20:].reshape(-1, 1)
-        X_train = np.arange(data['Time'].shape[0]).reshape(-1, 1)
-        y_hat, sigma = gpr.fit(X, y).predict(X, return_std=True)
-        self.fig.add_trace(go.Bar(x=x_pred[1:], y=y_hat))
+        #X_train = np.arange(data['Time'].shape[0]).reshape(-1, 1)
+        y_hat, sigma = gpr.fit(X, y).predict(np.array(data['Expenses'].iloc[-30:]).reshape(-1, 1), return_std=True)
+        print(f'{np.min(sigma)}:{np.max(sigma)}')
+        self.fig.add_trace(go.Line(x=x_pred[1:], y=y_hat))
+        prophet_df = data.copy()
+        prophet_df.drop('Trend', axis=1)
+        prophet_df = prophet_df.rename(columns={'Time': 'ds', 'Expenses': 'y'})
+        m = Prophet()
+        m.fit(prophet_df)
+        future = m.make_future_dataframe(periods=60)
+        print(future['ds'])
+        #self.fig.add_trace(go.Line(x=future['ds'], y=future['y_hat']))
         ###
 
         self.fig.update_layout(legend_title_text='Expense History')
