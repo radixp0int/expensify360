@@ -157,6 +157,7 @@ def get_expense_records(user, filter_function=None):
         proxy.status = expense.isApproved
         proxy.type = expense.expenseType
         proxy.amount = expense_total(expense)
+        proxy.id =expense.id
     return records
 
 

@@ -52,11 +52,17 @@
                         <td>{{ expense.expense_date }}</td>
                         <td>${{ expense.amount|floatformat:2|intcomma }}</td>
                         <td>
-                            <button onclick="fadeOutEffect(this);deleteRow(this);"
-                                    id="liveAlertBtn{{ forloop.counter }}" type="button"
-                                    class="btn btn-success btn-sm btn-space">Approve
-                            </button>
-                            <button type="button" class="btn btn-danger btn-sm m-0">Decline</button>
+                            <form name="change-status" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="change" value="{{ expense.id }}_Approved">
+                                <input type="submit" value="Approve" class="btn btn-primary">
+                            </form>
+
+                            <form name="change-status" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="change" value="{{ expense.id }}_Denied">
+                                <input type="submit" value="Decline" class="btn btn-primary">
+                            </form>
                         </td>
                     </tr>
                     <tr class="expense-row hidden row-{{ forloop.counter }}">
