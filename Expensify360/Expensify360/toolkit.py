@@ -36,6 +36,22 @@ def expense_total(expense):
     return 0.0  # silent failure
 
 
+def set_expense_total(expense, new_value):
+    """
+    :param: expense: expense object
+    :param: new_value: new expense total for this expense
+    :return: None
+    """
+    expense_type = expense.expenseType
+    if str.upper(expense_type) == 'MILEAGE':
+        expense.mileageTotal = new_value
+    elif str.upper(expense_type) == 'EXPENSE':
+        expense.expenseTotal = new_value
+    elif str.upper(expense_type) == 'TIME' or str.upper(expense_type) == 'HOURS':
+        expense.hourTotal = new_value
+    expense.save()
+
+
 def get_organization_structure(user=None, request=None, include_unassigned_users=True):
     """
     :param user: User, required if request not passed
@@ -257,6 +273,12 @@ def make_test_data(user, num_to_generate=500):
             expense.save()
 
 
+def embed_seasonality_and_trend():
+    expenses = sorted(list(Expense.objects.all()), key=lambda x: np.datetime64(x.expenseDate), reverse=False)
+    for i, ele in enumerate(expenses):
+        set_expense_total(ele, float(expense_total(ele))/100 + 100 * np.sin(i/6) + 100 * i/6)
+
+
 def make_demo():
     """
         runserver and go to /magic to run. Not safe to run
@@ -313,4 +335,5 @@ def make_demo():
             print(f'user {user} added to {name}')
     print('generating expense data...')
     make_test_data(user=boss)
+    embed_seasonality_and_trend()
     return
