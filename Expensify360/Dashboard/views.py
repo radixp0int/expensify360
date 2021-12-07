@@ -5,6 +5,7 @@ from Dashboard.forms import *
 from django.contrib import messages
 from Dashboard.data_visualization import *
 from Expensify360.toolkit import *
+from Expenses.models import *
 
 
 @login_required
@@ -247,12 +248,17 @@ def manage_permissions(request):
 
 @login_required
 def expense_manager(request):
+    if request.method == 'POST' and 'change' in request.POST:
+        id, new_status = request.POST.get('change').split('_')
+        expense = Expense.objects.get(id=id)
+        expense.isApproved = new_status
+        expense.save()
 
     context = {
-        'expenses': list(get_expense_records(
-            request.user,
-            filter_function=lambda x: x.isApproved == 'Pending').values()
-                         )
+        'expenses': list(
+            get_expense_records(
+                request.user, filter_function=lambda x: x.isApproved == 'Pending').values()
+        )
     }
     VisualizationManager.update_all(request.user)  # only need to call after an approval has occurred
     return render(request, 'expense_manager.html', context)
