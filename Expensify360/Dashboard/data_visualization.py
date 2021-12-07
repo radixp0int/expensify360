@@ -6,6 +6,8 @@ from pandas import date_range, read_pickle, DataFrame
 import plotly.graph_objs as go
 from scipy.signal import savgol_filter
 import glob
+from sklearn.svm import SVR
+from sklearn.gaussian_process import GaussianProcessRegressor
 
 
 class VisualizationManager:
@@ -74,8 +76,20 @@ class VisualizationManager:
         # TODO include forecast plot
         self.fig = go.Figure()  # lol go figure
         self.fig.add_trace(go.Bar(x=data['Time'], y=data['Expenses'], name='Expenses'))
-        if data['Trend'] is not None:
-            self.fig.add_trace(go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
+        #if data['Trend'] is not None:
+            #self.fig.add_trace(go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
+        # testing
+        x_pred = date_range(start=data['Time'].iloc[0], periods=data['Time'].shape[0]+6, freq=self.resolution+'S')
+        gpr = GaussianProcessRegressor()
+        svr_rbf = SVR(kernel='rbf', C=np.mean(data['Expenses']), gamma=0.1, epsilon=0.1)
+        y = data['Expenses'].iloc[1:]
+        X = np.array(data['Expenses'].iloc[:-1]).reshape(-1, 1)
+        #X = np.arange(data['Time'].shape[0]+6)[-20:].reshape(-1, 1)
+        X_train = np.arange(data['Time'].shape[0]).reshape(-1, 1)
+        y_hat, sigma = gpr.fit(X, y).predict(X, return_std=True)
+        self.fig.add_trace(go.Bar(x=x_pred[1:], y=y_hat))
+        ###
+
         self.fig.update_layout(legend_title_text='Expense History')
         self.fig.update_xaxes(title_text='Time')
         self.fig.update_yaxes(title_text='Dollars')
