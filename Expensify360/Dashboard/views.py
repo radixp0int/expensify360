@@ -247,12 +247,13 @@ def manage_permissions(request):
 
 @login_required
 def expense_manager(request):
-
-    context = {
-        'expenses': list(get_expense_records(
+    expenses = list(
+        get_expense_records(
             request.user,
             filter_function=lambda x: x.isApproved == 'Pending').values()
-                         )
+    )
+    context = {
+        'expenses': sorted(expenses, key=lambda x: x.expense_date, reverse=True)
     }
     VisualizationManager.update_all(request.user)  # only need to call after an approval has occurred
     return render(request, 'expense_manager.html', context)
