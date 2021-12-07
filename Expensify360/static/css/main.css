@@ -58,8 +58,3 @@ table {
 .alert {
     display: none;
 }
-
-td {
-    margin: auto;
-    display: block;
-}
