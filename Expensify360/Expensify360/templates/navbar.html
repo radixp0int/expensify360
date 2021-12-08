@@ -19,24 +19,30 @@
                  width="32" height="32" class="d-inline-block align-top"
                  alt="Expensify 360 round logo"> Expensify360
         </a>
-        <button style="float: right;" class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <button style="float: right;" class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#collapsibleNavbar">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse nav-pills" id="collapsibleNavbar">
             <ul class="navbar-nav btn-group">
                 {% if user.is_authenticated %}
                     <li class="nav-item active">
-                        <a class="nav-link mx-2 btn-outline-secondary rounded" href="{{ request.META.HTTP_REFERER }}">Go
-                            Back</a>
+                        <a class="nav-link mx-2 btn-outline-secondary rounded" href="{{ request.META.HTTP_REFERER }}">
+                            Go Back</a>
                     </li>
                     <li class="nav-item active">
-                        <a class="nav-link mx-2 btn-outline-secondary rounded" href={% url 'expense' %}>Log Expense</a>
+                        <a class="nav-link mx-2 btn-outline-secondary rounded" href={% url 'expense' %}>
+                            Enter Expense</a>
                     </li>
                     {% with ok=user|is_project_manager %}
                         {% if ok %}
                             <li class="nav-item active">
                                 <a class="nav-link mx-2 btn-outline-secondary rounded"
                                    href="{% url 'expense_manager' %}">Expense Manager</a>
+                            <li class="nav-item active">
+                                <a class="nav-link mx-2 btn-outline-secondary rounded"
+                                   href="{% url 'expense_history' %}">View History</a>
+                            </li>
                             </li>
                         {% endif %}
                     {% endwith %}
