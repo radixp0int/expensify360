@@ -19,10 +19,7 @@ class mileageEntryForm(forms.Form):
 
 
 class expenseEntryForm(forms.Form):
-    userID = forms.CharField(label='User ID')
     expenseDate = forms.DateField(label='Expense Date')
-    organization = forms.CharField(label='Organization')
-    project = forms.ChoiceField(label='Project')
     file = forms.FileField(label='Receipt Upload')
     expenseCost = forms.DecimalField(label='Item Cost', max_digits=8,
                                      widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
@@ -35,10 +32,7 @@ class expenseEntryForm(forms.Form):
 
 
 class timeEntryForm(forms.Form):
-    userID = forms.CharField(label='User ID')
     expenseDate = forms.DateField(label='Expense Date')
-    organization = forms.CharField(label='Organization')
-    project = forms.CharField(label='Project')
     hours = forms.DecimalField(label='Hours Worked', max_digits=6,
                                widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
     hourlyRate = forms.DecimalField(label='Hourly Rate', max_digits=6,
