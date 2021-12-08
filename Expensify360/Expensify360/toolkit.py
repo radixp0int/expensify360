@@ -126,27 +126,36 @@ def is_project_manager(user):
     return set(project_manager_permissions()).intersection([perm for perm in user.user_permissions.all()]) != set([])
 
 
-def get_expenses(user):
+def get_expenses(user, manager=True):
     """
-    :param user: User object, a manager or project manager
+    :param user: User object
+    :param manager: bool, if the user is a manager
     :return: list of Expense objects for which user is responsible
     """
+
     # expense uses charfields so we need a list of names for projects this user manages
-    projects = set(list(Project.objects.filter(manager=user).all()) + list(Project.objects.filter(second_manager=user)))
+    if manager:
+        projects = set(list(Project.objects.filter(manager=user).all()) + list(Project.objects.filter(second_manager=user)))
+    else:
+        projects = list(user.project_set.all())
     project_names = [project.name for project in projects]
     expenses = []
     for name in project_names:
         with suppress(Exception):
-            expenses += Expense.objects.filter(project=name).all()
+            if not manager:
+                expenses += Expense.objects.filter(project=name).filter(userID=user.username).all()
+            else:
+                expenses += Expense.objects.filter(project=name).all()
     return expenses
 
 
-def get_expense_records(user, filter_function=None):
+def get_expense_records(user, filter_function=None, manager=True):
     """
-            :param user: manager or project manager user object
-            :param filter_function: optional, function that takes
+        :param user: User object
+        :param filter_function: optional, function that takes
                 an expense object and returns a bool. Used to filter
                 expenses by a criteria i.e. approval status, requester, etc.
+        :param manager: bool, if this user is a manager or project manager
 
         :return:
             a dict[expense object: data].
@@ -159,7 +168,7 @@ def get_expense_records(user, filter_function=None):
                 data.type:str, in ['Mileage', 'Expense', 'Hours'] |
                 data.amount:float, expense total
     """
-    expenses = get_expenses(user)
+    expenses = get_expenses(user, manager=manager)
 
     if filter_function: expenses = [e for e in expenses if filter_function(e)]
     records = {

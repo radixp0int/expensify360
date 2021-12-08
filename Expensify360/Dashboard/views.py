@@ -239,7 +239,6 @@ def remove_user(request):
     return render(request, 'remove_user.html', context)
 
 
-
 @login_required
 @permission_required('Can add user')
 def manage_permissions(request):
@@ -296,12 +295,20 @@ def expense_manager(request):
     return render(request, 'expense_manager.html', context)
 
 
+@login_required
 def expense_history(request):
-    expenses = list(
-        get_expense_records(
-            request.user,
-            filter_function=lambda x: x.isApproved != 'Pending').values()
-    )
+    if is_project_manager(request.user): # also true for managers
+        expenses = list(
+            get_expense_records(
+                request.user,
+                filter_function=lambda x: x.isApproved != 'Pending').values(),
+        )
+    else:
+        expenses = list(
+            get_expense_records(
+                request.user,
+                filter_function=lambda x: x.userID == request.user.username, manager=False).values()
+        )
     context = {
         'expenses': sorted(expenses, key=lambda x: x.expense_date, reverse=True)
     }
