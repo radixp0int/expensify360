@@ -334,6 +334,7 @@ def make_demo():
             Project.objects.get(name=name).users.add(User.objects.get(username=user))
             print(f'user {user} added to {name}')
     print('generating expense data...')
+
     make_test_data(user=boss)
     embed_seasonality_and_trend()
     return
