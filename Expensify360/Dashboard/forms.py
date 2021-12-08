@@ -49,8 +49,6 @@ class ManageUsers(forms.Form):
 
 
 class RemoveUser(forms.Form):
-    Username = forms.CharField()
-
     helper = FormHelper()
     helper.form_class = 'bootstrap4'
     helper.layout = Layout(
@@ -58,8 +56,6 @@ class RemoveUser(forms.Form):
         FormActions(
             Submit('remove-user', 'Remove User', css_class="btn btn-primary btn-me me-2"),
         ),
-
-        Field('Username', css_class='input-xlarge')
     )
 
 
