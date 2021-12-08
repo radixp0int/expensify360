@@ -75,7 +75,7 @@ class VisualizationManager:
         self.fig = go.Figure()  # lol go figure
         self.fig.add_trace(go.Bar(x=data['Time'], y=data['Expenses'], name='Expenses'))
         if data['Trend'] is not None:
-            self.fig.add_trace(go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
+            self.fig.add_trace(go.Scatter(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
         self.fig.update_layout(legend_title_text='Expense History')
         self.fig.update_xaxes(title_text='Time')
         self.fig.update_yaxes(title_text='Dollars')

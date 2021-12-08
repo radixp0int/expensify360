@@ -82,9 +82,7 @@ def create_proj(request):
 @login_required
 @permission_required('auth.add_user')
 def manage_users(request):
-    # TODO: add remove user from group option
     # TODO: delete project / organization option, warn user on delete
-    # TODO: refactor delete user (should have its own page and add warning)
     if request.method == 'POST':
         if 'register' in request.POST:
             # then we're registering a user
@@ -100,20 +98,6 @@ def manage_users(request):
         elif 'add-user' in request.POST:
             # we want the registration form
             return render(request, 'add_user.html', {'add': UserCreationForm(), 'done_or_cancel': SubmitOrCancel()})
-
-        elif 'remove-user' in request.POST:
-            name = request.POST.get('Username')
-            try:
-                user = User.objects.get(username=request.POST.get('Username'))
-                user.delete()
-                messages.success(request, f'{name} Deleted Successfully')
-                return render(
-                    request,
-                    'user_management.html',
-                    {'add': ManageUsers(), 'rem': RemoveUser(), 'add_to_group': AddToGroup()}
-                )
-            except User.DoesNotExist:
-                messages.error(request, f'{name} Does Not Exist')
 
         elif 'add-group' in request.POST:
             # take me to organization add form
@@ -195,6 +179,9 @@ def manage_users(request):
 
         elif 'select_user_permissions' in request.POST:
             return redirect(to='change_user_permissions')
+        
+        elif 'remove-user' in request.POST:
+            return redirect(to='remove-user')
 
     # otherwise just render the options
     return render(
@@ -208,6 +195,49 @@ def manage_users(request):
             'delegate_project': ChangePermissionsButton()
         }
     )
+
+
+@login_required
+@permission_required('Can add user')
+def remove_user(request):
+    if request.method == 'POST' and 'username' in request.POST:
+        username = request.POST.get('username')
+        group_type, group_name = request.POST.get('selected-action').split('`')
+        user = User.objects.get(username=username)
+        if group_type == 'organization':
+            group = Organization.objects.get(name=group_name)
+            user.organization_set.remove(group)
+        else:
+            group = Project.objects.get(name=group_name)
+            if group.second_manager.username == username:
+                group.second_manager.user_permissions.set([])
+                group.second_manager = request.user
+                group.save()
+            user.project_set.remove(group)
+
+        group.user_set.remove()
+        group.save()
+        messages.success(request, f'{username} removed from {group_name} {group_type}.')
+
+    users = []
+    organizations = []
+    projects = []
+
+    org_struct = get_organization_structure(request.user, include_unassigned_users=False)
+    for org in org_struct:
+        organizations.append(org.name)
+        for project in org.proj_list:
+            projects.append(project.name)
+            for user in project.users:
+                if user != request.user:
+                    users.append(user.username)
+    context = {
+        'users': list(set(users)),
+        'orgs': organizations,
+        'projects': projects
+    }
+    return render(request, 'remove_user.html', context)
+
 
 
 @login_required
