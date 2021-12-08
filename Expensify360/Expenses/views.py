@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from Dashboard.data_visualization import VisualizationManager
 
+from Dashboard.models import *
 from .models import *
 from .forms import *
 
@@ -18,6 +19,7 @@ def expense(request):
 def mileageEntry(request):
     # Grab the current user ID to pre-populate the form
     current_user = request.user
+    user_projects = [project for project in current_user.project_set.all()]
 
     # Get current date and time and convert it to USA format
     today = datetime.date.today()
@@ -26,10 +28,13 @@ def mileageEntry(request):
     if request.method == 'POST':
         form = mileageEntryForm(request.POST)
         if form.is_valid():
-            userID = form.cleaned_data['userID']
+            userID = current_user
             expenseDate = form.cleaned_data['expenseDate']
-            organization = form.cleaned_data['organization']
-            project = form.cleaned_data['project']
+
+            project = request.POST.get('project')
+            projectObject = Project.objects.get(name__exact=project)
+            organization = projectObject.org
+
             miles = form.cleaned_data['miles']
             mileageRate = form.cleaned_data['mileageRate']
             mileageTotal = form.cleaned_data['mileageTotal']
@@ -48,11 +53,11 @@ def mileageEntry(request):
             return HttpResponseRedirect('/expense')
     else:
         # Load a clean copy of the mileage entry form
-        form = mileageEntryForm(initial={'userID': current_user,
-                                         'expenseDate': today})
+        form = mileageEntryForm(initial={'expenseDate': today})
 
         context = {
             'form': form,
+            'projects': user_projects,
         }
 
         return render(request, 'mileageEntry.html', context)
@@ -61,6 +66,7 @@ def mileageEntry(request):
 def expenseEntry(request):
     # Grab the current user ID to pre-populate the form
     current_user = request.user
+    user_projects = [project for project in current_user.project_set.all()]
 
     # Get current date and time and convert it to USA format
     today = datetime.date.today()
@@ -71,10 +77,13 @@ def expenseEntry(request):
 
         print(form.errors)
         if form.is_valid():
-            userID = form.cleaned_data['userID']
+            userID = current_user
             expenseDate = form.cleaned_data['expenseDate']
-            organization = form.cleaned_data['organization']
-            project = form.cleaned_data['project']
+
+            project = request.POST.get('project')
+            projectObject = Project.objects.get(name__exact=project)
+            organization = projectObject.org
+
             file = request.FILES['file']
             expenseCost = form.cleaned_data['expenseCost']
             tax = form.cleaned_data['tax']
@@ -94,14 +103,14 @@ def expenseEntry(request):
                                   expenseType=expenseType,)
             expenseInfo.save()
             return HttpResponseRedirect('/expense')
-            # TODO FINISH FILE UPLOAD
+
     else:
         # Load a clean copy of the expense entry form
-        form = expenseEntryForm(initial={'userID': current_user,
-                                         'expenseDate': today})
+        form = expenseEntryForm(initial={'expenseDate': today},)
 
         context = {
             'form': form,
+            'projects': user_projects,
         }
 
         return render(request, 'expenseEntry.html', context)
@@ -110,6 +119,7 @@ def expenseEntry(request):
 def timeEntry(request):
     # Grab the current user ID to pre-populate the form
     current_user = request.user
+    user_projects = [project for project in current_user.project_set.all()]
 
     # Get current date and time and convert it to USA format
     today = datetime.date.today()
@@ -118,10 +128,13 @@ def timeEntry(request):
     if request.method == 'POST':
         form = timeEntryForm(request.POST)
         if form.is_valid():
-            userID = form.cleaned_data['userID']
+            userID = current_user
             expenseDate = form.cleaned_data['expenseDate']
-            organization = form.cleaned_data['organization']
-            project = form.cleaned_data['project']
+
+            project = request.POST.get('project')
+            projectObject = Project.objects.get(name__exact=project)
+            organization = projectObject.org
+
             hours = form.cleaned_data['hours']
             hourlyRate = form.cleaned_data['hourlyRate']
             hourTotal = form.cleaned_data['hourTotal']
@@ -136,15 +149,21 @@ def timeEntry(request):
                                   hourTotal=hourTotal,
                                expenseType=expenseType,)
             hourInfo.save()
+            print(userID, expenseDate)
             return HttpResponseRedirect('/expense')
     else:
         # Load a clean copy of the time entry form
-        form = timeEntryForm(initial={'userID': current_user,
-                                      'expenseDate': today})
+        form = timeEntryForm(initial={'expenseDate': today})
 
     context = {
         'form': form,
+        'projects': user_projects,
     }
 
     return render(request, 'timeEntry.html', context)
 
+
+# @login_required
+def expense_approval(request):
+    context = {}
+    return render(request, 'expense_approval.html', context)

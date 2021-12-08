@@ -28,14 +28,49 @@
                 document.getElementById("id_expenseTotal").value = 0;
             }
         }
+
+        function hideForm() {
+            var selectedProject = document.getElementById( "project_selector_id" );
+
+            if (selectedProject.options[ selectedProject.selectedIndex ].value  === "none") {
+                document.getElementById("submit_id").hidden = true;
+                document.getElementById("div_id_expenseDate").hidden = true;
+                document.getElementById("div_id_file").hidden = true;
+                document.getElementById("div_id_expenseCost").hidden = true;
+                document.getElementById("div_id_tax").hidden = true;
+                document.getElementById("div_id_shipping").hidden = true;
+                document.getElementById("div_id_expenseTotal").hidden = true;
+            }
+            else {
+                document.getElementById("submit_id").hidden = false;
+                document.getElementById("div_id_expenseDate").hidden = false;
+                document.getElementById("div_id_file").hidden = false;
+                document.getElementById("div_id_expenseCost").hidden = false;
+                document.getElementById("div_id_tax").hidden = false;
+                document.getElementById("div_id_shipping").hidden = false;
+                document.getElementById("div_id_expenseTotal").hidden = false;
+            }
+        }
     </script>
+
+    <body onload="hideForm()">
 
     <div class="forms" id="alert">
         <form method="post" id="expense-form" enctype="multipart/form-data">
+            <div>
+                <label>Project*</label>
+                <select name="project" id="project_selector_id" class="form-control" onchange=hideForm()>
+                    <option value="none" selected>--------</option>
+                    {% for project in projects %}
+                        <option name="option" value="{{project}}">{{project}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
             {% csrf_token %}
             {{ form|crispy }}
             <div class="col text-center" style="padding-top: 20px;">
-                <input class="btn btn-lg btn-success" type="submit" value="Submit">
+                <input class="btn btn-lg btn-success" type="submit" value="Submit" id="submit_id">
                 <input class="btn btn-lg btn-danger" type="button" value="Cancel"
                        data-target="#unsaved-modal" data-toggle="modal"#} >
             </div>
@@ -55,7 +90,7 @@
                     <p>Unsaved changes will be lost. If you would like to save changes, press "Keep Editing".</p>
                 </div>
                 <div class="modal-footer">
-                    <a class="btn btn-secondary mx-2" href={% url 'expense' %}>Go Back</a>
+                    <a> class="btn btn-secondary mx-2" href={% url 'expense' %}>Go Back</a>
                     <button class="btn btn-primary mx-2" class="close" data-dismiss="modal">Keep Editing</button>
                 </div>
             </div>
