@@ -1,18 +1,22 @@
 import pickle
+import numpy as np
+import pandas
 from numpy import datetime64
 import datetime
 from Expensify360.toolkit import *
 from pandas import date_range, read_pickle, DataFrame
 import plotly.graph_objs as go
+import statsmodels.tsa.api as tsa
 from scipy.signal import savgol_filter
 import glob
+import datetime
 
 
 class VisualizationManager:
 
     def __init__(self, user, resolution='M', lookback=100000):
         self.resolution = resolution
-        self.user = user    # this is a string!
+        self.user = user  # this is a string!
         self.lookback = int(lookback)
         self.name = f'{self.lookback}_{self.resolution}_{self.user}'
         self.fig = None
@@ -31,7 +35,8 @@ class VisualizationManager:
 
             returns: tuple of x:datetime64, y:float
         """
-        expenses = list(get_expense_records(User.objects.get(username=self.user), filter_function=lambda x: x.isApproved == 'Approved').values())
+        expenses = list(get_expense_records(User.objects.get(username=self.user),
+                                            filter_function=lambda x: x.isApproved == 'Approved').values())
         if len(expenses) == 0: return None
         now = np.datetime64(datetime.datetime.now(), self.resolution)
         earliest_expense = sorted(expenses, key=lambda e: np.datetime64(e.expense_date, self.resolution))[0]
@@ -40,12 +45,12 @@ class VisualizationManager:
         n_periods = np.min((self.lookback, delta))
         t = date_range(
             end=now + np.timedelta64(1, self.resolution),
-            periods=n_periods+1,
+            periods=n_periods + 1,
             freq=self.resolution
         )
 
         t = np.unique(np.array(t).astype(f'datetime64[{self.resolution}]'))
-        binned = np.zeros(n_periods+1)
+        binned = np.zeros(n_periods + 1)
         # aggregate according to resolution
         for i, ele in enumerate(t):
             for expense in expenses:
@@ -66,16 +71,52 @@ class VisualizationManager:
         data.to_pickle(f'{self.name}_data')
         return data
 
+    def create_forecast(self):
+        data = self.load_data()
+        # assuming data is nonstationary
+        stationary_data = data.diff()
+
+        model = tsa.SARIMAX(data['Expenses'], order=(1, 1, 1), trend='c')
+        results = model.fit()
+        # prediction = results.get_prediction(start=-20, dynamic=True)
+        # mean_prediction = prediction.predicted_mean
+        # confidence_intervals = prediction.conf_int()
+        forecast = results.get_forecast(steps=50)
+        mean_forecast = forecast.predicted_mean
+        # print(mean_forecast)
+        # print(results.summary())
+        return mean_forecast
+
     def create_plot(self):
         data = self.load_data()
+        forecast = self.create_forecast()
+        forecast.name = "Forecast"
+        og_index = len(data.index)
+        data = pandas.concat([data, forecast])
+        data = data.rename(columns={0: 'Forecast'})
+
+        i = 0
+        while i < 50:
+            last_date = data.iat[og_index - 1, 2]
+            new_date = last_date + datetime.timedelta(days=1)
+            data.iat[og_index, 2] = new_date
+            og_index += 1
+            i += 1
+
+        print(data.tail(60))  # for testing
+
         if data is None:
             # indicates not enough data, silent fail
             return ''
         # TODO include forecast plot
+
         self.fig = go.Figure()  # lol go figure
         self.fig.add_trace(go.Bar(x=data['Time'], y=data['Expenses'], name='Expenses'))
         if data['Trend'] is not None:
-            self.fig.add_trace(go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
+            self.fig.add_trace(
+                go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
+        self.fig.add_trace(
+            go.Line(x=data['Time'], y=data['Forecast'], name='Forecast', line=dict(color='black', width=2, dash='dash')))
         self.fig.update_layout(legend_title_text='Expense History')
         self.fig.update_xaxes(title_text='Time')
         self.fig.update_yaxes(title_text='Dollars')
