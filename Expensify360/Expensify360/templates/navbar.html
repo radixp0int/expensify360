@@ -39,13 +39,13 @@
                             <li class="nav-item active">
                                 <a class="nav-link mx-2 btn-outline-secondary rounded"
                                    href="{% url 'expense_manager' %}">Expense Manager</a>
-                            <li class="nav-item active">
-                                <a class="nav-link mx-2 btn-outline-secondary rounded"
-                                   href="{% url 'expense_history' %}">View History</a>
-                            </li>
                             </li>
                         {% endif %}
                     {% endwith %}
+                        <li class="nav-item active">
+                            <a class="nav-link mx-2 btn-outline-secondary rounded"
+                               href="{% url 'expense_history' %}">View History</a>
+                        </li>
                     </ul>
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
