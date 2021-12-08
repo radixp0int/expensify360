@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from Dashboard.data_visualization import VisualizationManager
 
 from .models import *
 from .forms import *
@@ -27,21 +28,21 @@ def mileageEntry(request):
         if form.is_valid():
             userID = form.cleaned_data['userID']
             expenseDate = form.cleaned_data['expenseDate']
-            submissionDate = form.cleaned_data['submissionDate']
             organization = form.cleaned_data['organization']
             project = form.cleaned_data['project']
             miles = form.cleaned_data['miles']
             mileageRate = form.cleaned_data['mileageRate']
             mileageTotal = form.cleaned_data['mileageTotal']
+            expenseType = "Mileage"
 
             mileageInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
-                                  submissionDate=submissionDate,
                                   organization=organization,
                                   project=project,
                                   miles=miles,
                                   mileageRate=mileageRate,
-                                  mileageTotal=mileageTotal, )
+                                  mileageTotal=mileageTotal,
+                                  expenseType=expenseType,)
             mileageInfo.save()
             print(userID, expenseDate)
             return HttpResponseRedirect('/expense')
@@ -72,7 +73,6 @@ def expenseEntry(request):
         if form.is_valid():
             userID = form.cleaned_data['userID']
             expenseDate = form.cleaned_data['expenseDate']
-            submissionDate = form.cleaned_data['submissionDate']
             organization = form.cleaned_data['organization']
             project = form.cleaned_data['project']
             file = request.FILES['file']
@@ -80,17 +80,18 @@ def expenseEntry(request):
             tax = form.cleaned_data['tax']
             shipping = form.cleaned_data['shipping']
             expenseTotal = form.cleaned_data['expenseTotal']
+            expenseType = "Expense"
 
             expenseInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
-                                  submissionDate=submissionDate,
                                   organization=organization,
                                   project=project,
                                   expensePhoto=file,
                                   expenseCost=expenseCost,
                                   tax=tax,
                                   shipping=shipping,
-                                  expenseTotal=expenseTotal,)
+                                  expenseTotal=expenseTotal,
+                                  expenseType=expenseType,)
             expenseInfo.save()
             return HttpResponseRedirect('/expense')
             # TODO FINISH FILE UPLOAD
@@ -119,31 +120,31 @@ def timeEntry(request):
         if form.is_valid():
             userID = form.cleaned_data['userID']
             expenseDate = form.cleaned_data['expenseDate']
-            submissionDate = form.cleaned_data['submissionDate']
             organization = form.cleaned_data['organization']
             project = form.cleaned_data['project']
             hours = form.cleaned_data['hours']
             hourlyRate = form.cleaned_data['hourlyRate']
             hourTotal = form.cleaned_data['hourTotal']
+            expenseType = "Time"
 
             hourInfo = Expense(userID=userID,
                                   expenseDate=expenseDate,
-                                  submissionDate=submissionDate,
                                   organization=organization,
                                   project=project,
                                   hours=hours,
                                   hourlyRate=hourlyRate,
-                                  hourTotal=hourTotal, )
+                                  hourTotal=hourTotal,
+                               expenseType=expenseType,)
             hourInfo.save()
-            print(userID, expenseDate)
             return HttpResponseRedirect('/expense')
     else:
         # Load a clean copy of the time entry form
         form = timeEntryForm(initial={'userID': current_user,
-                                         'expenseDate': today})
+                                      'expenseDate': today})
 
     context = {
         'form': form,
     }
 
     return render(request, 'timeEntry.html', context)
+

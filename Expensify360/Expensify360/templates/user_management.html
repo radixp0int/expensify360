@@ -1,19 +1,50 @@
 {% extends 'header.html' %}
-
+{% load static %}
 {% load crispy_forms_tags %}
 {% block content %}
-    <div class="container">
-        <h1 class="h1">Add User</h1>
-        {% crispy add %}
-    </div>
 
-    <div class="container">
-        <h1 class="h1">Remove User</h1>
-        {% crispy rem %}
-    </div>
+<h1> User Management </h1>
 
-    <div class="container">
-        <h1 class="h1">Add User To Group</h1>
-        {% crispy add_to_group %}
+<link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
+
+<!-- TODO: no reason this couldn't be a for loop -->
+<div class="col-12 col-xxl-6 mb-4">
+    <div class="card border-0 shadow">
+        <div class="card-header border-bottom d-flex align-items-center">
+            {% crispy add %}
+        </div>
     </div>
-    {% endblock %}
+</div>
+
+<div class="col-12 col-xxl-6 mb-4">
+    <div class="card border-0 shadow">
+        <div class="card-header border-bottom d-flex align-items-center">
+            {% crispy add_to_group %}
+        </div>
+    </div>
+</div>
+
+<div class="col-12 col-xxl-6 mb-4">
+    <div class="card border-0 shadow">
+        <div class="card-header border-bottom d-flex align-items-center">
+            {% crispy add_to_project %}
+        </div>
+    </div>
+</div>
+
+<div class="col-12 col-xxl-6 mb-4">
+    <div class="card border-0 shadow">
+        <div class="card-header border-bottom d-flex align-items-center">
+            {% crispy rem %}
+        </div>
+    </div>
+</div>
+
+<div class="col-12 col-xxl-6 mb-4">
+    <div class="card border-0 shadow">
+        <div class="card-header border-bottom d-flex align-items-center">
+            {% crispy delegate_project %}
+        </div>
+    </div>
+</div>
+{% endblock %}

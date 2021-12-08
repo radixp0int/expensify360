@@ -1,44 +1,120 @@
-<!DOCTYPE html>
+{% load static %}
+{% load custom_tags %}
+
 <!-- styling across app is inherited from here! -->
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- these libs are actually local, in /External Libraries -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-  <a class="navbar-brand" href={% url 'home' %}>Expensify360</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="collapsibleNavbar">
-    <ul class="navbar-nav">
-        {% if user.is_authenticated %}
-            <li class="nav-item">
-                <a class="btn btn-primary" href="{{ request.META.HTTP_REFERER }}">Go Back</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href={% url 'logout' %}>Logout</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href={% url 'expense' %}>Log Expense</a>
-            </li>
-            <li class="nav-item">
-            <!--TODO: account management link -->
-                <a class="nav-link" href='#'>{{ user.username }}</a>
-            </li>
-        {% else %}
-            <li class="nav-item">
-                <a class="nav-link" href={% url 'login' %}>Login</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href={% url 'signup' %}>Register</a>
-            </li>
-        {% endif %}
+{% block content %}
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom" id="main-nav" role="navigation">
+        <a class="navbar-brand btn-outline-secondary rounded" href={% url 'home' %}>
+            <img src="{% static 'images/logos/round-logo.png' %}"
+                 width="32" height="32" class="d-inline-block align-top"
+                 alt="Expensify 360 round logo"> Expensify360
+        </a>
+        <button style="float: right;" class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse nav-pills" id="collapsibleNavbar">
+            <ul class="navbar-nav btn-group">
+                {% if user.is_authenticated %}
+                    <li class="nav-item active">
+                        <a class="nav-link mx-2 btn-outline-secondary rounded" href="{{ request.META.HTTP_REFERER }}">
+                            Go Back</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link mx-2 btn-outline-secondary rounded" href={% url 'expense' %}>
+                            Enter Expense</a>
+                    </li>
+                    {% with ok=user|is_project_manager %}
+                        {% if ok %}
+                            <li class="nav-item active">
+                                <a class="nav-link mx-2 btn-outline-secondary rounded"
+                                   href="{% url 'expense_manager' %}">Expense Manager</a>
+                            <li class="nav-item active">
+                                <a class="nav-link mx-2 btn-outline-secondary rounded"
+                                   href="{% url 'expense_history' %}">View History</a>
+                            </li>
+                            </li>
+                        {% endif %}
+                    {% endwith %}
+                    </ul>
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href='#'>
+                                {{ user.username }}
+                            </a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link btn-outline-secondary rounded" data-target="#logout-modal"
+                               data-toggle="modal"
+                               href='#'>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd"
+                                          d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                                    <path fill-rule="evenodd"
+                                          d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                                </svg>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                    <div id="logout-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h3 id="logout-modal-title">Leave Session</h3>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Would you like to log out?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <a class="btn btn-secondary mx-2" href={% url 'logout' %}>Yes</a>
+                                    <button class="btn btn-primary mx-2" class="close" data-dismiss="modal">No</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <li class="nav-item active">
+                        <a class="nav-link mx-2" href={% url 'login' %}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-box-arrow-in-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M6 3.5a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-2a.5.5 0 0 0-1 0v2A1.5 1.5 0 0 0 6.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-8A1.5 1.5 0 0 0 5 3.5v2a.5.5 0 0 0 1 0v-2z"/>
+                                <path fill-rule="evenodd"
+                                      d="M11.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H1.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                            </svg>
+                            Login
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link mx-2" href={% url 'signup' %}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+                                <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                                <path fill-rule="evenodd"
+                                      d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                            Register
+                        </a>
+                    </li>
+                {% endif %}
             <!--add more links here-->
-    </ul>
-  </div>
-</nav>
+            </ul>
+        </div>
+    </nav>
+
+{% endblock content %}

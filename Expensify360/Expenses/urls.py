@@ -6,4 +6,5 @@ urlpatterns = [
     path('expense/MileageEntry', views.mileageEntry, name='mileageEntry'),
     path('expense/ExpenseEntry', views.expenseEntry, name='expenseEntry'),
     path('expense/TimeEntry', views.timeEntry, name='timeEntry'),
+    # path('expense_manager/', views.expense_manager, name='expense_manager')
 ]

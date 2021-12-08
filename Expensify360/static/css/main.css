@@ -1,0 +1,70 @@
+h1 {
+    padding: 25px 20px 10px;
+    text-align: center;
+}
+
+h5 {
+    padding: 20px 20px 20px 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+nav .navbar-nav .nav-item li a {
+    color: white !important;
+}
+
+.navbar-custom {
+    background-color: #10185C;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 0px;
+    padding-bottom: 5px;
+    width: 100%; /* Full width */
+}
+
+section {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.forms {
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+#main-nav a {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+#expense-grid {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+table {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.table td {
+    vertical-align: middle
+}
+
+.table-space {
+    margin-top: 20px;
+    margin-left: 40px;
+    margin-right: 100px;
+}
+
+.btn-space {
+    margin-right: 10px;
+}
+
+.alert {
+    display: none;
+}

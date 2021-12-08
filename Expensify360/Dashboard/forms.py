@@ -3,7 +3,6 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Field, HTML
 from crispy_forms.bootstrap import FormActions
-from django.contrib.auth.forms import UserCreationForm
 
 # crispy docs: https://django-crispy-forms.readthedocs.io/en/latest/
 
@@ -17,8 +16,8 @@ class CreateOrgForm(forms.Form):
         Field('Organization_Name', css_class='input-xlarge'),
 
         FormActions(
-            Submit('create', 'Create', css_class="btn btn-primary btn-me me-2"),
-            HTML("<a href={% url 'home' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
+            Submit('create', 'Create', css_class="btn btn-success btn-me me-2"),
+            HTML("<a href={% url 'home' %} class='btn btn-danger btn-me me-2'>Cancel</a>")
         )
     )
 
@@ -32,15 +31,13 @@ class CreateProjForm(forms.Form):
         Field('Project_Name', css_class='input-xlarge'),
 
         FormActions(
-            Submit('create', 'Create', css_class="btn btn-primary btn-me me-2"),
-            HTML("<a href={% url 'home' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
+            Submit('create', 'Create', css_class="btn btn-success btn-me me-2"),
+            HTML("<a href={% url 'home' %} class='btn btn-danger btn-me me-2'>Cancel</a>")
         )
     )
     
 
 class ManageUsers(forms.Form):
-    
-    # TODO: add user to project
 
     helper = FormHelper()
     helper.form_class = 'bootstrap4'
@@ -57,11 +54,12 @@ class RemoveUser(forms.Form):
     helper = FormHelper()
     helper.form_class = 'bootstrap4'
     helper.layout = Layout(
-        Field('Username', css_class='input-xlarge'),
 
         FormActions(
             Submit('remove-user', 'Remove User', css_class="btn btn-primary btn-me me-2"),
-        )
+        ),
+
+        Field('Username', css_class='input-xlarge')
     )
 
 
@@ -71,8 +69,8 @@ class SubmitOrCancel(forms.Form):
     helper.layout = Layout(
 
         FormActions(
-            Submit('register', 'Create Account', css_class="btn btn-primary btn-me me-2"),
-            HTML("<a href={% url 'user_management' %} class='btn btn-secondary text-dark btn-me me-2'>Cancel</a>")
+            Submit('register', 'Create Account', css_class="btn btn-success btn-me me-2"),
+            HTML("<a href={% url 'user_management' %} class='btn btn-danger btn-me me-2'>Cancel</a>")
         )
     )
 
@@ -83,7 +81,29 @@ class AddToGroup(forms.Form):
     helper.layout = Layout(
 
         FormActions(
-            Submit('add-group', 'Add To Group', css_class="btn btn-primary btn-me me-2"),
+            Submit('add-group', 'Add User To Organization', css_class="btn btn-primary btn-me me-2"),
+        )
+    )
+
+
+class AddToProject(forms.Form):
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+
+        FormActions(
+            Submit('add-project', 'Add User To Project', css_class="btn btn-primary btn-me me-2"),
+        )
+    )
+
+
+class ChangePermissionsButton(forms.Form):
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+
+        FormActions(
+            Submit('select_user_permissions', 'Assign Project Managers', css_class="btn btn-primary btn-me me-2"),
         )
     )
 
@@ -109,12 +129,15 @@ class SelectGroupForm(forms.Form):
     )
 
 
-class ManageGroups(forms.Form):
-    pass
-    # TODO: edit group name
-    # TODO: delete group
-    # TODO: add user
-    # TODO: change manager
+class SelectManagerForm(forms.Form):
+    helper = FormHelper()
+    helper.form_class = 'bootstrap4'
+    helper.layout = Layout(
+
+        FormActions(
+            Submit('select_manager', 'Assign Manager', css_class="btn btn-primary btn-me me-2"),
+        )
+    )
 
 
 '''

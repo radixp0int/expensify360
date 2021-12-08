@@ -1,99 +1,91 @@
-import re
-from contextlib import suppress
-
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User, Group
-from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
-from Dashboard.models import *
 from django.contrib import messages
+from Dashboard.data_visualization import *
+from Expensify360.toolkit import *
+from Expenses.models import *
 
 
 @login_required
 def homepage(request):
-    context = {'organizations': []}
-
-    orgs = Organization.objects.filter(manager=request.user).all()
-    prjs = Project.objects.filter(manager=request.user).all()
-
-    for g in orgs:
-        if g.name == 'Unassigned':
-            continue
-        i = Org()
-        i.name = g.name
-        i.proj_list = []
-        for proj in prjs:
-            if proj.org == g:
-                p = Org()
-                p.name = proj.name
-                p.users = [u for u in Project.objects.get(name=p.name).user_set.all()]
-                messages.success(request, f'{p.users}')
-                i.proj_list.append(p)
-        context['organizations'].append(i)
-
-        all_users = g.user_set.all()
-        assigned = [u for x in i.proj_list for u in users(x)]
-        unassigned = set(all_users) - set(assigned)
-        if len(unassigned) != 0:
-            g = Org()
-            g.name = 'Unassigned'
-            g.users = list(unassigned)
-            i.proj_list.append(g)
-
+    context = {'organizations': get_organization_structure(request=request),
+               'user_permissions': request.user.get_user_permissions(),
+               }
+    if is_manager(request.user):
+        context['chart'] = get_chart(request)
     return render(request, 'homepage.html', context)
 
 
-def users(x): return x.users
+# not a view
+def get_chart(request):
+    lookback = 300
+    resolution = 'M'
+    # TODO add buttons to change resolution in template ['Y', 'M', 'W'] and lookback
+    vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
+    VisualizationManager.save(vm)
+    chart = vm.create_plot()
+    return chart
 
 
 @login_required
+@permission_required('Dashboard.add_organization')
 def create_org(request):
     if request.method == 'POST':
         form = CreateOrgForm(request.POST)
         if form.is_valid():
-            org = Organization.create(
+            organization = Organization.create(
                 name=form.cleaned_data['Organization_Name'],
                 manager=request.user,
             )
             try:
-                org.save()
-                request.user.groups.add(org)
-                messages.success(request, f'{org} Created')
+                organization.save()
+                organization.users.add(request.user)
+                messages.success(request, f'{organization} Created')
             except IntegrityError:
-                messages.error(request, f'{org} already exists')
+                messages.error(request, f'{organization} already exists')
     # either way render an empty form
     return render(request, 'create_org.html', {'form': CreateOrgForm()})
 
 
 @login_required
+@permission_required('Dashboard.add_project')
 def create_proj(request):
     if request.method == 'POST':
         form = CreateProjForm(request.POST)
         if form.is_valid():
-            org = Organization.objects.get(name=request.GET.get('org-name'))
-            prj = Project.create(
-                name=form.cleaned_data['Project_Name'],
+            name = form.cleaned_data['Project_Name']
+
+            # check for reserved char
+            if '`' in name:
+                messages.error(request, "Backtick ' ` ' Not Allowed in Project Name!")
+                return render(request, 'create-proj.html', {'form': form})
+
+            organization = Organization.objects.get(name=request.GET.get('org-name'))
+            project = Project.create(
+                name=name,
                 manager=request.user,
-                org=org
+                second_manager=request.user,
+                org=organization,
             )
             try:
-                prj.save()
-                request.user.groups.add(prj)
-                messages.success(request, f'{prj} Project Created in {org}')
+                project.save()
+                project.users.add(request.user)
+                messages.success(request, f'{project} Project Created in {organization}')
             except IntegrityError:
-                messages.error(request, f'{prj} already exists')
+                messages.error(request, f'{project} already exists')
     # either way render an empty form
     return render(request, 'create-proj.html', {'form': CreateProjForm()})
 
 
 @login_required
+@permission_required('auth.add_user')
 def manage_users(request):
     # TODO: add remove user from group option
-    # TODO add user to project option
+    # TODO: delete project / organization option, warn user on delete
+    # TODO: refactor delete user (should have its own page and add warning)
     if request.method == 'POST':
-
         if 'register' in request.POST:
             # then we're registering a user
             form = UserCreationForm(request.POST)
@@ -124,7 +116,7 @@ def manage_users(request):
                 messages.error(request, f'{name} Does Not Exist')
 
         elif 'add-group' in request.POST:
-            # take me to group add form
+            # take me to organization add form
             return render(
                 request,
                 'add_to_group.html',
@@ -136,16 +128,22 @@ def manage_users(request):
                 }
             )
 
-        else:  # adding user to group
+        elif 'org-name' in request.POST:
+            # adding user to organization
             form = SelectGroupForm(request.POST)
             if form.is_valid():
                 try:
-                    u = User.objects.get(username=request.POST.get('username'))
-                    org = Organization.objects.get(name=request.POST.get('org-name'))
-                    u.groups.add(org)
-                    messages.success(request, f'{u.username} Added To {org}')
+                    user = User.objects.get(username=request.POST.get('username'))
+                    organization = Organization.objects.get(name=request.POST.get('org-name'))
+                    user.organization_set.add(organization)
+                    organization.users.add(user)
+
+                    messages.success(request, f'{user.username} Added To {organization}')
                 except User.DoesNotExist:
-                    messages.error(request, 'User Does Not Exist')
+                    bad_name = request.POST.get('username')
+                    if len(bad_name) == 0:
+                        messages.error(request, 'Please Enter a Username')
+                    messages.error(request, f"User '{bad_name}' Does Not Exist")
                 return render(
                     request,
                     'add_to_group.html',
@@ -156,14 +154,125 @@ def manage_users(request):
                         'select': SelectGroupForm()
                     }
                 )
+
+        elif 'add-project' in request.POST:
+            # take me to project add form
+            return render(
+                request,
+                'add_to_project.html',
+                {
+                    'orgs': list(Project.objects.filter(manager=request.user)),
+                    'user_name': UserNameForm(),
+                    'done_or_cancel': SubmitOrCancel(),
+                    'select': SelectGroupForm()
+                }
+            )
+
+        elif 'project-name' in request.POST:
+            # add user to project
+            form = SelectGroupForm(request)
+            if form.is_valid():
+                try:
+                    user = User.objects.get(username=request.POST.get('username'))
+                    project = Project.objects.get(name=request.POST.get('project-name'))
+                    project.users.add(user)
+                    messages.success(request, f'{user.username} Added To {project}')
+                except User.DoesNotExist:
+                    bad_name = request.POST.get('username')
+                    if len(bad_name) == 0:
+                        messages.error(request, 'Please Enter a Username')
+                    messages.error(request, f"User '{bad_name}' Does Not Exist")
+                return render(
+                    request,
+                    'add_to_project.html',
+                    {
+                        'orgs': list(Project.objects.filter(manager=request.user)),
+                        'user_name': UserNameForm(),
+                        'done_or_cancel': SubmitOrCancel(),
+                        'select': SelectGroupForm()
+                    }
+                )
+
+        elif 'select_user_permissions' in request.POST:
+            return redirect(to='change_user_permissions')
+
     # otherwise just render the options
     return render(
         request,
         'user_management.html',
-        {'add': ManageUsers(), 'rem': RemoveUser(), 'add_to_group': AddToGroup()}
+        context={
+            'add': ManageUsers(),
+            'rem': RemoveUser(),
+            'add_to_group': AddToGroup(),
+            'add_to_project': AddToProject(),
+            'delegate_project': ChangePermissionsButton()
+        }
     )
 
 
-class Org(object):
-    # magic class
-    pass
+@login_required
+@permission_required('Can add user')
+def manage_permissions(request):
+    if request.method == 'POST' and 'select' in request.POST:
+        # we concat these with backtick in the template
+        username, projectname = tuple(request.POST.get('select').split('`'))
+        user = User.objects.get(username=username)
+        project = Project.objects.get(name=projectname)
+        # remove permission from current lead iff they are not a manager
+        if project.second_manager != project.manager:
+            project.second_manager.user_permissions.set([])
+        if not is_manager(user):
+            user.user_permissions.set(project_manager_permissions())
+        project.second_manager = user
+        project.users.add(user)
+        project.save()
+        messages.success(request, f'User {user} Assigned as Project Manager for {project}')
+
+    user_list = set()  # no dupes here!
+    project_list = set(
+        list(request.user.projects_led.all()) + list(request.user.projects_managed.all())
+    )
+    for project in project_list:
+        for user in project.users.all():
+            user_list.add(user)
+    context = {
+        'form': SelectManagerForm(),
+        'users': user_list,
+        'projects': [
+            {'name': project, 'manager': project.second_manager}
+            for project in project_list
+        ]
+    }
+    return render(request, 'change_user_permissions.html', context)
+
+
+@login_required
+def expense_manager(request):
+    if request.method == 'POST' and 'change' in request.POST:
+        id, new_status = request.POST.get('change').split('_')
+        expense = Expense.objects.get(id=id)
+        expense.isApproved = new_status
+        expense.save()
+
+    expenses = list(
+        get_expense_records(
+            request.user,
+            filter_function=lambda x: x.isApproved == 'Pending').values()
+    )
+    context = {
+        'expenses': sorted(expenses, key=lambda x: x.expense_date, reverse=True)
+    }
+    VisualizationManager.update_all(request.user)  # only need to call after an approval has occurred
+    return render(request, 'expense_manager.html', context)
+
+
+def expense_history(request):
+    expenses = list(
+        get_expense_records(
+            request.user,
+            filter_function=lambda x: x.isApproved != 'Pending').values()
+    )
+    context = {
+        'expenses': sorted(expenses, key=lambda x: x.expense_date, reverse=True)
+    }
+    return render(request, 'expense_history.html', context)
