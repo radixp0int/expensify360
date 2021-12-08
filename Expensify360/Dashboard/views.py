@@ -218,7 +218,6 @@ def remove_user(request):
 
         group.user_set.remove()
         group.save()
-        print('ok')
         messages.success(request, f'{username} removed from {group_name} {group_type}.')
 
     users = []
