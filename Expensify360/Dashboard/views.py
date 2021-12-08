@@ -181,7 +181,6 @@ def manage_users(request):
             return redirect(to='change_user_permissions')
         
         elif 'remove-user' in request.POST:
-            print('yes')
             return redirect(to='remove-user')
 
     # otherwise just render the options
