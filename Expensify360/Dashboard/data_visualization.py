@@ -71,17 +71,17 @@ class VisualizationManager:
         data.to_pickle(f'{self.name}_data')
         return data
 
-    def create_forecast(self):
+    def create_forecast(self, lag, fSteps):
         data = self.load_data()
         # assuming data is nonstationary
-        stationary_data = data.diff()
+        stationary_data = data.diff() #doesn't work
 
-        model = tsa.SARIMAX(data['Expenses'], order=(1, 1, 1), trend='c')
+        model = tsa.SARIMAX(data['Expenses'], order=(lag, 1, 1), trend='c')
         results = model.fit()
         # prediction = results.get_prediction(start=-20, dynamic=True)
         # mean_prediction = prediction.predicted_mean
         # confidence_intervals = prediction.conf_int()
-        forecast = results.get_forecast(steps=50)
+        forecast = results.get_forecast(steps=fSteps)
         mean_forecast = forecast.predicted_mean
         # print(mean_forecast)
         # print(results.summary())
@@ -89,21 +89,23 @@ class VisualizationManager:
 
     def create_plot(self):
         data = self.load_data()
-        forecast = self.create_forecast()
+        lag = 15
+        fSteps = 12
+        forecast = self.create_forecast(lag, fSteps)
         forecast.name = "Forecast"
         og_index = len(data.index)
         data = pandas.concat([data, forecast])
         data = data.rename(columns={0: 'Forecast'})
 
         i = 0
-        while i < 50:
+        while i < fSteps:
             last_date = data.iat[og_index - 1, 2]
-            new_date = last_date + datetime.timedelta(days=1)
+            new_date = last_date + datetime.timedelta(days=30)
             data.iat[og_index, 2] = new_date
             og_index += 1
             i += 1
 
-        print(data.tail(60))  # for testing
+        print(data.tail(lag+10))  # for testing
 
         if data is None:
             # indicates not enough data, silent fail
