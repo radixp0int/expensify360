@@ -29,31 +29,43 @@
             }
         }
 
-        function UpdateButtonLock() {
-            let selectedProject = document.getElementById("project_selector_id").value;
+        function hideForm() {
+            var selectedProject = document.getElementById( "project_selector_id" );
 
-            if (selectedProject === "Select a Project") {
-                document.getElementById("submit_id").disabled = true;
+            if (selectedProject.options[ selectedProject.selectedIndex ].value  === "none") {
+                document.getElementById("submit_id").hidden = true;
+                document.getElementById("div_id_expenseDate").hidden = true;
+                document.getElementById("div_id_file").hidden = true;
+                document.getElementById("div_id_expenseCost").hidden = true;
+                document.getElementById("div_id_tax").hidden = true;
+                document.getElementById("div_id_shipping").hidden = true;
+                document.getElementById("div_id_expenseTotal").hidden = true;
             }
             else {
-                document.getElementById("submit_id").disabled = false;
+                document.getElementById("submit_id").hidden = false;
+                document.getElementById("div_id_expenseDate").hidden = false;
+                document.getElementById("div_id_file").hidden = false;
+                document.getElementById("div_id_expenseCost").hidden = false;
+                document.getElementById("div_id_tax").hidden = false;
+                document.getElementById("div_id_shipping").hidden = false;
+                document.getElementById("div_id_expenseTotal").hidden = false;
             }
         }
     </script>
 
+    <body onload="hideForm()">
+
     <div class="forms" id="alert">
         <form method="post" id="expense-form" enctype="multipart/form-data">
-            <select name="select" id="project_selector_id" class="form-control" onchange=UpdateButtonLock()>
-                <option value="none" selected>
-                    Select a Project
-                </option>
-                <option>
-                    1
-                </option>
-                <!--{% for user in users %}
-                    <option name="option" value="{{ user }}`{{ project.name }}">{{ user }}</option>
-                {% endfor %}-->
-            </select>
+            <div>
+                <label>Project*</label>
+                <select name="project" id="project_selector_id" class="form-control" onchange=hideForm()>
+                    <option value="none" selected>--------</option>
+                    {% for project in projects %}
+                        <option name="option" value="{{project}}">{{project}}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
             {% csrf_token %}
             {{ form|crispy }}
