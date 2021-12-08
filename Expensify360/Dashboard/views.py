@@ -1,17 +1,17 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from django.contrib import messages
 from Dashboard.data_visualization import *
-from asgiref.sync import sync_to_async
+from Expensify360.toolkit import *
+from Expenses.models import *
 
 
 @login_required
 def homepage(request):
     context = {'organizations': get_organization_structure(request=request),
-               'user_permissions': request.user.get_user_permissions()
+               'user_permissions': request.user.get_user_permissions(),
                }
     if is_manager(request.user):
         context['chart'] = get_chart(request)
@@ -20,13 +20,11 @@ def homepage(request):
 
 # not a view
 def get_chart(request):
-    lookback = 200
+    lookback = 300
     resolution = 'M'
-    try:
-        vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
-    except FileNotFoundError:
-        vm = VisualizationManager(user=request.user, resolution=resolution, lookback=lookback)
-        VisualizationManager.save(vm)
+    # TODO add buttons to change resolution in template ['Y', 'M', 'W'] and lookback
+    vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
+    VisualizationManager.save(vm)
     chart = vm.create_plot()
     return chart
 
@@ -246,3 +244,23 @@ def manage_permissions(request):
         ]
     }
     return render(request, 'change_user_permissions.html', context)
+
+
+@login_required
+def expense_manager(request):
+    if request.method == 'POST' and 'change' in request.POST:
+        id, new_status = request.POST.get('change').split('_')
+        expense = Expense.objects.get(id=id)
+        expense.isApproved = new_status
+        expense.save()
+
+    expenses = list(
+        get_expense_records(
+            request.user,
+            filter_function=lambda x: x.isApproved == 'Pending').values()
+    )
+    context = {
+        'expenses': sorted(expenses, key=lambda x: x.expense_date, reverse=True)
+    }
+    VisualizationManager.update_all(request.user)  # only need to call after an approval has occurred
+    return render(request, 'expense_manager.html', context)

@@ -28,12 +28,28 @@ def expense_total(expense):
     """
     expense_type = expense.expenseType
     if str.upper(expense_type) == 'MILEAGE':
-        return expense.mileageTotal
+        return float(expense.mileageTotal)
     if str.upper(expense_type) == 'EXPENSE':
-        return expense.expenseTotal
-    if str.upper(expense_type) == 'HOURS':
-        return expense.hourTotal
+        return float(expense.expenseTotal)
+    if str.upper(expense_type) == 'TIME' or str.upper(expense_type) == 'HOURS':
+        return float(expense.hourTotal)
     return 0.0  # silent failure
+
+
+def set_expense_total(expense, new_value):
+    """
+    :param: expense: expense object
+    :param: new_value: new expense total for this expense
+    :return: None
+    """
+    expense_type = expense.expenseType
+    if str.upper(expense_type) == 'MILEAGE':
+        expense.mileageTotal = new_value
+    elif str.upper(expense_type) == 'EXPENSE':
+        expense.expenseTotal = new_value
+    elif str.upper(expense_type) == 'TIME' or str.upper(expense_type) == 'HOURS':
+        expense.hourTotal = new_value
+    expense.save()
 
 
 def get_organization_structure(user=None, request=None, include_unassigned_users=True):
@@ -104,32 +120,29 @@ def is_manager(user):
 def is_project_manager(user):
     """
     :param user: User object
-    :return: bool, True if user is a project manager else False
+    :return: bool, True if user is a project manager or manager else False
     """
-    return set(project_manager_permissions()).intersection(user.user_permissions) != set([])
+    return set(project_manager_permissions()).intersection([perm for perm in user.user_permissions.all()]) != set([])
 
 
 def get_expenses(user):
     """
-    :param user: User object, a manager
+    :param user: User object, a manager or project manager
     :return: list of Expense objects for which user is responsible
     """
-    # expense uses charfields so we need a list of names for groups this user manages
-    organizations = Organization.objects.filter(manager=user).all()
-
-    group_names = [organization.name for organization in organizations]
-    # group_names += [project.name for project in projects]
+    # expense uses charfields so we need a list of names for projects this user manages
+    projects = set(list(Project.objects.filter(manager=user).all()) + list(Project.objects.filter(second_manager=user)))
+    project_names = [project.name for project in projects]
     expenses = []
-    for name in group_names:
+    for name in project_names:
         with suppress(Exception):
-            # TODO: once approval logic is done, need an arg to select by status
-            expenses += Expense.objects.filter(organization=name).all()
+            expenses += Expense.objects.filter(project=name).all()
     return expenses
 
 
 def get_expense_records(user, filter_function=None):
     """
-            :param user: manager user object
+            :param user: manager or project manager user object
             :param filter_function: optional, function that takes
                 an expense object and returns a bool. Used to filter
                 expenses by a criteria i.e. approval status, requester, etc.
@@ -146,6 +159,7 @@ def get_expense_records(user, filter_function=None):
                 data.amount:float, expense total
     """
     expenses = get_expenses(user)
+
     if filter_function: expenses = [e for e in expenses if filter_function(e)]
     records = {
         expense: Org()
@@ -159,6 +173,7 @@ def get_expense_records(user, filter_function=None):
         proxy.status = expense.isApproved
         proxy.type = expense.expenseType
         proxy.amount = expense_total(expense)
+        proxy.id =expense.id
     return records
 
 
@@ -183,6 +198,7 @@ def make_test_data(user, num_to_generate=500):
     base_date = np.datetime64('2001-09-11')
     days_since = 7374 # to nov 18 2021
     type_list = ['Mileage', 'Expense', 'Hours']
+    status_choices = ['Approved', 'Pending', 'Denied']
     for i in range(num_to_generate):
         rng = np.random.default_rng()
         proxy_organization = rng.choice(organizations)
@@ -195,7 +211,7 @@ def make_test_data(user, num_to_generate=500):
         expenseDate = str(base_date + rng.choice(days_since))
         organization = organization
         project = project
-        isApproved = 'Approved'
+        isApproved = rng.choice(status_choices)
         expenseType = rng.choice(type_list)
         if expenseType == type_list[0]:
             # Mileage Specific
@@ -257,6 +273,12 @@ def make_test_data(user, num_to_generate=500):
             expense.save()
 
 
+def embed_seasonality_and_trend():
+    expenses = sorted(list(Expense.objects.all()), key=lambda x: np.datetime64(x.expenseDate), reverse=False)
+    for i, ele in enumerate(expenses):
+        set_expense_total(ele, float(expense_total(ele))/100 + 100 * np.sin(i/6) + 100 * i/6)
+
+
 def make_demo():
     """
         runserver and go to /magic to run. Not safe to run
@@ -313,4 +335,5 @@ def make_demo():
             print(f'user {user} added to {name}')
     print('generating expense data...')
     make_test_data(user=boss)
+    embed_seasonality_and_trend()
     return

@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from Dashboard.data_visualization import VisualizationManager
 
 from Dashboard.models import *
 from .models import *
@@ -8,7 +9,6 @@ from .forms import *
 
 import datetime
 
-# https://simpleisbetterthancomplex.com/tutorial/2018/01/29/how-to-implement-dependent-or-chained-dropdown-list-with-django.html
 
 # @login_required
 def expense(request):
@@ -146,44 +146,6 @@ def timeEntry(request):
     }
 
     return render(request, 'timeEntry.html', context)
-
-
-def editMileage(request):
-    # Grab the current user ID to pre-populate the form
-    current_user = request.user
-
-    if request.method == 'POST':
-        form = mileageEntryForm(request.POST)
-        if form.is_valid():
-            userID = current_user
-            expenseDate = form.cleaned_data['expenseDate']
-            organization = form.cleaned_data['organization']
-            project = form.cleaned_data['project']
-            miles = form.cleaned_data['miles']
-            mileageRate = form.cleaned_data['mileageRate']
-            mileageTotal = form.cleaned_data['mileageTotal']
-            expenseType = "Mileage Expense"
-
-            mileageInfo = Expense(userID=userID,
-                                  expenseDate=expenseDate,
-                                  organization=organization,
-                                  project=project,
-                                  miles=miles,
-                                  mileageRate=mileageRate,
-                                  mileageTotal=mileageTotal,
-                                  expenseType=expenseType, )
-            mileageInfo.save()
-            print(userID, expenseDate)
-            return HttpResponseRedirect('/expense')
-    else:
-        # Load a clean copy of the mileage entry form
-        form = mileageEntryForm(initial={'expenseDate': today})
-
-        context = {
-            'form': form,
-        }
-
-        return render(request, 'mileageEntry.html', context)
 
 
 # @login_required
