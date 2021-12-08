@@ -6,10 +6,7 @@ from crispy_forms.bootstrap import FormActions
 
 
 class mileageEntryForm(forms.Form):
-    userID = forms.CharField(label='User ID')
     expenseDate = forms.DateField(label='Expense Date')
-    organization = forms.CharField(label='Organization')
-    project = forms.CharField(label='Project')
     miles = forms.DecimalField(label='Miles Driven', max_digits=8,
                                widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
     mileageRate = forms.DecimalField(label='Rate Per Mile', max_digits=5,
