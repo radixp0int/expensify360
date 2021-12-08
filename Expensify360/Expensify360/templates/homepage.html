@@ -24,15 +24,19 @@
         <div class="col-12 col-xxl-6 mb-4">
             <div class="card border-primary">
                 <div class="card-header border-bottom d-flex align-items-center justify-content-between">
-                    <h2 class="offset-xl-10 text-muted">Organizations</h2>
+                    <h2 class="offset-xl-10 text-muted">Organization Overview</h2>
                     <!-- ignore the errors pycharm throws below -->
                     <div class="nav-item">
-                        {% if 'Dashboard.add_organization' in user_permissions %}
-                            <a href={% url 'create_org' %} class="btn btn-sm btn-primary">Create Organization</a>
-                        {% endif %}
-                        {% if 'auth.add_user' in user_permissions %}
-                            <a href={% url 'user_management' %} class="btn btn-sm btn-primary">Manage Users</a>
-                        {% endif %}
+                        <div class="spacer my-2 mx-2">
+                            {% if 'Dashboard.add_organization' in user_permissions %}
+                                <a href={% url 'create_org' %} class="btn btn-sm btn-primary">Create Organization</a>
+                            {% endif %}
+                        </div>
+                        <div class="spacer my-2 mx-2">
+                            {% if 'auth.add_user' in user_permissions %}
+                                <a href={% url 'user_management' %} class="btn btn-sm btn-primary">Manage Users</a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
 
