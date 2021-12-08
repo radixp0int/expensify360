@@ -115,6 +115,7 @@ def expenseEntry(request):
 def timeEntry(request):
     # Grab the current user ID to pre-populate the form
     current_user = request.user
+    user_projects = [project for project in current_user.project_set.all()]
 
     # Get current date and time and convert it to USA format
     today = datetime.date.today()
@@ -125,8 +126,11 @@ def timeEntry(request):
         if form.is_valid():
             userID = form.cleaned_data['userID']
             expenseDate = form.cleaned_data['expenseDate']
-            organization = form.cleaned_data['organization']
-            project = form.cleaned_data['project']
+
+            project = request.POST.get('project')
+            projectObject = Project.objects.get(name__exact=project)
+            organization = projectObject.org
+
             hours = form.cleaned_data['hours']
             hourlyRate = form.cleaned_data['hourlyRate']
             hourTotal = form.cleaned_data['hourTotal']
@@ -149,6 +153,7 @@ def timeEntry(request):
 
     context = {
         'form': form,
+        'projects': user_projects,
     }
 
     return render(request, 'timeEntry.html', context)
