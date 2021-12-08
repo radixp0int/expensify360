@@ -1,3 +1,4 @@
+import pandas as pd
 from django.contrib.auth.models import Permission, User
 from Dashboard.models import Organization, Project
 from Expenses.models import Expense
@@ -34,6 +35,22 @@ def expense_total(expense):
     if str.upper(expense_type) == 'TIME' or str.upper(expense_type) == 'HOURS':
         return float(expense.hourTotal)
     return 0.0  # silent failure
+
+
+def set_expense_total(expense, new_value):
+    """
+    :param: expense: expense object
+    :param: new_value: new expense total for this expense
+    :return: None
+    """
+    expense_type = expense.expenseType
+    if str.upper(expense_type) == 'MILEAGE':
+        expense.mileageTotal = new_value
+    elif str.upper(expense_type) == 'EXPENSE':
+        expense.expenseTotal = new_value
+    elif str.upper(expense_type) == 'TIME' or str.upper(expense_type) == 'HOURS':
+        expense.hourTotal = new_value
+    expense.save()
 
 
 def get_organization_structure(user=None, request=None, include_unassigned_users=True):
@@ -257,6 +274,20 @@ def make_test_data(user, num_to_generate=500):
             expense.save()
 
 
+def embed_seasonality_and_trend():
+    expenses = sorted(list(Expense.objects.filter(isApproved='Approved').all()), key=lambda x: np.datetime64(x.expenseDate), reverse=False)
+    t = pd.date_range(start=np.datetime64(expenses[0].expenseDate), end=np.datetime64(expenses[-1].expenseDate))
+    for i, ele in enumerate(t):
+        for expense in expenses:
+            if (
+                    np.datetime_as_string(np.datetime64(expense.expenseDate), unit='M') ==
+                    np.datetime_as_string(np.datetime64(ele), unit='M')
+            ):
+                set_expense_total(
+                    expense, np.sin((i + np.pi / 2) * 1 / np.pi) + 100 * np.sin(
+                        i * 6 / np.pi) + i / 5 + 100)
+
+
 def make_demo():
     """
         runserver and go to /magic to run. Not safe to run
@@ -313,4 +344,6 @@ def make_demo():
             print(f'user {user} added to {name}')
     print('generating expense data...')
     make_test_data(user=boss)
+    embed_seasonality_and_trend()
     return
+
