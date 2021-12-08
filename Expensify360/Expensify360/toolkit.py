@@ -1,3 +1,4 @@
+import pandas as pd
 from django.contrib.auth.models import Permission, User
 from Dashboard.models import Organization, Project
 from Expenses.models import Expense
@@ -274,9 +275,17 @@ def make_test_data(user, num_to_generate=500):
 
 
 def embed_seasonality_and_trend():
-    expenses = sorted(list(Expense.objects.all()), key=lambda x: np.datetime64(x.expenseDate), reverse=False)
-    for i, ele in enumerate(expenses):
-        set_expense_total(ele, float(expense_total(ele))/100 + 100 * np.sin(i/6) + 100 * i/6)
+    expenses = sorted(list(Expense.objects.filter(isApproved='Approved').all()), key=lambda x: np.datetime64(x.expenseDate), reverse=False)
+    t = pd.date_range(start=np.datetime64(expenses[0].expenseDate), end=np.datetime64(expenses[-1].expenseDate))
+    for i, ele in enumerate(t):
+        for expense in expenses:
+            if (
+                    np.datetime_as_string(np.datetime64(expense.expenseDate), unit='M') ==
+                    np.datetime_as_string(np.datetime64(ele), unit='M')
+            ):
+                set_expense_total(
+                    expense, np.sin((i + np.pi / 2) * 1 / np.pi) + 100 * np.sin(
+                        i * 6 / np.pi) + i / 5 + 100)
 
 
 def make_demo():
@@ -334,6 +343,8 @@ def make_demo():
             Project.objects.get(name=name).users.add(User.objects.get(username=user))
             print(f'user {user} added to {name}')
     print('generating expense data...')
+
     make_test_data(user=boss)
     embed_seasonality_and_trend()
     return
+
