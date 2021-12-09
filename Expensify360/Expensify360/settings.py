@@ -14,6 +14,8 @@ from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from django.views.debug import CURRENT_DIR
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -157,7 +159,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-MEDIA_URL = '/images/'
+MEDIA_ROOT = os.path.join(CURRENT_DIR, 'expense-uploads')
+MEDIA_URL = '/expense-uploads/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, '/')
 STATICFILES_DIRS = (
