@@ -10,12 +10,12 @@ from .forms import *
 import datetime
 
 
-# @login_required
+@login_required
 def expense(request):
     context = {}
     return render(request, 'expense.html', context)
 
-
+@login_required
 def mileageEntry(request):
     # Grab the current user ID to pre-populate the form
     current_user = request.user
@@ -62,7 +62,7 @@ def mileageEntry(request):
 
         return render(request, 'mileageEntry.html', context)
 
-
+@login_required
 def expenseEntry(request):
     # Grab the current user ID to pre-populate the form
     current_user = request.user
@@ -115,7 +115,7 @@ def expenseEntry(request):
 
         return render(request, 'expenseEntry.html', context)
 
-
+@login_required
 def timeEntry(request):
     # Grab the current user ID to pre-populate the form
     current_user = request.user
@@ -163,7 +163,7 @@ def timeEntry(request):
     return render(request, 'timeEntry.html', context)
 
 
-# @login_required
+@login_required
 def expense_approval(request):
     context = {}
     return render(request, 'expense_approval.html', context)
