@@ -6,7 +6,7 @@
 {% load crispy_forms_tags %}
 
 {% block title %} Dashboard {% endblock %}
-
+<!-- background is overridden in spinner.css -->
 {% block content %}
     <head>
         <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
@@ -40,7 +40,7 @@
                         <div class="col-12 col-xl-7 px-xl-0">
                             <div class="d-none d-sm-block">
                                 <h2 class="h6 text-gray-400 mb-0"> Total Expenses </h2>
-                                <h3 class="fw-extrabold mb-2">$8,589.98</h3>
+                                <h3 class="fw-extrabold mb-2">{{ summary.total_expenses }}</h3>
                             </div>
                             <small class="text-gray-500">
                                 Nov 1 - Dec 1
@@ -67,7 +67,7 @@
                         <div class="col-12 col-xl-7 px-xl-0">
                             <div class="d-none d-sm-block">
                                 <h2 class="h6 text-gray-400 mb-0"> Total Pending Expenses </h2>
-                                <h3 class="fw-extrabold mb-2">$1,659.32</h3>
+                                <h3 class="fw-extrabold mb-2">{{ summary.total_pending }}</h3>
                             </div>
                             <small class="text-gray-500">
                                 Nov 1 - Dec 1
@@ -78,7 +78,7 @@
                                          class="bi bi-caret-down-fill text-danger" viewBox="0 0 16 16">
                                         <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
                                     </svg>
-                                    <span class="text-danger fw-bolder">8.5%</span></div>
+                                    <span class="text-danger fw-bolder">8.5%</span></div>-
                             </div>
                         </div>
                     </div>
@@ -94,9 +94,9 @@
                         <div>
                             <div>
                                 <h2 class="h6 text-gray-400 mb-0"> Pending Requests </h2>
-                                <h3 class="fw-extrabold mb-2"> 98 </h3>
+                                <h3 class="fw-extrabold mb-2">{{ summary.pending_count }}</h3>
                             </div>
-                            <small class="text-gray-500">
+                           <small class="text-gray-500">
                                 Nov 1 - Dec 1
                             </small>
                             <div class="small d-flex mt-1">
