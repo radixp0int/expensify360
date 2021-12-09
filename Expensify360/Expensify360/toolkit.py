@@ -166,6 +166,7 @@ def get_expense_records(user, filter_function=None, manager=True):
                 data.status:str, approval status |
                 data.type:str, in ['Mileage', 'Expense', 'Hours'] |
                 data.amount:float, expense total
+                data.edited: bool
     """
     expenses = get_expenses(user, manager=manager)
 
@@ -179,7 +180,12 @@ def get_expense_records(user, filter_function=None, manager=True):
         proxy.expense_date = expense.expenseDate
         proxy.submission_date = expense.submissionDate
         proxy.project = expense.project
-        proxy.status = expense.isApproved.split('/')[0]
+        status = expense.isApproved.split('/')
+        proxy.status = status[0]
+        if len(status) == 2:
+            proxy.edited = True
+        else:
+            proxy.edited = False
         proxy.type = expense.expenseType
         proxy.amount = expense_total(expense)
         proxy.id =expense.id
