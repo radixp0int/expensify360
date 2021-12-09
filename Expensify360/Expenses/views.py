@@ -165,7 +165,7 @@ def timeEntry(request):
 
 @login_required
 def editExpense(request):
-    id = 1030 # DEBUG PURPOSES ONLY
+    id = request.session.get('ExpenseID')
     expense = Expense.objects.get(id=id)
 
     if request.method == 'POST':

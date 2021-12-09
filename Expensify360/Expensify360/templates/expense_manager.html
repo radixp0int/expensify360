@@ -70,7 +70,11 @@
                     <tr class="expense-row hidden row-{{ forloop.counter }}">
                         <td colspan="8">
                             <div id="accordion{{ forloop.counter }}" class="collapse" aria-hidden="true">
-                                Summary of the Expense {{ forloop.counter }}
+                                <form name="change-status" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="edit" value="{{ expense.id }}_{{ expense.type }}">
+                                <input type="submit" value="More Information" class="btn btn-success btn-sm btn-block">
+                            </form>
                             </div>
                         </td>
                     </tr>
