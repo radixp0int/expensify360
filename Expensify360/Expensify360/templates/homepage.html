@@ -2,39 +2,142 @@
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 {% load crispy_forms_filters %}
-
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block title %} Dashboard {% endblock %}
 
 {% block content %}
+    <head>
+        <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
+    </head>
+
+    <body>
     <div class="jumbotron jumbotron-fluid">
         <div class="container">
             <h1 class="display-4">Dashboard</h1>
-{#            <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.#}
-{#                More text will be here if we want</p>#}
+            {#            <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.#}
+            {#                More text will be here if we want</p>#}
         </div>
     </div>
 
-    <div>
-        {{ chart | safe }}
+    {#    Informational Cards    #}
+    <style>
+        .row-spaced {
+            margin-left: 2px;
+            margin-right: 2px;
+        }
+    </style>
+    <div class="row row-spaced">
+        <div class="col-12 col-sm-6 col-xl-4 mb-4">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <div class="row d-block d-xl-flex align-items-center">
+                        <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                        </div>
+                        <div class="col-12 col-xl-7 px-xl-0">
+                            <div class="d-none d-sm-block">
+                                <h2 class="h6 text-gray-400 mb-0"> Total Expenses </h2>
+                                <h3 class="fw-extrabold mb-2">$8,589.98</h3>
+                            </div>
+                            <small class="text-gray-500">
+                                Nov 1 - Dec 1
+                            </small>
+                            <div class="small d-flex mt-1">
+                                <div>Since last month
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                         class="bi bi-caret-up-fill text-success" viewBox="0 0 16 16">
+                                        <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+                                    </svg>
+                                    <span class="text-success fw-bolder">4.78%</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-4 mb-4">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <div class="row d-block d-xl-flex align-items-center">
+                        <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                        </div>
+                        <div class="col-12 col-xl-7 px-xl-0">
+                            <div class="d-none d-sm-block">
+                                <h2 class="h6 text-gray-400 mb-0"> Total Pending Expenses </h2>
+                                <h3 class="fw-extrabold mb-2">$1,659.32</h3>
+                            </div>
+                            <small class="text-gray-500">
+                                Nov 1 - Dec 1
+                            </small>
+                            <div class="small d-flex mt-1">
+                                <div>Since last month
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                         class="bi bi-caret-down-fill text-danger" viewBox="0 0 16 16">
+                                        <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                                    </svg>
+                                    <span class="text-danger fw-bolder">8.5%</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-4 mb-4">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <div class="row d-block d-xl-flex align-items-center">
+                        <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                        </div>
+                        <div>
+                            <div>
+                                <h2 class="h6 text-gray-400 mb-0"> Pending Requests </h2>
+                                <h3 class="fw-extrabold mb-2"> 98 </h3>
+                            </div>
+                            <small class="text-gray-500">
+                                Nov 1 - Dec 1
+                            </small>
+                            <div class="small d-flex mt-1">
+                                <div>Since last month
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                         class="bi bi-caret-up-fill text-success" viewBox="0 0 16 16">
+                                        <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
+                                    </svg>
+                                    <span class="text-success fw-bolder">2.1%</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    {#    End of Cards   #}
+
+    {#    Chart Begins   #}
+    <div class="row row-spaced">
+        <div class="col-12">
+            <div class="card border-0 shadow">
+                {{ chart | safe }}
+            </div>
+        </div>
+    </div>
+    {#    Chart Ends     #}
 
     <div class="py-4">
         <div class="col-12 col-xxl-6 mb-4">
             <div class="card border-primary">
                 <div class="card-header border-bottom d-flex align-items-center justify-content-between">
                     <h2 class="offset-xl-10 text-muted">Organization Overview</h2>
-                    <!-- ignore the errors pycharm throws below -->
+
                     <div class="nav-item">
                         <div class="spacer my-2 mx-2">
                             {% if 'Dashboard.add_organization' in user_permissions %}
-                                <a href={% url 'create_org' %} class="btn btn-sm btn-primary">Create Organization</a>
+                                <a class="btn btn-sm btn-primary" href={% url 'create_org' %}>Create Organization</a>
                             {% endif %}
                         </div>
                         <div class="spacer my-2 mx-2">
                             {% if 'auth.add_user' in user_permissions %}
-                                <a href={% url 'user_management' %} class="btn btn-sm btn-primary">Manage Users</a>
+                                <a class="btn btn-sm btn-primary" href={% url 'user_management' %}>Manage Users</a>
                             {% endif %}
                         </div>
                     </div>
@@ -81,5 +184,8 @@
             </div>
         </div>
     </div>
+
+    </body>
+
 
 {% endblock content %}
