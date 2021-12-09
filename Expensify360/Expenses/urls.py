@@ -7,5 +7,6 @@ urlpatterns = [
     path('expense/ExpenseEntry', views.expenseEntry, name='expenseEntry'),
     path('expense/TimeEntry', views.timeEntry, name='timeEntry'),
     path('expense/expense_editing', views.editExpense, name='editExpense'),
+    path('expense/mileage_editing', views.editMileage, name='editMileage'),
     # path('expense_manager/', views.expense_manager, name='expense_manager')
 ]
