@@ -5,6 +5,7 @@ from Expenses.models import Expense
 from contextlib import suppress
 import numpy as np
 from django.db import IntegrityError
+import datetime
 
 
 PROJECT_LEAD_PERMISSIONS = (
@@ -13,6 +14,29 @@ PROJECT_LEAD_PERMISSIONS = (
     'change_expense',
     'delete_expense'
 )
+
+
+def summarize_expense_records(expenses):
+
+    total, pending, count = 0.0, 0.0, 0
+    for expense in expenses.values():
+        if expense.status == 'Approved':
+            total += expense.amount
+        elif expense.status == 'Pending':
+            pending += expense.amount
+            count += 1
+    fmt = "${:,.2f}"
+    data = {
+        'total_expenses': fmt.format(total),
+        'total_pending': fmt.format(pending),
+        'pending_count': str(count)
+    }
+    return data
+
+
+def summary(user):
+    all_dict = summarize_expense_records(get_expense_records(user))
+    return all_dict
 
 
 class Org(object):

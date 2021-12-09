@@ -18,11 +18,6 @@ class VisualizationManager:
         self.fig = None
         self._up_to_date = True
 
-    # TODO add a summary method
-    def summary(self):
-        # expenses [up/down] x% since last [period] and [increasing/decreasing] x1%/[period]
-        pass
-
     def preprocess(self):
         """
             resolution:char

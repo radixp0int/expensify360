@@ -13,7 +13,8 @@ from Expenses.models import *
 def homepage(request):
     context = {'organizations': get_organization_structure(request=request),
                'user_permissions': request.user.get_user_permissions(),
-               'is_manager': is_manager(request.user)
+               'is_manager': is_manager(request.user),
+               'summary': summary(request.user)
                }
     return render(request, 'homepage.html', context)
 
