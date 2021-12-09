@@ -21,6 +21,8 @@
         </div>
     </div>
 
+    <div>
+
     {#    Informational Cards    #}
     <style>
         .row-spaced {
@@ -114,13 +116,9 @@
     {#    End of Cards   #}
 
     {#    Chart Begins   #}
-    <div class="row row-spaced">
-        <div class="col-12">
-            <div class="card border-0 shadow">
-                {{ chart | safe }}
-            </div>
-        </div>
-    </div>
+        {% if is_manager %}
+            {% include 'chart_gopher.html' %}
+        {% endif %}
     {#    Chart Ends     #}
 
     <div class="py-4">

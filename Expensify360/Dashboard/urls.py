@@ -12,5 +12,6 @@ urlpatterns = [
     path('user_management/change_user_permissions/', views.manage_permissions, name='change_user_permissions'),
     path('expense_manager/', views.expense_manager, name='expense_manager'),
     path('expense_history/', views.expense_history, name='expense_history'),
-    path('user_management/remove-user', views.remove_user, name='remove-user')
+    path('user_management/remove-user', views.remove_user, name='remove-user'),
+    path('chart/', views.get_chart, name='chart')
 ]

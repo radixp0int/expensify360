@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static '/css/spinner.css' %}"/>
+{% block javascript %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        //$(document).ready(function () {
+        //    $("#chart").load('chart/');
+        //    $('#loader').addClass('hidden')
+        //});
+        // Define our button click listener
+    $(document).ready(function () {
+
+        // On click, execute the ajax call.
+        $.ajax({
+            type: "GET",
+            url: "chart/",
+            dataType: 'html',
+            beforeSend: function () { // Before we send the request, remove the .hidden class from the spinner and default to inline-block.
+                $('#loader').removeClass('hidden')
+            },
+            success: function (data) {
+                $('#chart').html(data)
+            },
+            complete: function () { // Set our complete callback, adding the .hidden class and hiding the spinner.
+                $('#loader').addClass('hidden')
+            },
+        });
+    });
+
+    </script>
+{% endblock %}
+{% block content %}
+<html>
+<head>
+</head>
+<body>
+
+    <div id="chart"></div>
+    <div class="lds-dual-ring hidden" id="loader"></div>
+
+
+</body>
+</html>
+{% endblock %}

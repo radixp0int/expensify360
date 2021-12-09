@@ -13,13 +13,11 @@ from Expenses.models import *
 def homepage(request):
     context = {'organizations': get_organization_structure(request=request),
                'user_permissions': request.user.get_user_permissions(),
+               'is_manager': is_manager(request.user)
                }
-    if is_manager(request.user):
-        context['chart'] = get_chart(request)
     return render(request, 'homepage.html', context)
 
 
-# not a view
 def get_chart(request):
     lookback = 300
     resolution = 'M'
@@ -27,7 +25,7 @@ def get_chart(request):
     vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
     VisualizationManager.save(vm)
     chart = vm.create_plot()
-    return chart
+    return render(request, 'chart.html', context={'chart': chart})
 
 
 @login_required
