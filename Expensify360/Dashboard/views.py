@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from django.contrib import messages
@@ -282,6 +283,15 @@ def expense_manager(request):
         expense = Expense.objects.get(id=id)
         expense.isApproved = new_status
         expense.save()
+    elif request.method == 'POST' and 'edit' in request.POST:
+        ExpenseId, expenseType = request.POST.get('edit').split('_')
+        request.session['ExpenseID'] = ExpenseId
+        if expenseType == 'Expense':
+            return HttpResponseRedirect('/expense/expense_editing')
+        elif expenseType == 'Mileage':
+            return HttpResponseRedirect('/expense/mileage_editing')
+        elif expenseType == 'Hours':
+            return HttpResponseRedirect('/expense/time_editing')
 
     expenses = list(
         get_expense_records(
