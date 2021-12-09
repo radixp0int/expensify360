@@ -164,6 +164,38 @@ def timeEntry(request):
 
 
 @login_required
+def editExpense(request):
+    id = 1030 # DEBUG PURPOSES ONLY
+    expense = Expense.objects.get(id=id)
+
+    if request.method == 'POST':
+        form = expenseEditForm(request.POST, request.FILES)
+
+        print(form.errors)
+        if form.is_valid():
+            # expense.expensePhoto = request.FILES['file']
+            expense.tax = form.cleaned_data['tax']
+            expense.shipping = form.cleaned_data['shipping']
+            expense.expenseTotal = form.cleaned_data['expenseTotal']
+            expense.isApproved = "Approved"
+            expense.save()
+            return HttpResponseRedirect('/expense_manager')
+
+    else:
+        form = expenseEditForm(initial={'expenseDate': expense.expenseDate,
+                                         'file': expense.expensePhoto,
+                                         'expenseCost': expense.expenseCost,
+                                         'tax' : expense.tax,
+                                         'shipping': expense.shipping,
+                                         'expenseTotal': expense.expenseTotal},
+                                        )
+        context = {
+            'form': form,
+        }
+        return render(request, 'expense_editing.html', context)
+
+
+@login_required
 def expense_approval(request):
     context = {}
     return render(request, 'expense_approval.html', context)
