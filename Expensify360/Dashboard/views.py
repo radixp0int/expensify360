@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import UserCreationForm
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from Dashboard.forms import *
 from django.contrib import messages
@@ -18,7 +19,6 @@ def homepage(request):
     return render(request, 'homepage.html', context)
 
 
-# not a view
 def get_chart(request):
     lookback = 300
     resolution = 'M'
@@ -26,7 +26,7 @@ def get_chart(request):
     vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
     VisualizationManager.save(vm)
     chart = vm.create_plot()
-    return chart
+    return render(request, 'chart.html', context={'chart': chart})
 
 
 @login_required
