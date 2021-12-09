@@ -76,7 +76,7 @@ class VisualizationManager:
         # assuming data is nonstationary
         stationary_data = data.diff() #doesn't work
 
-        model = tsa.SARIMAX(data['Expenses'], order=(lag, 1, 1), trend='c')
+        model = tsa.SARIMAX(data['Expenses'], order=(lag, 0, 1))
         results = model.fit()
         # prediction = results.get_prediction(start=-20, dynamic=True)
         # mean_prediction = prediction.predicted_mean
@@ -89,7 +89,7 @@ class VisualizationManager:
 
     def create_plot(self):
         data = self.load_data()
-        lag = 15
+        lag = 30
         fSteps = 12
         forecast = self.create_forecast(lag, fSteps)
         forecast.name = "Forecast"
