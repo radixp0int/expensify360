@@ -116,7 +116,9 @@
     {#    End of Cards   #}
 
     {#    Chart Begins   #}
-        {% include 'chart_gopher.html' %}
+        {% if is_manager %}
+            {% include 'chart_gopher.html' %}
+        {% endif %}
     {#    Chart Ends     #}
 
     <div class="py-4">
