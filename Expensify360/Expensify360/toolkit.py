@@ -180,7 +180,7 @@ def get_expense_records(user, filter_function=None, manager=True):
         proxy.expense_date = expense.expenseDate
         proxy.submission_date = expense.submissionDate
         proxy.project = expense.project
-        proxy.status = expense.isApproved
+        proxy.status = expense.isApproved.split('/')[0]
         proxy.type = expense.expenseType
         proxy.amount = expense_total(expense)
         proxy.id =expense.id
