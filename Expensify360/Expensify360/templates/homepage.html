@@ -29,8 +29,8 @@
         }
 
         .plotly-spaced {
-            margin-left: 10px;
-            margin-right: 10px;
+            margin-left: 2px;
+            margin-right: 2px;
         }
     </style>
     <div class="row row-spaced">
@@ -119,8 +119,12 @@
     {#    End of Cards   #}
 
     {#    Chart Begins   #}
-    <div class="plotly-spaced">
-        {{ chart | safe }}
+    <div class="row plotly-spaced">
+        <div class="col-12">
+            <div class="card border-0 shadow">
+                {{ chart | safe }}
+            </div>
+        </div>
     </div>
     {#    Chart Ends     #}
 
