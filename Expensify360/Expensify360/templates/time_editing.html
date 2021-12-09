@@ -1,0 +1,54 @@
+{% extends 'header.html' %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+    <h1> Edit Time Entry </h1>
+
+    <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
+
+    <script>
+        function UpdateExpenseTotal() {
+            var hours = document.getElementById("id_hours").value;
+            var rate = document.getElementById("id_hourlyRate").value;
+
+            if ((hours > 0) && (rate > 0)) {
+                document.getElementById("id_hourTotal").value = hours * rate;
+            }
+        }
+    </script>
+
+    <div class="forms" id="alert">
+        <form method="post" id="time-form">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="col text-center" style="padding-top: 20px;">
+                <input class="btn btn-lg btn-success" type="submit" value="Submit" id="submit_id">
+                <input class="btn btn-lg btn-danger" type="button" value="Cancel"
+                       data-target="#unsaved-modal" data-toggle="modal"#} >
+            </div>
+        </form>
+    </div>
+    {#Unsaved changes modal#}
+    <div id="unsaved-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="logout-modal-title">Warning</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Unsaved changes will be lost. If you would like to save changes, press "Keep Editing".</p>
+                </div>
+                <div class="modal-footer">
+                    <a class="btn btn-secondary mx-2" href={% url 'expense_manager' %}>Go Back</a>
+                    <button class="btn btn-primary mx-2" class="close" data-dismiss="modal">Keep Editing</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
