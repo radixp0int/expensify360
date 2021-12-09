@@ -15,6 +15,7 @@ def expense(request):
     context = {}
     return render(request, 'expense.html', context)
 
+
 @login_required
 def mileageEntry(request):
     # Grab the current user ID to pre-populate the form
@@ -47,7 +48,7 @@ def mileageEntry(request):
                                   miles=miles,
                                   mileageRate=mileageRate,
                                   mileageTotal=mileageTotal,
-                                  expenseType=expenseType,)
+                                  expenseType=expenseType, )
             mileageInfo.save()
             print(userID, expenseDate)
             return HttpResponseRedirect('/expense')
@@ -61,6 +62,7 @@ def mileageEntry(request):
         }
 
         return render(request, 'mileageEntry.html', context)
+
 
 @login_required
 def expenseEntry(request):
@@ -100,13 +102,13 @@ def expenseEntry(request):
                                   tax=tax,
                                   shipping=shipping,
                                   expenseTotal=expenseTotal,
-                                  expenseType=expenseType,)
+                                  expenseType=expenseType, )
             expenseInfo.save()
             return HttpResponseRedirect('/expense')
 
     else:
         # Load a clean copy of the expense entry form
-        form = expenseEntryForm(initial={'expenseDate': today},)
+        form = expenseEntryForm(initial={'expenseDate': today}, )
 
         context = {
             'form': form,
@@ -114,6 +116,7 @@ def expenseEntry(request):
         }
 
         return render(request, 'expenseEntry.html', context)
+
 
 @login_required
 def timeEntry(request):
@@ -141,13 +144,13 @@ def timeEntry(request):
             expenseType = "Time"
 
             hourInfo = Expense(userID=userID,
-                                  expenseDate=expenseDate,
-                                  organization=organization,
-                                  project=project,
-                                  hours=hours,
-                                  hourlyRate=hourlyRate,
-                                  hourTotal=hourTotal,
-                               expenseType=expenseType,)
+                               expenseDate=expenseDate,
+                               organization=organization,
+                               project=project,
+                               hours=hours,
+                               hourlyRate=hourlyRate,
+                               hourTotal=hourTotal,
+                               expenseType=expenseType, )
             hourInfo.save()
             print(userID, expenseDate)
             return HttpResponseRedirect('/expense')
@@ -173,7 +176,8 @@ def editExpense(request):
 
         print(form.errors)
         if form.is_valid():
-            # expense.expensePhoto = request.FILES['file']
+            expense.expenseDate = form.cleaned_data['expenseDate']
+            expense.expensePhoto = request.FILES['file']
             expense.tax = form.cleaned_data['tax']
             expense.shipping = form.cleaned_data['shipping']
             expense.expenseTotal = form.cleaned_data['expenseTotal']
@@ -183,16 +187,47 @@ def editExpense(request):
 
     else:
         form = expenseEditForm(initial={'expenseDate': expense.expenseDate,
-                                         'file': expense.expensePhoto,
-                                         'expenseCost': expense.expenseCost,
-                                         'tax' : expense.tax,
-                                         'shipping': expense.shipping,
-                                         'expenseTotal': expense.expenseTotal},
-                                        )
+                                        'file': expense.expensePhoto,
+                                        'expenseCost': expense.expenseCost,
+                                        'tax': expense.tax,
+                                        'shipping': expense.shipping,
+                                        'expenseTotal': expense.expenseTotal},
+                               )
         context = {
             'form': form,
         }
         return render(request, 'expense_editing.html', context)
+
+
+@login_required
+def editMileage(request):
+    id = request.session.get('ExpenseID')
+    expense = Expense.objects.get(id=id)
+
+    if request.method == 'POST':
+        form = mileageEntryForm(request.POST, request.FILES)
+
+        print(form.errors)
+        if form.is_valid():
+            expense.expenseDate = form.cleaned_data['expenseDate']
+            expense.miles = form.cleaned_data['miles']
+            expense.mileageRate = form.cleaned_data['mileageRate']
+            expense.mileageTotal = form.cleaned_data['mileageTotal']
+            expense.expenseType = "Mileage"
+            expense.isApproved = "Approved"
+            expense.save()
+            return HttpResponseRedirect('/expense_manager')
+
+    else:
+        form = mileageEntryForm(initial={'expenseDate': expense.expenseDate,
+                                         'miles': expense.miles,
+                                         'mileageRate': expense.mileageRate,
+                                         'mileageTotal': expense.mileageTotal}
+                                )
+        context = {
+            'form': form,
+        }
+        return render(request, 'mileage_editing.html', context)
 
 
 @login_required
