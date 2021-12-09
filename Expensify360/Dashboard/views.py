@@ -13,9 +13,8 @@ from Expenses.models import *
 def homepage(request):
     context = {'organizations': get_organization_structure(request=request),
                'user_permissions': request.user.get_user_permissions(),
+               'is_manager': is_manager(request.user)
                }
-    if is_manager(request.user):
-        context['chart'] = get_chart(request)
     return render(request, 'homepage.html', context)
 
 
