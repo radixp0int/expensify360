@@ -213,7 +213,6 @@ def editMileage(request):
             expense.miles = form.cleaned_data['miles']
             expense.mileageRate = form.cleaned_data['mileageRate']
             expense.mileageTotal = form.cleaned_data['mileageTotal']
-            expense.expenseType = "Mileage"
             expense.isApproved = "Approved"
             expense.save()
             return HttpResponseRedirect('/expense_manager')
@@ -228,6 +227,36 @@ def editMileage(request):
             'form': form,
         }
         return render(request, 'mileage_editing.html', context)
+
+
+@login_required
+def editTime(request):
+    id = request.session.get('ExpenseID')
+    expense = Expense.objects.get(id=id)
+
+    if request.method == 'POST':
+        form = timeEntryForm(request.POST, request.FILES)
+
+        print(form.errors)
+        if form.is_valid():
+            expense.expenseDate = form.cleaned_data['expenseDate']
+            expense.hours = form.cleaned_data['hours']
+            expense.hourlyRate = form.cleaned_data['hourlyRate']
+            expense.hourTotal = form.cleaned_data['hourTotal']
+            expense.isApproved = "Approved"
+            expense.save()
+            return HttpResponseRedirect('/expense_manager')
+
+    else:
+        form = timeEntryForm(initial={'expenseDate': expense.expenseDate,
+                                         'hours': expense.hours,
+                                         'hourlyRate': expense.hourlyRate,
+                                         'hourTotal': expense.hourTotal}
+                                )
+        context = {
+            'form': form,
+        }
+        return render(request, 'time_editing.html', context)
 
 
 @login_required

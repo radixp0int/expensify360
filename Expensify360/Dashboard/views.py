@@ -290,6 +290,8 @@ def expense_manager(request):
             return HttpResponseRedirect('/expense/expense_editing')
         elif expenseType == 'Mileage':
             return HttpResponseRedirect('/expense/mileage_editing')
+        elif expenseType == 'Hours':
+            return HttpResponseRedirect('/expense/time_editing')
 
     expenses = list(
         get_expense_records(
