@@ -7,24 +7,24 @@ from crispy_forms.bootstrap import FormActions
 
 class mileageEntryForm(forms.Form):
     expenseDate = forms.DateField(label='Expense Date')
-    miles = forms.DecimalField(label='Miles Driven', max_digits=8,
+    miles = forms.DecimalField(label='Miles Driven',
                                widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
-    mileageRate = forms.DecimalField(label='Rate Per Mile', max_digits=5,
+    mileageRate = forms.DecimalField(label='Rate Per Mile',
                                      widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
-    mileageTotal = forms.DecimalField(label='Total Cost', max_digits=8,
+    mileageTotal = forms.DecimalField(label='Total Cost',
                                       widget=forms.NumberInput(attrs={'readonly': True}))
 
 
 class expenseEntryForm(forms.Form):
     expenseDate = forms.DateField(label='Expense Date')
     file = forms.FileField(label='Receipt Upload')
-    expenseCost = forms.DecimalField(label='Item Cost', max_digits=8,
+    expenseCost = forms.DecimalField(label='Item Cost',
                                      widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
-    tax = forms.DecimalField(label='Tax', max_digits=8,
+    tax = forms.DecimalField(label='Tax',
                              widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
-    shipping = forms.DecimalField(label='Shipping Cost', max_digits=8,
+    shipping = forms.DecimalField(label='Shipping Cost',
                                   widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
-    expenseTotal = forms.DecimalField(label='Total Cost', max_digits=8,
+    expenseTotal = forms.DecimalField(label='Total Cost',
                                       widget=forms.NumberInput(attrs={'readonly': True}))
 
 
@@ -43,9 +43,9 @@ class expenseEditForm(forms.Form):
 
 class timeEntryForm(forms.Form):
     expenseDate = forms.DateField(label='Expense Date')
-    hours = forms.DecimalField(label='Hours Worked', max_digits=6,
+    hours = forms.DecimalField(label='Hours Worked',
                                widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
-    hourlyRate = forms.DecimalField(label='Hourly Rate', max_digits=6,
+    hourlyRate = forms.DecimalField(label='Hourly Rate',
                                     widget=forms.NumberInput(attrs={'onchange': "UpdateExpenseTotal();"}))
-    hourTotal = forms.DecimalField(label='Total Cost', max_digits=6,
+    hourTotal = forms.DecimalField(label='Total Cost',
                                    widget=forms.NumberInput(attrs={'readonly': True}))
