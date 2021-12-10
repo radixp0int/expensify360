@@ -1,9 +1,33 @@
 {% extends 'header.html' %}
 
-{% load crispy_forms_tags %}
 {% block content %}
-    <div class="container">
-        <h1 class="h1">Create New Project</h1>
-        {% crispy form %}
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-10 shadow">
+            <div class="card-header border-bottom d-flex align-items-center justify-content-between">
+                <h2 class="fs-5 fw-bold mb-0">Create Project</h2>
+            </div>
+
+            <div class="card-body mb-auto">
+
+                <div class="spacer my-2"></div>
+                            <form method="post">
+                            {% csrf_token %}
+                                <div class="spacer my-2">
+                                <select name="organization" class="form-control">
+                                    <option value="none" selected disabled>
+                                        Choose Organization...
+                                    </option>
+                                    {% for org in organizations %}
+                                        <option name="option" value="{{ org }}">Add to {{ org }} Organization</option>
+                                    {% endfor %}
+                                </select>
+                                </div>
+                                    <input class="form-control" type="text" name="project-name" placeholder="Project Name">
+                                <div class="spacer my-2">
+                                    <button class="btn btn-primary" onclick="this.form.submit()">Submit</button>
+                                </div>
+                            </form>
+                </div>
+        </div>
     </div>
     {% endblock %}
