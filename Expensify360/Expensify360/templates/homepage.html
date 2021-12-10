@@ -145,7 +145,7 @@
                         <h3 class="card-title">Create Organization</h3>
                         <p class="card-text">Description about Create Organization Page.</p>
                         <a class="btn btn-primary" href={% url 'create_org' %}>
-                            Create Organization</a>
+                            Create</a>
                     </div>
                 </div>
             </div>
@@ -160,9 +160,7 @@
                     <div class="card-body text-center m-2">
                         <h3 class="card-title">Manage Users</h3>
                         <p class="card-text">Description about Manage Users Page.</p>
-                        {% if 'auth.add_user' in user_permissions %}
-                            <a class="btn btn-primary" href={% url 'user_management' %}>Manage Users</a>
-                        {% endif %}
+                        <a class="btn btn-primary" href={% url 'user_management' %}>Manage</a>
                     </div>
                 </div>
             </div>
@@ -177,13 +175,7 @@
                     <div class="card-body text-center m-2">
                         <h3 class="card-title">Create Project</h3>
                         <p class="card-text">Description about Create Project Page.</p>
-
-                        <form action={% url 'create_proj' %} name="org" method="get">
-                            {% csrf_token %}
-                            <input type="hidden" name="org-name" value="{{ org.name }}">
-                            <input type="submit" value="Create Project" class="btn btn-primary">
-                        </form>
-
+                        <a class="btn btn-primary" href={% url 'create_proj' %}>Create</a>
                     </div>
                 </div>
             </div>
@@ -194,36 +186,13 @@
     <div class="py-4">
         <div class="col-12 col-xxl-6 mb-4">
             <div class="card border-primary">
-                {#                <div class="card-header border-bottom d-flex align-items-center justify-content-between">#}
-                {#                    <h2 class="offset-xl-10 text-muted">Organization Overview</h2>#}
-                {##}
-                {#                    <div class="nav-item">#}
-                {#                        <div class="spacer my-2 mx-2">#}
-                {#                            {% if 'Dashboard.add_organization' in user_permissions %}#}
-                {#                                <a class="btn btn-sm btn-primary" href={% url 'create_org' %}>Create#}
-                {#                                    Organization</a>#}
-                {#                            {% endif %}#}
-                {#                        </div>#}
-                {#                        <div class="spacer my-2 mx-2">#}
-                {#                            {% if 'auth.add_user' in user_permissions %}#}
-                {#                                <a class="btn btn-sm btn-primary" href={% url 'user_management' %}>Manage Users</a>#}
-                {#                            {% endif %}#}
-                {#                        </div>#}
-                {#                    </div>#}
-                {#                </div>#}
+
 
                 <div class="card-body">
                     <ul class="list-group list-group-flush list my--3">
                         {% for org in organizations %}
                             <div class="card-deck justify-content-between">
                                 <h1 class="alert-light fw-bold mb-10">{{ org.name }}</h1>
-                                {#                                {% if 'Dashboard.add_project' in user_permissions %}#}
-                                {#                                    <form action={% url 'create_proj' %} name="org" method="get">#}
-                                {#                                        {% csrf_token %}#}
-                                {#                                        <input type="hidden" name="org-name" value="{{ org.name }}">#}
-                                {#                                        <input type="submit" value="Create Project" class="btn btn-primary">#}
-                                {#                                    </form>#}
-                                {#                                {% endif %}#}
                             </div>
                             {% for prj in org.proj_list %}
                                 <div class="popover-body bg-secondary my-4">
