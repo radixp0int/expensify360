@@ -12,24 +12,26 @@
         <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
     </head>
 
-    <body>
+
     <div class="jumbotron jumbotron-fluid">
         <div class="container">
             <h1 class="display-4">Dashboard</h1>
-            {#            <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.#}
-            {#                More text will be here if we want</p>#}
         </div>
     </div>
 
-    <div>
-
-    {#    Informational Cards    #}
     <style>
-        .row-spaced {
-            margin-left: 2px;
-            margin-right: 2px;
+        body {
+            background: #b9b8c2;
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 15vw;
+            object-fit: cover;
         }
     </style>
+    <body>
+    {#    Informational Cards    #}
     <div class="row row-spaced">
         <div class="col-12 col-sm-6 col-xl-4 mb-4">
             <div class="card border-0 shadow">
@@ -47,7 +49,8 @@
                             </small>
                             <div class="small d-flex mt-1">
                                 <div>Since last month
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                         fill="currentColor"
                                          class="bi bi-caret-up-fill text-success" viewBox="0 0 16 16">
                                         <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
                                     </svg>
@@ -74,11 +77,12 @@
                             </small>
                             <div class="small d-flex mt-1">
                                 <div>Since last month
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                         fill="currentColor"
                                          class="bi bi-caret-down-fill text-danger" viewBox="0 0 16 16">
                                         <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
                                     </svg>
-                                    <span class="text-danger fw-bolder">8.5%</span></div>-
+                                    <span class="text-danger fw-bolder">8.5%</span></div>
                             </div>
                         </div>
                     </div>
@@ -91,17 +95,18 @@
                     <div class="row d-block d-xl-flex align-items-center">
                         <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
                         </div>
-                        <div>
-                            <div>
+                        <div class="col-12 col-xl-7 px-xl-0">
+                            <div class="d-none d-sm-block">
                                 <h2 class="h6 text-gray-400 mb-0"> Pending Requests </h2>
                                 <h3 class="fw-extrabold mb-2">{{ summary.pending_count }}</h3>
                             </div>
-                           <small class="text-gray-500">
+                            <small class="text-gray-500">
                                 Nov 1 - Dec 1
                             </small>
                             <div class="small d-flex mt-1">
                                 <div>Since last month
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                         fill="currentColor"
                                          class="bi bi-caret-up-fill text-success" viewBox="0 0 16 16">
                                         <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
                                     </svg>
@@ -116,43 +121,109 @@
     {#    End of Cards   #}
 
     {#    Chart Begins   #}
-        {% if is_manager %}
-            {% include 'chart_gopher.html' %}
+    <div class="row row-spaced">
+        <div class="col-12">
+            <div class="card border-0 shadow">
+                {% if is_manager %}
+                    {% include 'chart_gopher.html' %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {#     Chart Ends      #}
+
+    {#     Cards Based on Permissions    #}
+    {#    Remove the <img> to not see images    #}
+    <div class="row row-spaced row-cols-1 row-cols-md-3 row-top-spaced">
+        {# Create Organization Tile#}
+        {% if 'Dashboard.add_organization' in user_permissions %}
+            <div class="col mb-4">
+                <div class="card h-100 border-0 shadow">
+                    <img src="https://media.istockphoto.com/vectors/coworkers-set-vector-collection-of-scene-of-freelancers-businessman-vector-id1210616882?k=20&m=1210616882&s=612x612&w=0&h=Z_w8OEhsyXQCP4VO0n2Ykh8T3qXdhVcGuT3f1MQ6kko="
+                         class="card-img-top" alt="...">
+                    <div class="card-body text-center m-2">
+                        <h3 class="card-title">Create Organization</h3>
+                        <p class="card-text">Description about Create Organization Page.</p>
+                        <a class="btn btn-primary" href={% url 'create_org' %}>
+                            Create Organization</a>
+                    </div>
+                </div>
+            </div>
         {% endif %}
-    {#    Chart Ends     #}
+
+        {# Manage Users Tile#}
+        {% if 'auth.add_user' in user_permissions %}
+            <div class="col mb-4">
+                <div class="card h-100 border-0 shadow">
+                    <img src="https://media.istockphoto.com/vectors/user-ratings-and-reviews-vector-id1143052274?k=20&m=1143052274&s=612x612&w=0&h=gWTfkZM_fopawLGgoCkXGxUkHJzUNAzmJU_v1kGpCLU="
+                         class="card-img-top" alt="...">
+                    <div class="card-body text-center m-2">
+                        <h3 class="card-title">Manage Users</h3>
+                        <p class="card-text">Description about Manage Users Page.</p>
+                        {% if 'auth.add_user' in user_permissions %}
+                            <a class="btn btn-primary" href={% url 'user_management' %}>Manage Users</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {# Create Project Tile#}
+        {% if 'Dashboard.add_project' in user_permissions %}
+            <div class="col mb-4">
+                <div class="card h-100 border-0 shadow">
+                    <img src="https://media.istockphoto.com/vectors/content-marketing-related-vector-illustration-flat-modern-design-vector-id1200957578?k=20&m=1200957578&s=612x612&w=0&h=9JTFz6_AeOHGWZXwIqJNsUQTQbrBX_hwZS4Uc9ZUobU="
+                         class="card-img-top" alt="...">
+                    <div class="card-body text-center m-2">
+                        <h3 class="card-title">Create Project</h3>
+                        <p class="card-text">Description about Create Project Page.</p>
+
+                        <form action={% url 'create_proj' %} name="org" method="get">
+                            {% csrf_token %}
+                            <input type="hidden" name="org-name" value="{{ org.name }}">
+                            <input type="submit" value="Create Project" class="btn btn-primary">
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    {#    End of Cards Based on Permision#}
 
     <div class="py-4">
         <div class="col-12 col-xxl-6 mb-4">
             <div class="card border-primary">
-                <div class="card-header border-bottom d-flex align-items-center justify-content-between">
-                    <h2 class="offset-xl-10 text-muted">Organization Overview</h2>
-
-                    <div class="nav-item">
-                        <div class="spacer my-2 mx-2">
-                            {% if 'Dashboard.add_organization' in user_permissions %}
-                                <a class="btn btn-sm btn-primary" href={% url 'create_org' %}>Create Organization</a>
-                            {% endif %}
-                        </div>
-                        <div class="spacer my-2 mx-2">
-                            {% if 'auth.add_user' in user_permissions %}
-                                <a class="btn btn-sm btn-primary" href={% url 'user_management' %}>Manage Users</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
+                {#                <div class="card-header border-bottom d-flex align-items-center justify-content-between">#}
+                {#                    <h2 class="offset-xl-10 text-muted">Organization Overview</h2>#}
+                {##}
+                {#                    <div class="nav-item">#}
+                {#                        <div class="spacer my-2 mx-2">#}
+                {#                            {% if 'Dashboard.add_organization' in user_permissions %}#}
+                {#                                <a class="btn btn-sm btn-primary" href={% url 'create_org' %}>Create#}
+                {#                                    Organization</a>#}
+                {#                            {% endif %}#}
+                {#                        </div>#}
+                {#                        <div class="spacer my-2 mx-2">#}
+                {#                            {% if 'auth.add_user' in user_permissions %}#}
+                {#                                <a class="btn btn-sm btn-primary" href={% url 'user_management' %}>Manage Users</a>#}
+                {#                            {% endif %}#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {#                </div>#}
 
                 <div class="card-body">
                     <ul class="list-group list-group-flush list my--3">
                         {% for org in organizations %}
                             <div class="card-deck justify-content-between">
                                 <h1 class="alert-light fw-bold mb-10">{{ org.name }}</h1>
-                                {% if 'Dashboard.add_project' in user_permissions %}
-                                    <form action={% url 'create_proj' %} name="org" method="get">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="org-name" value="{{ org.name }}">
-                                        <input type="submit" value="Create Project" class="btn btn-primary">
-                                    </form>
-                                {% endif %}
+                                {#                                {% if 'Dashboard.add_project' in user_permissions %}#}
+                                {#                                    <form action={% url 'create_proj' %} name="org" method="get">#}
+                                {#                                        {% csrf_token %}#}
+                                {#                                        <input type="hidden" name="org-name" value="{{ org.name }}">#}
+                                {#                                        <input type="submit" value="Create Project" class="btn btn-primary">#}
+                                {#                                    </form>#}
+                                {#                                {% endif %}#}
                             </div>
                             {% for prj in org.proj_list %}
                                 <div class="popover-body bg-secondary my-4">
@@ -182,8 +253,6 @@
             </div>
         </div>
     </div>
-
     </body>
-
 
 {% endblock content %}

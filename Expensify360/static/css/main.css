@@ -70,6 +70,14 @@ table {
     margin-right: 2px;
 }
 
+.row-top-spaced {
+    margin-top: 40px;
+}
+
+.jumbotron {
+    background-color: #FFFFFF;
+}
+
 .alert {
     display: none;
 }
