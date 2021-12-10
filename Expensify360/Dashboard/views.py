@@ -53,30 +53,37 @@ def create_org(request):
 @permission_required('Dashboard.add_project')
 def create_proj(request):
     if request.method == 'POST':
-        form = CreateProjForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['Project_Name']
+        print(request.POST)
+        project_name = request.POST.get('project-name')
+        if '`' in project_name:
+            messages.error(request, "Backtick ' ` ' Not Allowed in Project Name!")
+            context = {'organizations': list(request.user.organization_set.all())}
+            return render(request, 'create-proj.html', context)
+        if 'organization' not in request.POST:
+            messages.error(request, "Please Select an Organization.")
+            context = {'organizations': list(request.user.organization_set.all())}
+            return render(request, 'create-proj.html', context)
+        if len(project_name) == 0:
+            messages.error(request, "Please Enter a Project Name.")
+            context = {'organizations': list(request.user.organization_set.all())}
+            return render(request, 'create-proj.html', context)
+        # all checks passed, make the project
+        organization = Organization.objects.get(name=request.POST.get('organization'))
+        project = Project.create(
+            name=project_name,
+            manager=request.user,
+            second_manager=request.user,
+            org=organization,
+        )
+        try:
+            project.save()
+            project.users.add(request.user)
+            messages.success(request, f'{project} Project Created in {organization}')
+        except IntegrityError:
+            messages.error(request, f'{project} already exists')
 
-            # check for reserved char
-            if '`' in name:
-                messages.error(request, "Backtick ' ` ' Not Allowed in Project Name!")
-                return render(request, 'create-proj.html', {'form': form})
-
-            organization = Organization.objects.get(name=request.GET.get('org-name'))
-            project = Project.create(
-                name=name,
-                manager=request.user,
-                second_manager=request.user,
-                org=organization,
-            )
-            try:
-                project.save()
-                project.users.add(request.user)
-                messages.success(request, f'{project} Project Created in {organization}')
-            except IntegrityError:
-                messages.error(request, f'{project} already exists')
-    # either way render an empty form
-    return render(request, 'create-proj.html', {'form': CreateProjForm()})
+    context = {'organizations' : list(request.user.organization_set.all())}
+    return render(request, 'create-proj.html', context)
 
 
 @login_required
