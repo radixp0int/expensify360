@@ -57,6 +57,7 @@ pip3 install pipenv
 install requirements
 ```sh
 pip install -r requirements.txt
+conda install -c conda-forge prophet
 ```
 
 ## Development

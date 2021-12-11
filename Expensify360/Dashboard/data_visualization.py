@@ -59,8 +59,11 @@ class VisualizationManager:
             trend = None
         data = DataFrame({'Time': x, 'Expenses': y, 'Trend': trend})
         try:
-            pred = DataFrame(forecast(data))
-            pred.to_pickle(f'{self.name}_forecast')
+            if x.shape[0] > 2:
+                pred = DataFrame(forecast(data))
+                pred.to_pickle(f'{self.name}_forecast')
+            else:
+                pred = None
         except ValueError:  # this will be thrown for insufficient data
             pred = None
         data.to_pickle(f'{self.name}_data')
