@@ -5,7 +5,7 @@ from pandas import date_range, read_pickle, DataFrame, concat
 import plotly.graph_objs as go
 from scipy.signal import savgol_filter
 import glob
-from prophet import Prophet
+from Expensify360.profit.forecaster import Prophet
 
 
 class VisualizationManager:
