@@ -19,16 +19,15 @@
         }
 
         function hideForm() {
-            var selectedProject = document.getElementById( "project_selector_id" );
+            var selectedProject = document.getElementById("project_selector_id");
 
-            if (selectedProject.options[ selectedProject.selectedIndex ].value  === "none") {
+            if (selectedProject.options[selectedProject.selectedIndex].value === "none") {
                 document.getElementById("submit_id").hidden = true;
                 document.getElementById("div_id_expenseDate").hidden = true;
                 document.getElementById("div_id_miles").hidden = true;
                 document.getElementById("div_id_mileageRate").hidden = true;
                 document.getElementById("div_id_mileageTotal").hidden = true;
-            }
-            else {
+            } else {
                 document.getElementById("submit_id").hidden = false;
                 document.getElementById("div_id_expenseDate").hidden = false;
                 document.getElementById("div_id_miles").hidden = false;
@@ -47,7 +46,7 @@
                 <select name="project" id="project_selector_id" class="form-control" onchange=hideForm()>
                     <option value="none" selected>--------</option>
                     {% for project in projects %}
-                        <option name="option" value="{{project}}">{{project}}</option>
+                        <option name="option" value="{{ project }}">{{ project }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -57,11 +56,12 @@
             <div class="col text-center" style="padding-top: 20px;">
                 <input class="btn btn-lg btn-success" type="submit" value="Submit" id="submit_id">
                 <input class="btn btn-lg btn-danger" type="button" value="Cancel"
-                       data-target="#unsaved-modal" data-toggle="modal"#} >
+                       data-target="#unsaved-modal" data-toggle="modal">
             </div>
         </form>
     </div>
-    {#Unsaved changes modal#}
+
+    {#     Unsaved changes modal    #}
     <div id="unsaved-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -81,5 +81,5 @@
             </div>
         </div>
     </div>
-
+    {#    End of Modal    #}
 {% endblock %}
