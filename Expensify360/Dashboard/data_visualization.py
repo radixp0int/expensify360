@@ -74,10 +74,10 @@ class VisualizationManager:
         self.fig = go.Figure()  # lol go figure
         self.fig.add_trace(go.Bar(x=data['Time'], y=data['Expenses'], name='Expenses'))
         if data['Trend'] is not None:
-            self.fig.add_trace(go.Line(x=data['Time'], y=data['Trend'], name='Trend'))
+            self.fig.add_trace(go.Scatter(x=data['Time'], y=data['Trend'], name='Trend'))
         if pred is not None:
-            self.fig.add_trace(go.Line(x=pred['ds'], y=pred['yhat'], name="Forecast"))
-            self.fig.add_trace(go.Line(
+            self.fig.add_trace(go.Scatter(x=pred['ds'], y=pred['yhat'], name="Forecast"))
+            self.fig.add_trace(go.Scatter(
                 x=concat([pred['ds'], pred['ds'][::-1]]),
                 y=concat([pred['yhat_upper'], pred['yhat_lower'][::-1]]),
                 fill='toself',
