@@ -54,3 +54,4 @@ zope.interface==5.4.0
 numpy==1.21.2
 pandas
 scipy
+pystan==2.19.1.1
