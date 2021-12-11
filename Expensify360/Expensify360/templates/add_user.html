@@ -1,13 +1,18 @@
 {% extends 'header.html' %}
-
+{% load static %}
 {% load crispy_forms_tags %}
 {% load crispy_forms_filters %}
+
 {% block content %}
+    <head>
+        <h1> Add User </h1>
+        <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
+    </head>
     <div class="container">
         <form method="POST">
-		    {% csrf_token %}
-		    {{ add | crispy }}
+            {% csrf_token %}
+            {{ add | crispy }}
             {% crispy done_or_cancel %}
-	    </form>
+        </form>
     </div>
-    {% endblock %}
+{% endblock %}

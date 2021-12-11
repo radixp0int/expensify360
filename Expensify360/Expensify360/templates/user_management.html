@@ -3,48 +3,65 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-<h1> User Management </h1>
+    <head>
+        <h1> User Management </h1>
 
-<link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
-
-<!-- TODO: no reason this couldn't be a for loop -->
-<div class="col-12 col-xxl-6 mb-4">
-    <div class="card border-0 shadow">
-        <div class="card-header border-bottom d-flex align-items-center">
-            {% crispy add %}
+        <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
+    </head>
+    <style>
+    .link-center{
+        text-align: center;
+    }
+    </style>
+    <body>
+    <!-- TODO: no reason this couldn't be a for loop -->
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                <h4 class="card-title mt-3 mb-3">Add User</h4>
+                {% crispy add %}
+            </div>
         </div>
     </div>
-</div>
 
-<div class="col-12 col-xxl-6 mb-4">
-    <div class="card border-0 shadow">
-        <div class="card-header border-bottom d-flex align-items-center">
-            {% crispy add_to_group %}
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                <h4 class="card-title mt-3 mb-3">Add User To Organiation</h4>
+                {% crispy add_to_group %}
+            </div>
         </div>
     </div>
-</div>
 
-<div class="col-12 col-xxl-6 mb-4">
-    <div class="card border-0 shadow">
-        <div class="card-header border-bottom d-flex align-items-center">
-            {% crispy add_to_project %}
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                <h4 class="card-title mt-3 mb-3">Add User To Project</h4>
+                {% crispy add_to_project %}
+            </div>
         </div>
     </div>
-</div>
 
-<div class="col-12 col-xxl-6 mb-4">
-    <div class="card border-0 shadow">
-        <div class="card-header border-bottom d-flex align-items-center">
-            {% crispy rem %}
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                <h4 class="card-title mt-3 mb-3">Remove User</h4>
+                {% crispy rem %}
+            </div>
         </div>
     </div>
-</div>
 
-<div class="col-12 col-xxl-6 mb-4">
-    <div class="card border-0 shadow">
-        <div class="card-header border-bottom d-flex align-items-center">
-            {% crispy delegate_project %}
+    <div class="col-12 col-xxl-6 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                <h4 class="card-title mt-3 mb-3">Assign Project Managers</h4>
+                {% crispy delegate_project %}
+            </div>
         </div>
     </div>
-</div>
+
+    </body>
+    <div class="text-center">
+        <a class="btn btn-secondary btn-lg" href={% url 'home' %}>Go Back</a>
+    </div>
 {% endblock %}
