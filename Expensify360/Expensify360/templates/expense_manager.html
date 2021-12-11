@@ -73,7 +73,7 @@
                                 <form name="change-status" method="post">
                                 {% csrf_token %}
                                 <input type="hidden" name="edit" value="{{ expense.id }}_{{ expense.type }}">
-                                <input type="submit" value="More Information" class="btn btn-success btn-sm btn-block">
+                                <input type="submit" value="More Information" class="btn btn-link btn-sm btn-block">
                             </form>
                             </div>
                         </td>
