@@ -53,7 +53,7 @@ class VisualizationManager:
         x, y = t, binned
         if x.shape[0] < 1: return None  # caller must check for this!
         try:
-            trend = savgol_filter(y, window_length=13, polyorder=3)
+            trend = savgol_filter(y, window_length=33, polyorder=3)
             trend[trend < 0] = 0.0
         except ValueError:
             trend = None
