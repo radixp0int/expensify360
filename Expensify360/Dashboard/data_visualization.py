@@ -90,7 +90,7 @@ class VisualizationManager:
     def create_plot(self):
         data = self.load_data()
         lag = 30
-        fSteps = 12
+        fSteps = 13
         forecast = self.create_forecast(lag, fSteps)
         forecast.name = "Forecast"
         og_index = len(data.index)
@@ -118,7 +118,7 @@ class VisualizationManager:
             self.fig.add_trace(
                 go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
         self.fig.add_trace(
-            go.Line(x=data['Time'], y=data['Forecast'], name='Forecast', line=dict(color='black', width=2, dash='dash')))
+            go.Line(x=data['Time'], y=data['Forecast'], name='Forecast', line=dict(color='black', width=2, dash='solid')))
         self.fig.update_layout(legend_title_text='Expense History')
         self.fig.update_xaxes(title_text='Time')
         self.fig.update_yaxes(title_text='Dollars')
