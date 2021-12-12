@@ -5,7 +5,7 @@ from pandas import date_range, read_pickle, DataFrame, concat
 import plotly.graph_objs as go
 from scipy.signal import savgol_filter
 import glob
-from Expensify360.profit.forecaster import Prophet
+from prophet import Prophet
 
 
 class VisualizationManager:
@@ -53,7 +53,7 @@ class VisualizationManager:
         x, y = t, binned
         if x.shape[0] < 1: return None  # caller must check for this!
         try:
-            trend = savgol_filter(y, window_length=33, polyorder=3)
+            trend = savgol_filter(y, window_length=33, polyorder=5)
             trend[trend < 0] = 0.0
         except ValueError:
             trend = None
@@ -79,7 +79,7 @@ class VisualizationManager:
         if data['Trend'] is not None:
             self.fig.add_trace(go.Scatter(x=data['Time'], y=data['Trend'], name='Trend'))
         if pred is not None:
-            self.fig.add_trace(go.Scatter(x=pred['ds'], y=pred['yhat'], name="Forecast"))
+            self.fig.add_trace(go.Bar(x=pred['ds'], y=pred['yhat'], name="Forecast"))
             self.fig.add_trace(go.Scatter(
                 x=concat([pred['ds'], pred['ds'][::-1]]),
                 y=concat([pred['yhat_upper'], pred['yhat_lower'][::-1]]),
@@ -157,8 +157,8 @@ def forecast(data):
     prophet_df = data.copy()
     prophet_df.drop('Trend', axis=1, inplace=True)
     prophet_df = prophet_df.rename(columns={'Time': 'ds', 'Expenses': 'y'})
-    m = Prophet(mcmc_samples=60, n_changepoints=60, interval_width=.7)
-    m.fit(prophet_df, control={'adapt_delta': 0.9})
+    m = Prophet(mcmc_samples=120, n_changepoints=10, interval_width=.7)
+    m.fit(prophet_df, control={'adapt_delta': 0.9, 'max_treedepth': 16})
     future = m.make_future_dataframe(periods=12, freq='MS', include_history=False)
     pred = m.predict(future)
     pred['yhat'] = pred['yhat'].clip(lower=0)
