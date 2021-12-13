@@ -12,10 +12,9 @@
         <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
     </head>
 
-
     <div class="jumbotron jumbotron-fluid">
         <div class="container">
-            <h1 class="display-4">Dashboard</h1>
+            <h1 class="display-3"><strong>Dashboard</strong></h1>
         </div>
     </div>
 
@@ -24,76 +23,145 @@
             background: #b9b8c2;
         }
 
-        .card-img-top {
-            width: 100%;
-            height: 15vw;
-            object-fit: cover;
-        }
     </style>
+    <script>
+        {#Capture Time when Page Loaded#}
+        let created = new Date().getTime();
+
+        {#The time now#}
+        let now = new Date().getTime();
+
+        let getNow = function () {
+            {#Time Now updated#}
+            now = new Date().getTime();
+            {#The difference between now and created#}
+            let howLongAgo = created - now;
+
+            let getHumanTime = function (timestamp) {
+
+                {#Convert to a positive integer#}
+                let time = Math.abs(timestamp);
+
+                {#Define humanTime and units#}
+                let humanTime, units;
+
+                if (time > (1000 * 60 * 60 * 24 * 7)) {
+                    humanTime = parseInt(time / (1000 * 60 * 60 * 24 * 7), 10);
+                    units = 'weeks';
+                }
+
+                    {#If there are days#}
+                else if (time > (1000 * 60 * 60 * 24)) {
+                    humanTime = parseInt(time / (1000 * 60 * 60 * 24), 10);
+                    units = 'days';
+                }
+
+                    {#If there are hours#}
+                else if (time > (1000 * 60 * 60)) {
+                    humanTime = parseInt(time / (1000 * 60 * 60), 10);
+                    if (humanTime < 2) {
+                        units = 'hour';
+                    } else {
+                        units = 'hours';
+                    }
+                }
+
+                    {#If there are minutes#}
+                else if (time > (1000 * 60)) {
+                    humanTime = parseInt(time / (1000 * 60), 10);
+                    if (humanTime < 2) {
+                        units = 'minute';
+                    } else {
+                        units = 'minutes';
+                    }
+                }
+
+                    {#Otherwise, use seconds#}
+                else {
+                    humanTime = parseInt(time / (1000), 10);
+                    if (humanTime < 2) {
+                        units = 'second';
+                    } else {
+                        units = 'seconds';
+                    }
+                }
+
+                {#Get the time and units#}
+                let timeUnits = humanTime + ' ' + units;
+
+                {# If in the future#}
+                if (timestamp > 0) {
+                    return 'in ' + timeUnits;
+                }
+
+                {#If in the past#}
+                return timeUnits + ' ago';
+
+            };
+
+            {#Show the difference in the UI#}
+            let elements = document.querySelectorAll('.time-difference');
+            elements.forEach(function (elem) {
+                elem.textContent = 'Updated ' + getHumanTime(howLongAgo);
+            });
+        };
+        setInterval(getNow, 60000);
+
+    </script>
     <body>
-    {#    Informational Cards    #}
-    <div class="row row-spaced">
-        <div class="col-12 col-sm-6 col-xl-4 mb-4">
-            <div class="card border-0 shadow">
-                <div class="card-body">
-                    <div class="row d-block d-xl-flex align-items-center">
-                        <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
-                        </div>
-                        <div class="col-12 col-xl-7 px-xl-0">
-                            <div class="d-flex d-sm-block">
-                                <h2 class="h6 text-gray-400 mb-0"> Total Expenses </h2>
-                            </div>
-                            <div class="d-flex d-sm-block">
-                                <h3 class="fw-extrabold mb-2">{{ summary.total_expenses }}</h3>
-                            </div>
-                        </div>
-                    </div>
+
+    {#     New Summary Info Cards   #}
+    <div class="row row-spaced row-cols-sm-1 row-cols-md-2 row-cols-lg-4 row-top-spaced">
+        {# Info Card#}
+        <div class="col mb-3">
+            <div class="card h-90 border-0 shadow">
+                <div class="card-body text-center ml-2 mr-2">
+                    <h3 class="card-text h6">All Time Total Expenses</h3>
+                    <h3 class="card-title mb-2">{{ summary.total_expenses }}</h3>
+                    <p class="card-text time-difference">Just Updated</p>
+                </div>
+
+            </div>
+        </div>
+
+        {# Info Card#}
+        <div class="col mb-3">
+            <div class="card h-90 border-0 shadow">
+                <div class="card-body text-center ml-2 mr-2">
+                    <h3 class="card-text h6">Total Pending Expenses</h3>
+                    <h3 class="card-title mb-2">{{ summary.total_pending }}</h3>
+                    <p class="card-text time-difference">Just Updated</p>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-xl-4 mb-4">
-            <div class="card border-0 shadow">
-                <div class="card-body">
-                    <div class="row d-block d-xl-flex align-items-center">
-                        <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
-                        </div>
-                        <div class="col-12 col-xl-7 px-xl-0">
-                            <div class="d-flex d-sm-block">
-                                <h2 class="h6 text-gray-400 mb-0"> Total Pending Expenses </h2>
-                            </div>
-                            <div class="d-flex d-sm-block">
-                                <h3 class="fw-extrabold mb-2">{{ summary.total_pending }}</h3>
-                            </div>
-                            </div>
-                        </div>
-                    </div>
+
+        {# Info Card#}
+        <div class="col mb-3">
+            <div class="card h-90 border-0 shadow">
+                <div class="card-body text-center ml-2 mr-2">
+                    <h3 class="card-text h6">Total Pending Requests</h3>
+                    <h3 class="card-title mb-2">{{ summary.pending_count }}</h3>
+                    <p class="card-text time-difference">Just Updated</p>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-sm-6 col-xl-4 mb-4">
-            <div class="card border-0 shadow">
-                <div class="card-body">
-                    <div class="row d-block d-xl-flex align-items-center">
-                        <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
-                        </div>
-                        <div class="col-12 col-xl-7 px-xl-0">
-                            <div class="d-flex d-sm-block">
-                                <h2 class="h6 text-gray-400 mb-0"> Pending Requests </h2>
-                            </div>
-                            <div class="d-flex d-sm-block">
-                                <h3 class="fw-extrabold mb-2">{{ summary.pending_count }}</h3>
-                            </div>
-                            </div>
-                        </div>
-                    </div>
+
+        {# Info Card#}
+        <div class="col mb-3">
+            <div class="card h-90 border-0 shadow">
+                <div class="card-body text-center ml-2 mr-2">
+                    <h3 class="card-text h6">Requests Today</h3>
+                    <h3 class="card-title mb-2">{{ summary.pending_today }}</h3>
+                    <p class="card-text time-difference">Just Updated</p>
                 </div>
             </div>
         </div>
     </div>
-    {#    End of Cards   #}
+    {#    End of New Summary Info Cards    #}
+
 
     {#    Chart Begins   #}
-    <div class="row row-spaced">
+    <div class="row row-spaced row-top-spaced row-bottom-spaced">
         <div class="col-12">
             <div class="card border-0 shadow">
                 {% if is_manager %}
@@ -111,7 +179,7 @@
             <div class="col mb-4">
                 <div class="card h-100 border-0 shadow">
                     <img src="{% static 'images/cards/create_organization.jpg' %}"
-                         class="card-img-top" alt="...">
+                         class="card-img-top" alt="Create Organization Illustration">
                     <div class="card-body text-center m-2">
                         <h3 class="card-title">Create Organization</h3>
                         <p class="card-text">Description about Create Organization Page.</p>
@@ -127,7 +195,7 @@
             <div class="col mb-4">
                 <div class="card h-100 border-0 shadow">
                     <img src="{% static 'images/cards/manage_users.jpg' %}"
-                         class="card-img-top" alt="...">
+                         class="card-img-top" alt="Manage Users Illustration">
                     <div class="card-body text-center m-2">
                         <h3 class="card-title">Manage Users</h3>
                         <p class="card-text">Description about Manage Users Page.</p>
@@ -142,7 +210,7 @@
             <div class="col mb-4">
                 <div class="card h-100 border-0 shadow">
                     <img src="{% static 'images/cards/create_project.jpg' %}"
-                         class="card-img-top" alt="...">
+                         class="card-img-top" alt="Create Project Illustration">
                     <div class="card-body text-center m-2">
                         <h3 class="card-title">Create Project</h3>
                         <p class="card-text">Description about Create Project Page.</p>
@@ -154,7 +222,7 @@
     </div>
     {#    End of Cards Based on Permision#}
 
-    <div class="py-4">
+    <div class="py-3">
         <div class="col-12 col-xxl-6 mb-4">
             <div class="card border-0 shadow">
                 <div class="card-body">

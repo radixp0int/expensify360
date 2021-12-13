@@ -1,34 +1,39 @@
 {% extends 'header.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
+    <head>
+        <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
+        <h1 class="fs-5 fw-bold">Edit User Permissions</h1>
+    </head>
     <div class="col-12 col-xxl-6 mb-4">
         <div class="card border-10 shadow">
-            <div class="card-header border-bottom d-flex align-items-center justify-content-between">
-                <h2 class="fs-5 fw-bold mb-0">Edit User Permissions</h2>
-            </div>
 
             <div class="card-body">
                 <ul class="list-group list-group-flush list my--3">
                     {% for project in projects %}
-                        <h1 class="h2 text-muted">
+                        <h2 class="h2 text-muted mb-2">
 
                             {{ project.name }}
-                            <h6 class="h6">Managed by {{ project.manager }}</h6>
+                            <h6 class="h6 mb-4">Managed by {{ project.manager }}</h6>
                             <form method="post">
-                            {% csrf_token %}
-                                <select name="select" onchange="this.form.submit()" class="form-control">
+                                {% csrf_token %}
+                                <select name="select" onchange="this.form.submit()" class="form-control mb-4">
                                     <option value="none" selected disabled>
                                         Change Project Manager...
                                     </option>
                                     {% for user in users %}
                                         <option name="option" value="{{ user }}`{{ project.name }}">{{ user }}</option>
                                     {% endfor %}
-                            </select>
+                                </select>
                             </form>
-                        </h1>
+                        </h2>
                     {% endfor %}
                 </ul>
             </div>
         </div>
     </div>
-    {% endblock %}
+    <div class="text-center">
+        <a class="btn btn-secondary btn-lg" href={% url 'user_management' %}>Go Back</a>
+    </div>
+{% endblock %}
