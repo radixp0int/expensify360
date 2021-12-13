@@ -12,7 +12,6 @@
         <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
     </head>
 
-
     <div class="jumbotron jumbotron-fluid">
         <div class="container">
             <h1 class="display-3"><strong>Dashboard</strong></h1>
@@ -26,11 +25,8 @@
 
     </style>
     <script>
-
-
         {#Capture Time when Page Loaded#}
         let created = new Date().getTime();
-        ;
 
         {#The time now#}
         let now = new Date().getTime();
@@ -54,13 +50,13 @@
                     units = 'weeks';
                 }
 
-                {#If there are days#}
+                    {#If there are days#}
                 else if (time > (1000 * 60 * 60 * 24)) {
                     humanTime = parseInt(time / (1000 * 60 * 60 * 24), 10);
                     units = 'days';
                 }
 
-                {#If there are hours#}
+                    {#If there are hours#}
                 else if (time > (1000 * 60 * 60)) {
                     humanTime = parseInt(time / (1000 * 60 * 60), 10);
                     if (humanTime < 2) {
@@ -70,7 +66,7 @@
                     }
                 }
 
-                {#If there are minutes#}
+                    {#If there are minutes#}
                 else if (time > (1000 * 60)) {
                     humanTime = parseInt(time / (1000 * 60), 10);
                     if (humanTime < 2) {
@@ -80,7 +76,7 @@
                     }
                 }
 
-                {#Otherwise, use seconds#}
+                    {#Otherwise, use seconds#}
                 else {
                     humanTime = parseInt(time / (1000), 10);
                     if (humanTime < 2) {
@@ -110,7 +106,6 @@
             });
         };
         setInterval(getNow, 60000);
-
 
     </script>
     <body>
