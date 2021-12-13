@@ -74,7 +74,7 @@ class VisualizationManager:
     def create_forecast(self, lag, fSteps):
         data = self.load_data()
         # assuming data is nonstationary
-        stationary_data = data.diff() #doesn't work
+        stationary_data = data.diff()  # doesn't work
 
         model = tsa.SARIMAX(data['Expenses'], order=(lag, 0, 1))
         results = model.fit()
@@ -84,9 +84,15 @@ class VisualizationManager:
         forecast = results.get_forecast(steps=fSteps)
         mean_forecast = forecast.predicted_mean
         confidence_intervals = forecast.conf_int()
-        #print(confidence_intervals)
+        # print(confidence_intervals)
         forecast = pandas.concat([mean_forecast, confidence_intervals], axis=1)
-        #print(forecast)
+
+        i = 0
+        while i < fSteps:
+            if forecast.iat[i, 1] < 0:
+                forecast.iat[i, 1] = 0
+            i += 1
+        print(forecast)
         return forecast
 
     def create_plot(self):
@@ -106,7 +112,7 @@ class VisualizationManager:
             og_index += 1
             i += 1
 
-        print(data.tail(lag+10))  # for testing
+        #print(data.tail(lag + 10))  # for testing
 
         if data is None:
             # indicates not enough data, silent fail
@@ -119,7 +125,8 @@ class VisualizationManager:
             self.fig.add_trace(
                 go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
         self.fig.add_trace(
-            go.Line(x=data['Time'], y=data['predicted_mean'], name='Forecast', line=dict(color='black', width=2, dash='solid')))
+            go.Line(x=data['Time'], y=data['predicted_mean'], name='Forecast',
+                    line=dict(color='black', width=2, dash='solid')))
         # self.fig.add_trace(go.Scatter(
         #     x=data['Time'], y=([data['upper Expenses'], data['lower Expenses']]),
         #     fill='toself',
