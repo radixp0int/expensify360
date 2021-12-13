@@ -28,25 +28,25 @@
     <script>
 
 
-        // Created
+        {#Capture Time when Page Loaded#}
         let created = new Date().getTime();
         ;
 
-        // The time now
+        {#The time now#}
         let now = new Date().getTime();
 
         let getNow = function () {
-            // The time now
+            {#Time Now updated#}
             now = new Date().getTime();
-            // The difference between now and created
+            {#The difference between now and created#}
             let howLongAgo = created - now;
 
             let getHumanTime = function (timestamp) {
 
-                // Convert to a positive integer
+                {#Convert to a positive integer#}
                 let time = Math.abs(timestamp);
 
-                // Define humanTime and units
+                {#Define humanTime and units#}
                 let humanTime, units;
 
                 if (time > (1000 * 60 * 60 * 24 * 7)) {
@@ -54,13 +54,13 @@
                     units = 'weeks';
                 }
 
-                // If there are days
+                {#If there are days#}
                 else if (time > (1000 * 60 * 60 * 24)) {
                     humanTime = parseInt(time / (1000 * 60 * 60 * 24), 10);
                     units = 'days';
                 }
 
-                // If there are hours
+                {#If there are hours#}
                 else if (time > (1000 * 60 * 60)) {
                     humanTime = parseInt(time / (1000 * 60 * 60), 10);
                     if (humanTime < 2) {
@@ -70,7 +70,7 @@
                     }
                 }
 
-                // If there are minutes
+                {#If there are minutes#}
                 else if (time > (1000 * 60)) {
                     humanTime = parseInt(time / (1000 * 60), 10);
                     if (humanTime < 2) {
@@ -80,7 +80,7 @@
                     }
                 }
 
-                // Otherwise, use seconds
+                {#Otherwise, use seconds#}
                 else {
                     humanTime = parseInt(time / (1000), 10);
                     if (humanTime < 2) {
@@ -90,15 +90,15 @@
                     }
                 }
 
-                // Get the time and units
+                {#Get the time and units#}
                 let timeUnits = humanTime + ' ' + units;
 
-                // If in the future
+                {# If in the future#}
                 if (timestamp > 0) {
                     return 'in ' + timeUnits;
                 }
 
-                // If in the past
+                {#If in the past#}
                 return timeUnits + ' ago';
 
             };
