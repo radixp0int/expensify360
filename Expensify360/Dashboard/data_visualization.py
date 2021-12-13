@@ -1,11 +1,11 @@
 import pickle
 from numpy import datetime64
-import datetime
 from Expensify360.toolkit import *
-from pandas import date_range, read_pickle, DataFrame
+from pandas import date_range, read_pickle, DataFrame, concat
 import plotly.graph_objs as go
 from scipy.signal import savgol_filter
 import glob
+from prophet import Prophet
 
 
 class VisualizationManager:
@@ -26,7 +26,8 @@ class VisualizationManager:
 
             returns: tuple of x:datetime64, y:float
         """
-        expenses = list(get_expense_records(User.objects.get(username=self.user), filter_function=lambda x: x.isApproved == 'Approved').values())
+        expenses = list(get_expense_records(User.objects.get(username=self.user),
+                                            filter_function=lambda x: x.isApproved == 'Approved').values())
         if len(expenses) == 0: return None
         now = np.datetime64(datetime.datetime.now(), self.resolution)
         earliest_expense = sorted(expenses, key=lambda e: np.datetime64(e.expense_date, self.resolution))[0]
@@ -35,12 +36,12 @@ class VisualizationManager:
         n_periods = np.min((self.lookback, delta))
         t = date_range(
             end=now + np.timedelta64(1, self.resolution),
-            periods=n_periods+1,
+            periods=n_periods + 1,
             freq=self.resolution
         )
 
         t = np.unique(np.array(t).astype(f'datetime64[{self.resolution}]'))
-        binned = np.zeros(n_periods+1)
+        binned = np.zeros(n_periods + 1)
         # aggregate according to resolution
         for i, ele in enumerate(t):
             for expense in expenses:
@@ -51,26 +52,41 @@ class VisualizationManager:
                     binned[i] += expense.amount
         x, y = t, binned
         if x.shape[0] < 1: return None  # caller must check for this!
-
         try:
-            trend = savgol_filter(y, window_length=21, polyorder=3)
+            trend = savgol_filter(y, window_length=33, polyorder=5)
             trend[trend < 0] = 0.0
-        except ValueError:  # this will be thrown for insufficient data
+        except ValueError:
             trend = None
         data = DataFrame({'Time': x, 'Expenses': y, 'Trend': trend})
+        try:
+            if x.shape[0] > 2:
+                pred = DataFrame(forecast(data))
+                pred.to_pickle(f'{self.name}_forecast')
+            else:
+                pred = None
+        except ValueError:  # this will be thrown for insufficient data
+            pred = None
         data.to_pickle(f'{self.name}_data')
-        return data
+        return data, pred
 
     def create_plot(self):
-        data = self.load_data()
+        data, pred = self.load_data()
         if data is None:
             # indicates not enough data, silent fail
             return ''
-        # TODO include forecast plot
         self.fig = go.Figure()  # lol go figure
         self.fig.add_trace(go.Bar(x=data['Time'], y=data['Expenses'], name='Expenses'))
         if data['Trend'] is not None:
-            self.fig.add_trace(go.Scatter(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
+            self.fig.add_trace(go.Scatter(x=data['Time'], y=data['Trend'], name='Trend'))
+        if pred is not None:
+            self.fig.add_trace(go.Bar(x=pred['ds'], y=pred['yhat'], name="Forecast"))
+            self.fig.add_trace(go.Scatter(
+                x=concat([pred['ds'], pred['ds'][::-1]]),
+                y=concat([pred['yhat_upper'], pred['yhat_lower'][::-1]]),
+                fill='toself',
+                hoveron='points',
+                name='90% Confidence Interval'
+            ))
         self.fig.update_layout(legend_title_text='Expense History')
         self.fig.update_xaxes(title_text='Time')
         self.fig.update_yaxes(title_text='Dollars')
@@ -79,17 +95,17 @@ class VisualizationManager:
     def load_data(self):
         try:
             if self.up_to_date:
-                data = read_pickle(f'{self.name}_data')
+                data, pred = read_pickle(f'{self.name}_data'), read_pickle(f'{self.name}_forecast')
             else:
                 print('processing data...')
                 t0 = datetime.datetime.now()
-                data = self.preprocess()
+                data, pred = self.preprocess()
                 t1 = datetime.datetime.now()
                 print(f'done in {np.datetime64(t1) - np.datetime64(t0)}')
                 self.up_to_date = True
         except FileNotFoundError:
-            data = self.preprocess()
-        return data
+            data, pred = self.preprocess()
+        return data, pred
 
     @property
     def up_to_date(self):
@@ -135,3 +151,17 @@ class VisualizationManager:
         instances = cls.load_all(user)
         for instance in instances:
             instance.up_to_date = False
+
+
+def forecast(data):
+    prophet_df = data.copy()
+    prophet_df.drop('Trend', axis=1, inplace=True)
+    prophet_df = prophet_df.rename(columns={'Time': 'ds', 'Expenses': 'y'})
+    m = Prophet(mcmc_samples=120, n_changepoints=10, interval_width=.7)
+    m.fit(prophet_df, control={'adapt_delta': 0.9, 'max_treedepth': 16})
+    future = m.make_future_dataframe(periods=12, freq='MS', include_history=False)
+    pred = m.predict(future)
+    pred['yhat'] = pred['yhat'].clip(lower=0)
+    pred['yhat_lower'] = pred['yhat_lower'].clip(lower=0)
+    pred['yhat_upper'] = pred['yhat_upper'].clip(lower=0)
+    return pred
