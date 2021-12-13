@@ -83,25 +83,26 @@ class VisualizationManager:
         # confidence_intervals = prediction.conf_int()
         forecast = results.get_forecast(steps=fSteps)
         mean_forecast = forecast.predicted_mean
-        # print(mean_forecast)
-        # print(results.summary())
-        return mean_forecast
+        confidence_intervals = forecast.conf_int()
+        #print(confidence_intervals)
+        forecast = pandas.concat([mean_forecast, confidence_intervals], axis=1)
+        #print(forecast)
+        return forecast
 
     def create_plot(self):
         data = self.load_data()
         lag = 30
         fSteps = 13
         forecast = self.create_forecast(lag, fSteps)
-        forecast.name = "Forecast"
         og_index = len(data.index)
         data = pandas.concat([data, forecast])
         data = data.rename(columns={0: 'Forecast'})
 
         i = 0
         while i < fSteps:
-            last_date = data.iat[og_index - 1, 2]
+            last_date = data.iat[og_index - 1, 0]
             new_date = last_date + datetime.timedelta(days=30)
-            data.iat[og_index, 2] = new_date
+            data.iat[og_index, 0] = new_date
             og_index += 1
             i += 1
 
@@ -118,7 +119,23 @@ class VisualizationManager:
             self.fig.add_trace(
                 go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
         self.fig.add_trace(
-            go.Line(x=data['Time'], y=data['Forecast'], name='Forecast', line=dict(color='black', width=2, dash='solid')))
+            go.Line(x=data['Time'], y=data['predicted_mean'], name='Forecast', line=dict(color='black', width=2, dash='solid')))
+        # self.fig.add_trace(go.Scatter(
+        #     x=data['Time'], y=([data['upper Expenses'], data['lower Expenses']]),
+        #     fill='toself',
+        #     hoveron='points',
+        #     name='Confidence Interval'
+        # ))
+        self.fig.add_trace(go.Scatter(x=data['Time'], y=data['upper Expenses'],
+                                      fill=None,
+                                      mode='lines',
+                                      line_color='indigo',
+                                      name='Upper Bound'))
+        self.fig.add_trace(go.Scatter(x=data['Time'], y=data['lower Expenses'],
+                                      fill='tonexty',
+                                      mode='lines', line_color='indigo',
+                                      name="Lower Bound"))
+
         self.fig.update_layout(legend_title_text='Expense History')
         self.fig.update_xaxes(title_text='Time')
         self.fig.update_yaxes(title_text='Dollars')
