@@ -1,33 +1,35 @@
 {% extends 'header.html' %}
-
+{% load static %}
 {% block content %}
+    <head>
+        <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
+        <h1 class="fs-5 fw-bold">Create Project</h1>
+    </head>
+
     <div class="col-12 col-xxl-6 mb-4">
         <div class="card border-10 shadow">
-            <div class="card-header border-bottom d-flex align-items-center justify-content-between">
-                <h2 class="fs-5 fw-bold mb-0">Create Project</h2>
-            </div>
-
             <div class="card-body mb-auto">
 
                 <div class="spacer my-2"></div>
-                            <form method="post">
-                            {% csrf_token %}
-                                <div class="spacer my-2">
-                                <select name="organization" class="form-control">
-                                    <option value="none" selected disabled>
-                                        Choose Organization...
-                                    </option>
-                                    {% for org in organizations %}
-                                        <option name="option" value="{{ org }}">Add to {{ org }} Organization</option>
-                                    {% endfor %}
-                                </select>
-                                </div>
-                                    <input class="form-control" type="text" name="project-name" placeholder="Project Name">
-                                <div class="spacer my-2">
-                                    <button class="btn btn-primary" onclick="this.form.submit()">Submit</button>
-                                </div>
-                            </form>
-                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="spacer my-2 mb-4">
+                        <select name="organization" class="form-control">
+                            <option value="none" selected disabled>
+                                Choose Organization...
+                            </option>
+                            {% for org in organizations %}
+                                <option name="option" value="{{ org }}">Add to {{ org }} Organization</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <input class="form-control mb-4" type="text" name="project-name" placeholder="Project Name">
+                    <div class="spacer my-2">
+                        <button class="btn btn-success" onclick="this.form.submit()">Submit</button>
+                        <a class="btn btn-danger" href={% url 'home' %}>Cancel</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-    {% endblock %}
+{% endblock %}
