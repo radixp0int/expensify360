@@ -16,6 +16,10 @@ def homepage(request):
                'is_manager': is_manager(request.user),
                'summary': summary(request.user)
                }
+    if is_manager(request.user):
+        expenses = get_expense_records(
+            request.user, filter_function=lambda e: e.submissionDate == np.datetime64(datetime.datetime.now(), 'D'))
+        context['today_expenses_count'] = len(expenses.values())
     return render(request, 'homepage.html', context)
 
 
@@ -82,7 +86,7 @@ def create_proj(request):
         except IntegrityError:
             messages.error(request, f'{project} already exists')
 
-    context = {'organizations' : list(request.user.organization_set.all())}
+    context = {'organizations': list(request.user.organization_set.all())}
     return render(request, 'create-proj.html', context)
 
 
@@ -186,7 +190,7 @@ def manage_users(request):
 
         elif 'select_user_permissions' in request.POST:
             return redirect(to='change_user_permissions')
-        
+
         elif 'remove-user' in request.POST:
             return redirect(to='remove-user')
 
@@ -313,7 +317,7 @@ def expense_manager(request):
 
 @login_required
 def expense_history(request):
-    if is_project_manager(request.user): # also true for managers
+    if is_project_manager(request.user):  # also true for managers
         expenses = list(
             get_expense_records(
                 request.user,

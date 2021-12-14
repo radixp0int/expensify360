@@ -7,7 +7,6 @@ import numpy as np
 from django.db import IntegrityError
 import datetime
 
-
 PROJECT_LEAD_PERMISSIONS = (
     'add_expense',
     'view_expense',
@@ -17,7 +16,6 @@ PROJECT_LEAD_PERMISSIONS = (
 
 
 def summarize_expense_records(expenses):
-
     total, pending, count = 0.0, 0.0, 0
     for expense in expenses.values():
         if expense.status == 'Approved':
@@ -159,7 +157,8 @@ def get_expenses(user, manager=True):
 
     # expense uses charfields so we need a list of names for projects this user manages
     if manager:
-        projects = set(list(Project.objects.filter(manager=user).all()) + list(Project.objects.filter(second_manager=user)))
+        projects = set(
+            list(Project.objects.filter(manager=user).all()) + list(Project.objects.filter(second_manager=user)))
     else:
         projects = list(user.project_set.all())
     project_names = [project.name for project in projects]
@@ -213,7 +212,7 @@ def get_expense_records(user, filter_function=None, manager=True):
             proxy.edited = False
         proxy.type = expense.expenseType
         proxy.amount = expense_total(expense)
-        proxy.id =expense.id
+        proxy.id = expense.id
     return records
 
 
@@ -236,7 +235,7 @@ def make_test_data(user, num_to_generate=500):
     """
     organizations = get_organization_structure(user)
     base_date = np.datetime64('2001-09-11')
-    days_since = 7374 # to nov 18 2021
+    days_since = 7374  # to nov 18 2021
     type_list = ['Mileage', 'Expense', 'Hours']
     status_choices = ['Approved', 'Pending', 'Denied']
     for i in range(num_to_generate):
@@ -255,7 +254,7 @@ def make_test_data(user, num_to_generate=500):
         expenseType = rng.choice(type_list)
         if expenseType == type_list[0]:
             # Mileage Specific
-            miles = rng.choice(3000) + 10.0 # must be nonzero!
+            miles = rng.choice(3000) + 10.0  # must be nonzero!
             mileageRate = 0.53
             mileageTotal = miles * mileageRate
             expense = Expense.create(
@@ -314,7 +313,8 @@ def make_test_data(user, num_to_generate=500):
 
 
 def embed_seasonality_and_trend():
-    expenses = sorted(list(Expense.objects.filter(isApproved='Approved').all()), key=lambda x: np.datetime64(x.expenseDate), reverse=False)
+    expenses = sorted(list(Expense.objects.filter(isApproved='Approved').all()),
+                      key=lambda x: np.datetime64(x.expenseDate), reverse=False)
     t = pd.date_range(start=np.datetime64(expenses[0].expenseDate), end=np.datetime64(expenses[-1].expenseDate))
     for i, ele in enumerate(t):
         for expense in expenses:
@@ -386,4 +386,3 @@ def make_demo():
     make_test_data(user=boss)
     embed_seasonality_and_trend()
     return
-
