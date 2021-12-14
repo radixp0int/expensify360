@@ -25,6 +25,10 @@ nav .navbar-nav .nav-item li a {
     width: 100%; /* Full width */
 }
 
+.bg-custom {
+    background-color: #10185C;
+}
+
 section {
     margin-left: auto;
     margin-right: auto;
