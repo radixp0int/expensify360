@@ -2,14 +2,14 @@ import pickle
 import numpy as np
 import pandas
 from numpy import datetime64
-import datetime
 from Expensify360.toolkit import *
-from pandas import date_range, read_pickle, DataFrame
+from pandas import date_range, read_pickle, DataFrame, concat
 import plotly.graph_objs as go
 import statsmodels.tsa.api as tsa
 from scipy.signal import savgol_filter
 import glob
 import datetime
+from sklearn.preprocessing import StandardScaler
 
 
 class VisualizationManager:
@@ -20,7 +20,10 @@ class VisualizationManager:
         self.lookback = int(lookback)
         self.name = f'{self.lookback}_{self.resolution}_{self.user}'
         self.fig = None
+        self.lag =12
+        self.fSteps=6
         self._up_to_date = True
+
 
     def preprocess(self):
         """
@@ -56,107 +59,77 @@ class VisualizationManager:
                     binned[i] += expense.amount
         x, y = t, binned
         if x.shape[0] < 1: return None  # caller must check for this!
-
         try:
-            trend = savgol_filter(y, window_length=21, polyorder=3)
+            trend = savgol_filter(y, window_length=33, polyorder=5)
             trend[trend < 0] = 0.0
-        except ValueError:  # this will be thrown for insufficient data
+        except ValueError:
             trend = None
         data = DataFrame({'Time': x, 'Expenses': y, 'Trend': trend})
+        try:
+            if x.shape[0] > 2:
+                pred = DataFrame(forecast(data, self.lag, self.fSteps))
+                pred.to_pickle(f'{self.name}_forecast')
+            else:
+                pred = None
+        except ValueError:  # this will be thrown for insufficient data
+            pred = None
         data.to_pickle(f'{self.name}_data')
-        return data
-
-    def create_forecast(self, lag, fSteps):
-        data = self.load_data()
-        # assuming data is nonstationary
-        stationary_data = data.diff()  # doesn't work
-
-        model = tsa.SARIMAX(data['Expenses'], order=(lag, 0, 1))
-        results = model.fit()
-        # prediction = results.get_prediction(start=-20, dynamic=True)
-        # mean_prediction = prediction.predicted_mean
-        # confidence_intervals = prediction.conf_int()
-        forecast = results.get_forecast(steps=fSteps)
-        mean_forecast = forecast.predicted_mean
-        confidence_intervals = forecast.conf_int()
-        # print(confidence_intervals)
-        forecast = pandas.concat([mean_forecast, confidence_intervals], axis=1)
-
-        i = 0
-        while i < fSteps:
-            if forecast.iat[i, 1] < 0:
-                forecast.iat[i, 1] = 0
-            i += 1
-        print(forecast)
-        return forecast
+        return data, pred
 
     def create_plot(self):
-        data = self.load_data()
-        lag = 30
-        fSteps = 13
-        forecast = self.create_forecast(lag, fSteps)
-        og_index = len(data.index)
-        data = pandas.concat([data, forecast])
-        data = data.rename(columns={0: 'Forecast'})
-
-        i = 0
-        while i < fSteps:
-            last_date = data.iat[og_index - 1, 0]
-            new_date = last_date + datetime.timedelta(days=30)
-            data.iat[og_index, 0] = new_date
-            og_index += 1
-            i += 1
-
-        #print(data.tail(lag + 10))  # for testing
-
+        data, pred = self.load_data()
+        future = pd.Series(pd.date_range(
+            start=datetime64(data['Time'].iloc[-1], 'M'),
+            end=(datetime64(data['Time'].iloc[-1], 'M') + np.timedelta64(6, 'M')),
+            freq='M'
+        ))
         if data is None:
             # indicates not enough data, silent fail
             return ''
-        # TODO include forecast plot
-
         self.fig = go.Figure()  # lol go figure
         self.fig.add_trace(go.Bar(x=data['Time'], y=data['Expenses'], name='Expenses'))
         if data['Trend'] is not None:
-            self.fig.add_trace(
-                go.Line(x=data['Time'], y=data['Trend'], name='Trend', line=dict(color='firebrick', width=2)))
-        self.fig.add_trace(
-            go.Line(x=data['Time'], y=data['predicted_mean'], name='Forecast',
-                    line=dict(color='black', width=2, dash='solid')))
-        # self.fig.add_trace(go.Scatter(
-        #     x=data['Time'], y=([data['upper Expenses'], data['lower Expenses']]),
-        #     fill='toself',
-        #     hoveron='points',
-        #     name='Confidence Interval'
-        # ))
-        self.fig.add_trace(go.Scatter(x=data['Time'], y=data['upper Expenses'],
-                                      fill=None,
-                                      mode='lines',
-                                      line_color='indigo',
-                                      name='Upper Bound'))
-        self.fig.add_trace(go.Scatter(x=data['Time'], y=data['lower Expenses'],
-                                      fill='tonexty',
-                                      mode='lines', line_color='indigo',
-                                      name="Lower Bound"))
+            self.fig.add_trace(go.Scatter(x=data['Time'], y=data['Trend'], name='Trend'))
+        if pred is not None:
+            self.fig.add_trace(go.Bar(x=future, y=pred['predicted_mean'], name="Forecast"))
+            # self.fig.add_trace(go.Scatter(
+            #     x=concat([future, future]),
+            #     y=concat([pred['lower Expenses'], pred['upper Expenses']]),
+            #     fill='toself',
+            #     hoveron='points',
+            #     name='90% Confidence Interval'
+            # ))
+            # Plotting CI
+            self.fig.add_trace(go.Scatter(x=future, y=pred['upper Expenses'],
+                                          fill=None,
+                                          mode='lines',
+                                          line_color='indigo',
+                                          name='Upper Bound'))
+            self.fig.add_trace(go.Scatter(x=future, y=pred['lower Expenses'],
+                                          fill='tonexty',
+                                          mode='lines', line_color='indigo',
+                                          name="Lower Bound"))
 
-        self.fig.update_layout(legend_title_text='Expense History')
-        self.fig.update_xaxes(title_text='Time')
-        self.fig.update_yaxes(title_text='Dollars')
+            self.fig.update_layout(legend_title_text='Expense History')
+            self.fig.update_xaxes(title_text='Time')
+            self.fig.update_yaxes(title_text='Dollars')
+
         return self.fig.to_html()
 
     def load_data(self):
         try:
             if self.up_to_date:
-                data = read_pickle(f'{self.name}_data')
+                data, pred = read_pickle(f'{self.name}_data'), read_pickle(f'{self.name}_forecast')
             else:
                 print('processing data...')
                 t0 = datetime.datetime.now()
-                data = self.preprocess()
+                data, pred = self.preprocess()
                 t1 = datetime.datetime.now()
                 print(f'done in {np.datetime64(t1) - np.datetime64(t0)}')
                 self.up_to_date = True
         except FileNotFoundError:
-            data = self.preprocess()
-        return data
+            data, pred = self.preprocess()
+        return data, pred
 
     @property
     def up_to_date(self):
@@ -202,3 +175,27 @@ class VisualizationManager:
         instances = cls.load_all(user)
         for instance in instances:
             instance.up_to_date = False
+
+
+def forecast(data, lag=12, fSteps=6):
+    model = tsa.SARIMAX(data['Expenses'], order=(lag, 0, 1), trend='t')
+
+    results = model.fit()
+
+    forecast = results.get_forecast(steps=fSteps)
+    confidence_intervals = forecast.conf_int()
+    mean_forecast = forecast.predicted_mean
+    forecast = pandas.concat(
+        {
+            'forecast': mean_forecast,
+            'ci': confidence_intervals},
+        axis=1
+    )
+    pred = forecast['forecast']['predicted_mean'].iloc[-6:]
+    print(forecast['forecast']['predicted_mean'].iloc[-6:])
+    pred = pred.clip(lower=0)
+    upper = forecast['ci']['upper Expenses'].iloc[-6:].clip(lower=0)
+    lower = forecast['ci']['lower Expenses'].iloc[-6:].clip(lower=0)
+
+    ret_df = pandas.concat([pred, upper, lower], axis=1)
+    return ret_df
