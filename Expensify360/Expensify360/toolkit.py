@@ -216,7 +216,7 @@ def get_expense_records(user, filter_function=None, manager=True):
     return records
 
 
-def make_test_data(user, num_to_generate=500):
+def make_test_data(user, num_to_generate=100):
     """
     :param user: User, a manager
     :param num_to_generate:int, optional, default=500
@@ -234,8 +234,9 @@ def make_test_data(user, num_to_generate=500):
     in their respective ranges.
     """
     organizations = get_organization_structure(user)
-    base_date = np.datetime64('2001-09-11')
-    days_since = 7374  # to nov 18 2021
+    base_date = np.datetime64('2016-03-11', 'D')
+    delta = np.datetime64(datetime.datetime.now(), 'D') - base_date
+    days_since = delta.astype('datetime64[D]').astype(int)
     type_list = ['Mileage', 'Expense', 'Hours']
     status_choices = ['Approved', 'Pending', 'Denied']
     for i in range(num_to_generate):
