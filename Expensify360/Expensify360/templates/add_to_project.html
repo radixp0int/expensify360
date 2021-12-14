@@ -1,21 +1,36 @@
 {% extends 'header.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
-    <div class="container-fluid">
+
+    <head>
+        <link rel="stylesheet" type="text/css" href="{% static '/css/main.css' %}"/>
         <h1 class="h1">Add User To Project</h1>
+    </head>
+    <body>
+    <div class="container-fluid">
         {% csrf_token %}
-        <div class ="offset-4">
-            <div>
-                    <form action='' name="org" method="post">
-                        {% csrf_token %}
-                        Username
-                        <input type="text" name="username" value="" class="form-control">
-                        {% for grp in orgs %}
-                            <input type="submit" name="project-name" value="{{ grp }}" class="btn btn-primary">
-                        {% endfor %}
-                    </form>
-                </div>
+        <div class="col-12">
+            <div class="card border-0 shadow">
+                <form action='' name="org" method="post" class="m-4">
+                    {% csrf_token %}
+                    <h4 class="mb-4">Enter Username:</h4>
+                    <input type="text" name="username" value="" class="form-control mb-4">
+                    <h4 class="mb-4">Select Project:</h4>
+                    {% for grp in orgs %}
+                        <div class="d-flex justify-content-between align-items-center h5">
+                            {{ forloop.counter }}.
+                            {{ grp }}
+                            <input type="submit" name="project-name"
+                                   value="Add To Project" class="btn btn-success ml-4 mb-1">
+                        </div>
+                    {% endfor %}
+                </form>
+            </div>
         </div>
-        <a href={% url 'user_management' %} class="btn btn-sm btn-primary">Done</a>
+    </div>
+    </body>
+    <div class="text-center mt-4">
+        <a class="btn btn-secondary btn-lg" href={% url 'user_management' %}>Go Back</a>
     </div>
 {% endblock %}

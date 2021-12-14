@@ -23,6 +23,9 @@
             background: #b9b8c2;
         }
 
+        h5 {
+            padding: 0px 0px 0px 0px;
+        }
     </style>
     <script>
         {#Capture Time when Page Loaded#}
@@ -151,7 +154,7 @@
             <div class="card h-90 border-0 shadow">
                 <div class="card-body text-center ml-2 mr-2">
                     <h3 class="card-text h6">Requests Today</h3>
-                    <h3 class="card-title mb-2">{{ summary.pending_today }}</h3>
+                    <h3 class="card-title mb-2">{{ today_expenses_count }}</h3>
                     <p class="card-text time-difference">Just Updated</p>
                 </div>
             </div>
@@ -220,36 +223,38 @@
             </div>
         {% endif %}
     </div>
-    {#    End of Cards Based on Permision#}
-
+    {#    End of Cards Based on Permision   #}
+    {#    Organization Table     #}
     <div class="py-3">
         <div class="col-12 col-xxl-6 mb-4">
             <div class="card border-0 shadow">
                 <div class="card-body">
-                    <ul class="list-group list-group-flush list my-3">
+                    <ul class="list-group list-group-flush list my-3" id="list-tab" role="tablist">
                         {% for org in organizations %}
-                            <div class="card-deck justify-content-between">
-                                <h1 class="alert-light fw-bold mb-10">{{ org.name }}</h1>
+                            <div class="d-flex justify-content-between align-items-center h5">
+                                <h2 class="alert fw-bold mb-2"><strong>{{ org.name }}</strong></h2>
+                                <h2 class="alert-light fw-bold mb-2 mr-2"><em>Organization</em></h2>
                             </div>
                             {% for prj in org.proj_list %}
-                                <div class="popover-body bg-secondary my-4">
-                                    <div class="popover-header bg-secondary">
-                                        <h4 class="h4 mb-0">{{ prj.name }}</h4>
-                                        <h6 class="h6 text-light font-italic">Project</h6>
+                                <div class="popover-body bg-white my-4">
+                                    <div class="popover-header bg-custom">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h4 class="h3 mb-0 text-light">{{ prj.name }}</h4>
+                                            <h6 class="h4 font-italic text-light mr-2">Project</h6>
+                                        </div>
                                     </div>
                                     {% for member in prj.users %}
                                         <li class="list-inline">
                                             <div class="modal-header">
-                                                <h4 class="h4 text-light">
+                                                <h4 class="h4">
                                                     {{ member }}
                                                 </h4>
                                                 {% if member == prj.project_manager %}
-                                                    <small class="mx-1 font-italic bg-primary rounded">Project
-                                                        Manager</small>
+                                                    <h6 class="font-italic bg-custom rounded text-light h5">
+                                                        Project Manager</h6>
                                                 {% endif %}
                                             </div>
                                         </li>
-
                                     {% endfor %}
                                 </div>
                             {% endfor %}
@@ -260,5 +265,4 @@
         </div>
     </div>
     </body>
-
 {% endblock content %}
