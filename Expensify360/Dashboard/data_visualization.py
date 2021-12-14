@@ -1,22 +1,29 @@
 import pickle
+import numpy as np
+import pandas
 from numpy import datetime64
 from Expensify360.toolkit import *
 from pandas import date_range, read_pickle, DataFrame, concat
 import plotly.graph_objs as go
+import statsmodels.tsa.api as tsa
 from scipy.signal import savgol_filter
 import glob
-from prophet import Prophet
+import datetime
+from sklearn.preprocessing import StandardScaler
 
 
 class VisualizationManager:
 
     def __init__(self, user, resolution='M', lookback=100000):
         self.resolution = resolution
-        self.user = user    # this is a string!
+        self.user = user  # this is a string!
         self.lookback = int(lookback)
         self.name = f'{self.lookback}_{self.resolution}_{self.user}'
         self.fig = None
+        self.lag =12
+        self.fSteps=6
         self._up_to_date = True
+
 
     def preprocess(self):
         """
@@ -60,7 +67,7 @@ class VisualizationManager:
         data = DataFrame({'Time': x, 'Expenses': y, 'Trend': trend})
         try:
             if x.shape[0] > 2:
-                pred = DataFrame(forecast(data))
+                pred = DataFrame(forecast(data, self.lag, self.fSteps))
                 pred.to_pickle(f'{self.name}_forecast')
             else:
                 pred = None
@@ -71,6 +78,11 @@ class VisualizationManager:
 
     def create_plot(self):
         data, pred = self.load_data()
+        future = pd.Series(pd.date_range(
+            start=datetime64(data['Time'].iloc[-1], 'M'),
+            end=(datetime64(data['Time'].iloc[-1], 'M') + np.timedelta64(6, 'M')),
+            freq='M'
+        ))
         if data is None:
             # indicates not enough data, silent fail
             return ''
@@ -79,17 +91,29 @@ class VisualizationManager:
         if data['Trend'] is not None:
             self.fig.add_trace(go.Scatter(x=data['Time'], y=data['Trend'], name='Trend'))
         if pred is not None:
-            self.fig.add_trace(go.Bar(x=pred['ds'], y=pred['yhat'], name="Forecast"))
-            self.fig.add_trace(go.Scatter(
-                x=concat([pred['ds'], pred['ds'][::-1]]),
-                y=concat([pred['yhat_upper'], pred['yhat_lower'][::-1]]),
-                fill='toself',
-                hoveron='points',
-                name='90% Confidence Interval'
-            ))
-        self.fig.update_layout(legend_title_text='Expense History')
-        self.fig.update_xaxes(title_text='Time')
-        self.fig.update_yaxes(title_text='Dollars')
+            self.fig.add_trace(go.Bar(x=future, y=pred['predicted_mean'], name="Forecast"))
+            # self.fig.add_trace(go.Scatter(
+            #     x=concat([future, future]),
+            #     y=concat([pred['lower Expenses'], pred['upper Expenses']]),
+            #     fill='toself',
+            #     hoveron='points',
+            #     name='90% Confidence Interval'
+            # ))
+            # Plotting CI
+            self.fig.add_trace(go.Scatter(x=future, y=pred['upper Expenses'],
+                                          fill=None,
+                                          mode='lines',
+                                          line_color='indigo',
+                                          name='Upper Bound'))
+            self.fig.add_trace(go.Scatter(x=future, y=pred['lower Expenses'],
+                                          fill='tonexty',
+                                          mode='lines', line_color='indigo',
+                                          name="Lower Bound"))
+
+            self.fig.update_layout(legend_title_text='Expense History')
+            self.fig.update_xaxes(title_text='Time')
+            self.fig.update_yaxes(title_text='Dollars')
+
         return self.fig.to_html()
 
     def load_data(self):
@@ -153,15 +177,25 @@ class VisualizationManager:
             instance.up_to_date = False
 
 
-def forecast(data):
-    prophet_df = data.copy()
-    prophet_df.drop('Trend', axis=1, inplace=True)
-    prophet_df = prophet_df.rename(columns={'Time': 'ds', 'Expenses': 'y'})
-    m = Prophet(mcmc_samples=120, n_changepoints=10, interval_width=.7)
-    m.fit(prophet_df, control={'adapt_delta': 0.9, 'max_treedepth': 16})
-    future = m.make_future_dataframe(periods=12, freq='MS', include_history=False)
-    pred = m.predict(future)
-    pred['yhat'] = pred['yhat'].clip(lower=0)
-    pred['yhat_lower'] = pred['yhat_lower'].clip(lower=0)
-    pred['yhat_upper'] = pred['yhat_upper'].clip(lower=0)
-    return pred
+def forecast(data, lag=12, fSteps=6):
+    model = tsa.SARIMAX(data['Expenses'], order=(lag, 0, 1), trend='t')
+
+    results = model.fit()
+
+    forecast = results.get_forecast(steps=fSteps)
+    confidence_intervals = forecast.conf_int()
+    mean_forecast = forecast.predicted_mean
+    forecast = pandas.concat(
+        {
+            'forecast': mean_forecast,
+            'ci': confidence_intervals},
+        axis=1
+    )
+    pred = forecast['forecast']['predicted_mean'].iloc[-6:]
+    print(forecast['forecast']['predicted_mean'].iloc[-6:])
+    pred = pred.clip(lower=0)
+    upper = forecast['ci']['upper Expenses'].iloc[-6:].clip(lower=0)
+    lower = forecast['ci']['lower Expenses'].iloc[-6:].clip(lower=0)
+
+    ret_df = pandas.concat([pred, upper, lower], axis=1)
+    return ret_df
