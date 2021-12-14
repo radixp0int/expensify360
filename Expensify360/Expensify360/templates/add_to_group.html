@@ -11,7 +11,7 @@
         {% csrf_token %}
         <div class="col-12">
             <div class="card border-0 shadow">
-                <form action='#' name="org" method="post" class="m-4">
+                <form name="org" method="post" class="m-4">
                     {% csrf_token %}
                     <h4 class="mb-4">Enter Username:</h4>
                     <input type="text" name="username" value="" class="form-control mb-4">
@@ -21,7 +21,9 @@
                             {{ forloop.counter }}.
                             {{ grp }}
                             <input type="hidden" name="org-name" value="{{ grp }}">
-                            <input type="submit" value="Add To Organization" class="btn btn-success ml-4 mb-1">
+                            <input type="submit"
+                                   value="Add To Organization"
+                                   class="btn btn-success ml-4 mb-1" onclick="this.form.submit()">
                         </div>
                     {% endfor %}
                 </form>
