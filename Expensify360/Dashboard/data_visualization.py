@@ -1,15 +1,14 @@
+import datetime
+import glob
 import pickle
-import numpy as np
-import pandas
-from numpy import datetime64
-from Expensify360.toolkit import *
-from pandas import date_range, read_pickle, DataFrame, concat
+
 import plotly.graph_objs as go
 import statsmodels.tsa.api as tsa
+from numpy import datetime64
+from pandas import date_range, read_pickle, DataFrame, concat, Series
 from scipy.signal import savgol_filter
-import glob
-import datetime
-from sklearn.preprocessing import StandardScaler
+
+from Expensify360.toolkit import *
 
 
 class VisualizationManager:
@@ -20,19 +19,11 @@ class VisualizationManager:
         self.lookback = int(lookback)
         self.name = f'{self.lookback}_{self.resolution}_{self.user}'
         self.fig = None
-        self.lag =12
-        self.fSteps=6
+        self.lag = 12
+        self.fSteps = 6
         self._up_to_date = True
 
-
     def preprocess(self):
-        """
-            resolution:char
-            'Y'|'M'|'W'|'D'
-            default:'M'
-
-            returns: tuple of x:datetime64, y:float
-        """
         expenses = list(get_expense_records(User.objects.get(username=self.user),
                                             filter_function=lambda x: x.isApproved == 'Approved').values())
         if len(expenses) == 0: return None
@@ -78,7 +69,7 @@ class VisualizationManager:
 
     def create_plot(self):
         data, pred = self.load_data()
-        future = pd.Series(pd.date_range(
+        future = Series(pd.date_range(
             start=datetime64(data['Time'].iloc[-1], 'M'),
             end=(datetime64(data['Time'].iloc[-1], 'M') + np.timedelta64(6, 'M')),
             freq='M'
@@ -92,14 +83,6 @@ class VisualizationManager:
             self.fig.add_trace(go.Scatter(x=data['Time'], y=data['Trend'], name='Trend'))
         if pred is not None:
             self.fig.add_trace(go.Bar(x=future, y=pred['predicted_mean'], name="Forecast"))
-            # self.fig.add_trace(go.Scatter(
-            #     x=concat([future, future]),
-            #     y=concat([pred['lower Expenses'], pred['upper Expenses']]),
-            #     fill='toself',
-            #     hoveron='points',
-            #     name='90% Confidence Interval'
-            # ))
-            # Plotting CI
             self.fig.add_trace(go.Scatter(x=future, y=pred['upper Expenses'],
                                           fill=None,
                                           mode='lines',
@@ -185,17 +168,14 @@ def forecast(data, lag=12, fSteps=6):
     forecast = results.get_forecast(steps=fSteps)
     confidence_intervals = forecast.conf_int()
     mean_forecast = forecast.predicted_mean
-    forecast = pandas.concat(
+    forecast = concat(
         {
             'forecast': mean_forecast,
             'ci': confidence_intervals},
         axis=1
     )
-    pred = forecast['forecast']['predicted_mean'].iloc[-6:]
-    print(forecast['forecast']['predicted_mean'].iloc[-6:])
-    pred = pred.clip(lower=0)
+    pred = forecast['forecast']['predicted_mean'].iloc[-6:].clip(lower=0)
     upper = forecast['ci']['upper Expenses'].iloc[-6:].clip(lower=0)
     lower = forecast['ci']['lower Expenses'].iloc[-6:].clip(lower=0)
 
-    ret_df = pandas.concat([pred, upper, lower], axis=1)
-    return ret_df
+    return concat([pred, upper, lower], axis=1)
