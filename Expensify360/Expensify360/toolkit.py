@@ -33,7 +33,7 @@ def summarize_expense_records(expenses):
 
 
 def summary(user):
-    all_dict = summarize_expense_records(get_expense_records(user))
+    all_dict = summarize_expense_records(get_expense_records(user, manager=is_manager(user), project_manager=is_project_manager(user)))
     return all_dict
 
 
@@ -148,10 +148,11 @@ def is_project_manager(user):
     return set(project_manager_permissions()).intersection([perm for perm in user.user_permissions.all()]) != set([])
 
 
-def get_expenses(user, manager=True):
+def get_expenses(user, manager=True, project_manager=False):
     """
     :param user: User object
     :param manager: bool, if the user is a manager
+    :param project_manager: boo, if the user is a project manager
     :return: list of Expense objects for which user is responsible
     """
 
@@ -159,26 +160,29 @@ def get_expenses(user, manager=True):
     if manager:
         projects = set(
             list(Project.objects.filter(manager=user).all()) + list(Project.objects.filter(second_manager=user)))
+    elif project_manager:
+        projects = list(user.projects_led.all())
     else:
         projects = list(user.project_set.all())
     project_names = [project.name for project in projects]
     expenses = []
     for name in project_names:
         with suppress(Exception):
-            if not manager:
+            if not manager and not project_manager:
                 expenses += Expense.objects.filter(project=name).filter(userID=user.username).all()
             else:
                 expenses += Expense.objects.filter(project=name).all()
     return expenses
 
 
-def get_expense_records(user, filter_function=None, manager=True):
+def get_expense_records(user, filter_function=None, manager=True, project_manager=False):
     """
         :param user: User object
         :param filter_function: optional, function that takes
                 an expense object and returns a bool. Used to filter
                 expenses by a criteria i.e. approval status, requester, etc.
-        :param manager: bool, if this user is a manager or project manager
+        :param manager: bool, if this user is a manager or project manager, default True
+        :param project_manager: bool, default False
 
         :return:
             a dict[expense object: data].
@@ -192,7 +196,7 @@ def get_expense_records(user, filter_function=None, manager=True):
                 data.amount:float, expense total
                 data.edited: bool
     """
-    expenses = get_expenses(user, manager=manager)
+    expenses = get_expenses(user, manager=manager, project_manager=project_manager)
 
     if filter_function: expenses = [e for e in expenses if filter_function(e)]
     records = {
