@@ -161,7 +161,7 @@ class VisualizationManager:
 
 
 def forecast(data, lag=12, fSteps=6):
-    model = tsa.SARIMAX(data['Expenses'], order=(lag, 0, 1), trend='t')
+    model = tsa.SARIMAX(data['Expenses'], order=(lag, 0, 1), trend='t', filter_concentrated=True)
 
     results = model.fit()
 
