@@ -26,7 +26,6 @@ def homepage(request):
 def get_chart(request):
     lookback = 300
     resolution = 'M'
-    # TODO add buttons to change resolution in template ['Y', 'M', 'W'] and lookback
     vm = VisualizationManager.load(f'{lookback}_{resolution}_{request.user}')
     VisualizationManager.save(vm)
     chart = vm.create_plot()
@@ -93,7 +92,6 @@ def create_proj(request):
 @login_required
 @permission_required('auth.add_user')
 def manage_users(request):
-    # TODO: delete project / organization option, warn user on delete
     if request.method == 'POST':
         if 'register' in request.POST:
             # then we're registering a user
@@ -220,7 +218,10 @@ def remove_user(request):
             user.organization_set.remove(group)
         else:
             group = Project.objects.get(name=group_name)
-            if group.second_manager.username == username:
+            num_projects_led_by_current = len(
+                User.objects.get(username=username).projects_led.all())
+            if group.second_manager.username == username and num_projects_led_by_current == 1:
+                # if this user leads another project they keep permissions
                 group.second_manager.user_permissions.set([])
                 group.second_manager = request.user
                 group.save()
@@ -259,7 +260,9 @@ def manage_permissions(request):
         user = User.objects.get(username=username)
         project = Project.objects.get(name=projectname)
         # remove permission from current lead iff they are not a manager
-        if project.second_manager != project.manager:
+        # and lead no other projects
+        num_projects_led_by_current = len(User.objects.get(username=project.second_manager.username).projects_led.all())
+        if project.second_manager != project.manager and num_projects_led_by_current == 1:
             project.second_manager.user_permissions.set([])
         if not is_manager(user):
             user.user_permissions.set(project_manager_permissions())
