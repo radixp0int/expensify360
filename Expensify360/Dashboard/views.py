@@ -23,6 +23,8 @@ def homepage(request):
     return render(request, 'homepage.html', context)
 
 
+@login_required
+@permission_required('Dashboard.add_organization')
 def get_chart(request):
     lookback = 300
     resolution = 'M'
@@ -290,6 +292,7 @@ def manage_permissions(request):
 
 
 @login_required
+@permission_required('Can edit expense')
 def expense_manager(request):
     if request.method == 'POST' and 'change' in request.POST:
         id, new_status = request.POST.get('change').split('_')
