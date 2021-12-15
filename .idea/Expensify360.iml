@@ -22,7 +22,7 @@
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludePattern pattern="shelf" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.9 (exp_dec_14)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.9 (django_env)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="plotly-latest" level="application" />
   </component>
