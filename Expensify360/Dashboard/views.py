@@ -16,9 +16,14 @@ def homepage(request):
                'is_manager': is_manager(request.user),
                'summary': summary(request.user)
                }
-    if is_manager(request.user):
+    today = np.datetime64(datetime.datetime.now(), 'D')
+    if is_manager(request.user) or is_project_manager(request.user):
         expenses = get_expense_records(
-            request.user, filter_function=lambda e: e.submissionDate == np.datetime64(datetime.datetime.now(), 'D'))
+            request.user, filter_function=lambda e: e.submissionDate == today)
+        context['today_expenses_count'] = len(expenses.values())
+    else:
+        expenses = get_expense_records(
+            request.user, manager=False, filter_function=lambda e: np.datetime64(e.submissionDate, 'D') == today and e.userID == request.user.username)
         context['today_expenses_count'] = len(expenses.values())
     return render(request, 'homepage.html', context)
 
@@ -292,7 +297,7 @@ def manage_permissions(request):
 
 
 @login_required
-@permission_required('Can edit expense')
+@permission_required('Expenses.change_expense')
 def expense_manager(request):
     if request.method == 'POST' and 'change' in request.POST:
         id, new_status = request.POST.get('change').split('_')
