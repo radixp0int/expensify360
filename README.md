@@ -14,22 +14,15 @@ Expensify360 is a business expense tool created by:
 
 ## Features
 
-- Highlight Feature 1
-- Highlight Feature 2
-- Highlight Feature 3
-- Highlight Feature 4
-- Highlight Feature 5
+- Time, Business, and Hour Expense Entry.
+- Ability to manage multiple projects across several organizations.
+- Ability for managers to review and edit employee expenses.
+- Expense predictions.
 
-Markdown is a lightweight markup language based on the formatting conventions
-that people naturally use in email.
-
-This text you see here is *actually- written in Markdown! To get a feel
-for Markdown's syntax, type some text into the left window and
-watch the results in the right.
 
 ## Tech
 
-Dillinger uses a number of open source projects to work properly:
+Expensify360 uses a number of open source projects to work properly:
 
 - [Django] - Python-based open-source web framework
 - [Bootstrap] - A free and open-source CSS framework 
